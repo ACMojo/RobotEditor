@@ -1,0 +1,17 @@
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.csprojResolveAssemblyReference.cache
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\View\MainWindow.g.cs
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\View\RobotValues.g.cs
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\App.g.cs
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor_MarkupCompile.cache
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor_MarkupCompile.lref
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\View\MainWindow.baml
+C:\Users\alexa\source\repos\Robot\RobotEditor\bin\Debug\RobotEditor.exe.config
+C:\Users\alexa\source\repos\Robot\RobotEditor\bin\Debug\RobotEditor.exe
+C:\Users\alexa\source\repos\Robot\RobotEditor\bin\Debug\RobotEditor.pdb
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\View\RobotValues.baml
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.g.resources
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.Properties.Resources.resources
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.csproj.GenerateResource.Cache
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.csproj.CoreCompileInputs.cache
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.exe
+C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\RobotEditor.pdb
