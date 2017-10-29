@@ -13,7 +13,7 @@ namespace RobotEditor.View
         {
             InitializeComponent();
 
-            DataContext = new MainWindowViewModel();
+            DataContext = new MainWindowViewModel(view1);
         }
 
         #endregion

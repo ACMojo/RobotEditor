@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-C:\Users\alexa\source\repos\Robot\RobotEditor\obj\Debug\
+C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\obj\Debug\
 RobotEditor
 none
 false
 DEBUG;TRACE
-C:\Users\alexa\source\repos\Robot\RobotEditor\App.xaml
+C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\App.xaml
 21583926661
 
-18222852557
-131569487696
+201982270318
+68-988768880
 View\MainWindow.xaml;View\RobotValues.xaml;
 
-True
+False
 

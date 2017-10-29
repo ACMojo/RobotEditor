@@ -26,7 +26,6 @@ namespace RobotEditor.ViewModel
         {
 
             Model = robot;
-            //_robot = robot;
 
             _errors.Add(nameof(Name), string.Empty);
 
