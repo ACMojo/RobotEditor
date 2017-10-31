@@ -7,15 +7,15 @@
         xmlns:viewModel="clr-namespace:RobotEditor.ViewModel"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModel:MainWindowViewModel, IsDesignTimeCreatable=false}"
-        Title="MainWindow" Height="437.882" Width="1161.059" MinWidth="1160" MinHeight="437">
+        Title="MainWindow" Height="437.882" Width="1593.059" MinWidth="1590" MinHeight="437">
     <Grid>
         <Grid HorizontalAlignment="Left" Height="396" Margin="3,7,0,0" VerticalAlignment="Top" Width="715">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="9*"/>
                 <ColumnDefinition Width="85*"/>
             </Grid.ColumnDefinitions>
-            <h:HelixViewport3D x:Name="view1" CameraRotationMode="Trackball" ModelUpDirection="0,1,0" Margin="234,10,0,52" Grid.Column="1" ItemsSource="{Binding Path=Models}">
- 
+            <h:HelixViewport3D x:Name="view_Carbody" CameraRotationMode="Trackball" ModelUpDirection="0,1,0" Margin="234,10,0,52" Grid.Column="1" ItemsSource="{Binding Path=CarbodyModels}">
+
             </h:HelixViewport3D>
             <Button x:Name="button_AddCarbody" Content="Add Carbody" HorizontalAlignment="Left" Margin="10,200,0,0" VerticalAlignment="Top" Width="90" Command="{Binding AddCarbody}" Grid.ColumnSpan="2"/>
             <Button x:Name="button_FitToView" Content="Fit to view" HorizontalAlignment="Left" Margin="540,366,0,0" VerticalAlignment="Top" Width="97" Command="{Binding FitToView}" Grid.Column="1"/>
@@ -28,16 +28,17 @@
             <Button x:Name="button_DeleteCarbody" Content="Delete Carbody" HorizontalAlignment="Left" Margin="52,200,0,0" VerticalAlignment="Top" Width="93" Grid.Column="1" Command="{Binding DeleteCarbody}"/>
             <Button x:Name="button_BoundingBox" Content="Calc OOB" Grid.Column="1" HorizontalAlignment="Left" Margin="52,235,0,0" VerticalAlignment="Top" Width="93" Command="{Binding CalcBoundingBox}"/>
         </Grid>
-        <Grid HorizontalAlignment="Left" Height="334" Margin="745,10,0,0" VerticalAlignment="Top" Width="284">
-            <DataGrid x:Name="Robots_Grid" HorizontalAlignment="Left" Height="174" Margin="36,10,0,0" VerticalAlignment="Top" Width="203" ItemsSource="{Binding Robots}" AutoGenerateColumns="False"
+        <Grid HorizontalAlignment="Left" Height="387" Margin="814,10,0,0" VerticalAlignment="Top" Width="736">
+            <DataGrid x:Name="Robots_Grid" HorizontalAlignment="Left" Height="174" Margin="510,10,0,0" VerticalAlignment="Top" Width="203" ItemsSource="{Binding Robots}" AutoGenerateColumns="False"
                   SelectedItem="{Binding SelectedRobot}" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Robot" Width="200" Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}"/>
                 </DataGrid.Columns>
             </DataGrid>
-            <Button x:Name="button_CreateRobot" Content="Add Robot" HorizontalAlignment="Left" Margin="36,231,0,0" VerticalAlignment="Top" Width="100" Command="{Binding AddRobot}"/>
-            <Button x:Name="button_deleteRobot" Content="Delete Robot" HorizontalAlignment="Left" Margin="164,231,0,0" VerticalAlignment="Top" Width="75" Command="{Binding DeleteRobot}"/>
-            <Button x:Name="button_CreateXML" Content="Create XML" HorizontalAlignment="Left" Margin="36,266,0,0" VerticalAlignment="Top" Width="100" Command="{Binding CreateXML}"/>
+            <Button x:Name="button_CreateRobot" Content="Add Robot" HorizontalAlignment="Left" Margin="510,232,0,0" VerticalAlignment="Top" Width="100" Command="{Binding AddRobot}"/>
+            <Button x:Name="button_deleteRobot" Content="Delete Robot" HorizontalAlignment="Left" Margin="638,232,0,0" VerticalAlignment="Top" Width="75" Command="{Binding DeleteRobot}"/>
+            <Button x:Name="button_CreateXML" Content="Create XML" HorizontalAlignment="Left" Margin="510,266,0,0" VerticalAlignment="Top" Width="100" Command="{Binding CreateXML}"/>
+            <h:HelixViewport3D x:Name="view_Robot" CameraRotationMode="Trackball" ModelUpDirection="0,1,0" Margin="10,10,348,43" ItemsSource="{Binding Path=RobotModels}"/>
         </Grid>
     </Grid>
 </Window>

@@ -61,11 +61,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.a))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(A)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(A)] = string.Empty;
 
@@ -84,11 +84,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.alpha))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(Alpha)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(Alpha)] = string.Empty;
 
@@ -107,11 +107,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.d))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(D)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(D)] = string.Empty;
 
@@ -130,11 +130,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.theta))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(Theta)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(Theta)] = string.Empty;
 

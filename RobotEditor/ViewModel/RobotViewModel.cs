@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Windows.Media.Media3D;
 
 using RobotEditor.Model;
 using RobotEditor.View;
@@ -28,6 +29,7 @@ namespace RobotEditor.ViewModel
             Model = robot;
 
             _errors.Add(nameof(Name), string.Empty);
+            _errors.Add(nameof(robotModel), string.Empty);
 
             foreach (var joint in Model.Joints)
                 Joints.Add(new JointViewModel(joint));
@@ -37,6 +39,7 @@ namespace RobotEditor.ViewModel
 
             Joints.CollectionChanged += Joints_CollectionChanged;
         }
+
 
         #endregion
 
@@ -67,6 +70,22 @@ namespace RobotEditor.ViewModel
         #endregion
 
         #region Private methods
+
+        public ModelVisual3D robotModel
+        {
+            get { return Model.RobotModel; }
+            set
+            {
+                if (value.Equals(Model.RobotModel))
+                    return;
+
+                Model.RobotModel = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+
 
         public string Name
         {

@@ -38,3 +38,5 @@ C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\obj\Debug\Robo
 C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\obj\Debug\RobotEditor.csproj.CoreCompileInputs.cache
 C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\obj\Debug\RobotEditor.exe
 C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\obj\Debug\RobotEditor.pdb
+C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\bin\Debug\MathNet.Numerics.dll
+C:\Users\alexa\source\repos\DecisionModel\RobotEditor\RobotEditor\bin\Debug\MathNet.Numerics.xml

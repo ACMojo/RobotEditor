@@ -1,14 +1,19 @@
-﻿namespace RobotEditor.Model
+﻿using System;
+using System.Dynamic;
+
+namespace RobotEditor.Model
 {
     public enum JointTypes { Linear, Rotational };
 
     class Joint
     {
 
-        public double a { get; set; }
-        public double alpha { get; set; }
-        public double d { get; set; }
-        public double theta { get; set; }
+        public double a { get; set;  }
+        public double alpha { get; set;  }
+        public double d { get; set;  }
+        public double theta { get; set;  }
+
+
         public double maxLim { get; set; }
         public double minLim { get; set; }
         public JointTypes JTypes { get; set; }
@@ -40,5 +45,7 @@
             speed = 0.0;
             acceleration = 0.0;
         }
+
+
     }
 }

@@ -27,13 +27,10 @@ namespace RobotEditor.ViewModel
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
 
-        //private Model3D currentModel;
+        private readonly IHelixViewport3D viewportCarbody;
+        private readonly IHelixViewport3D viewportRobot;
 
-        //private string currentModelPath;
-
-        private readonly IHelixViewport3D viewport;
-
-        public MainWindowViewModel(HelixViewport3D viewport)
+        public MainWindowViewModel(HelixViewport3D viewportCarbody, HelixViewport3D viewportRobot)
         {
             CreateXML = new DelegateCommand<object>(CreateXMLExecute, CreateXMLCanExecute);
             AddCarbody = new DelegateCommand<object>(AddCarbodyExecute, AddCarbodyCanExecute);
@@ -43,11 +40,17 @@ namespace RobotEditor.ViewModel
             DeleteRobot = new DelegateCommand<object>(DeleteRobotExecute, DeleteRobotCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
 
-            this.viewport = viewport;
-            this.viewport.ZoomExtents(0);
+            this.viewportCarbody = viewportCarbody;
+            this.viewportRobot = viewportRobot;
+            this.viewportCarbody.ZoomExtents(0);
+            this.viewportRobot.ZoomExtents(0);
 
-            Models.Add(new DefaultLights());
-            Models.Add(new CoordinateSystemVisual3D());
+
+            CarbodyModels.Add(new DefaultLights());
+            CarbodyModels.Add(new CoordinateSystemVisual3D());
+
+            RobotModels.Add(new DefaultLights());
+            //RobotModels.Add(new CoordinateSystemVisual3D());
         }
 
 
@@ -71,11 +74,25 @@ namespace RobotEditor.ViewModel
                 if (Equals(value, _selectedRobot))
                     return;
 
+                if (_selectedRobot != null)
+                {
+                    RobotModels.Remove(_selectedRobot.robotModel);
+                }
+
                 _selectedRobot = value;
+
+                if (_selectedRobot != null)
+                {
+                    RobotModels.Add(_selectedRobot.robotModel);
+                }
+
+
                 RaisePropertyChanged();
 
                 DeleteRobot.RaisePropertyChanged();
                 CreateXML.RaisePropertyChanged();
+
+                this.viewportRobot.ZoomExtents(0);
             }
         }
 
@@ -89,15 +106,15 @@ namespace RobotEditor.ViewModel
 
                 if (_selectedCarbody != null)
                 {
-                    Models.Remove(_selectedCarbody.carbodyModel);
-                    Models.Remove(_selectedCarbody.boundingBox);
+                    CarbodyModels.Remove(_selectedCarbody.carbodyModel);
+                    CarbodyModels.Remove(_selectedCarbody.boundingBox);
                 }
 
                 _selectedCarbody = value;
 
                 if (_selectedCarbody != null)
                 {
-                    Models.Add(_selectedCarbody.carbodyModel);
+                    CarbodyModels.Add(_selectedCarbody.carbodyModel);
                 }
 
                 RaisePropertyChanged();
@@ -105,16 +122,19 @@ namespace RobotEditor.ViewModel
                 DeleteCarbody.RaisePropertyChanged();
                 CalcBoundingBox.RaisePropertyChanged();
 
-                this.viewport.ZoomExtents(0);
+                this.viewportCarbody.ZoomExtents(0);
             }
         }
 
-        public ObservableCollection<Visual3D> Models { get; } = new ObservableCollection<Visual3D>();
+        public ObservableCollection<Visual3D> CarbodyModels { get; } = new ObservableCollection<Visual3D>();
+        public ObservableCollection<Visual3D> RobotModels { get; } = new ObservableCollection<Visual3D>();
 
         private bool AddRobotCanExecute(object arg)
         {
             return true;
         }
+
+
 
         private void AddRobotExecute(object obj)
         {
@@ -123,10 +143,85 @@ namespace RobotEditor.ViewModel
             var result = newRobot.ShowDialog();
 
             if (result == true)
+            {
+                var coordinateSystem = new CoordinateSystemVisual3D();
+                var baseCoordinateSystem = coordinateSystem;
+                baseCoordinateSystem.XAxisColor = Colors.Yellow;
+                baseCoordinateSystem.YAxisColor = Colors.Yellow;
+                baseCoordinateSystem.ZAxisColor = Colors.Yellow;
+
+                baseCoordinateSystem.ArrowLengths = 100.0;
+
+
+                int i = 0;
+                foreach (Joint joint in robot.Joints)
+                {
+                    i++;
+                    var interimCS = new CoordinateSystemVisual3D();
+
+                    if (i == robot.Joints.Count)
+                    {
+                        interimCS.XAxisColor = Colors.Magenta;
+                        interimCS.YAxisColor = Colors.Magenta;
+                        interimCS.ZAxisColor = Colors.Magenta;
+                    }
+                    interimCS.ArrowLengths = 100.0;
+
+
+                    var DH_Matrix = new Matrix3D(
+                        Math.Cos(degreeToRadian(joint.theta)),
+                        Math.Sin(degreeToRadian(joint.theta)),
+                        0.0,
+                        0.0,
+                        -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                        Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                        Math.Sin(degreeToRadian(joint.alpha)),
+                        0.0,
+                        Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                        -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                        Math.Cos(degreeToRadian(joint.alpha)),
+                        0.0,
+                        joint.a * Math.Cos(degreeToRadian(joint.theta)),
+                        joint.a * Math.Sin(degreeToRadian(joint.theta)),
+                        joint.d,
+                        1.0
+                        );
+          
+
+                    interimCS.Transform = new MatrixTransform3D(DH_Matrix);
+
+                    LinesVisual3D line = new LinesVisual3D();
+                    line.Thickness = 5.0;
+                    Point3DCollection PCollection = new Point3DCollection();
+                    PCollection.Add(new Point3D(0.0, 0.0, 0.0));
+                    PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
+                    line.Color = Colors.Gray;
+                    line.Points = PCollection;
+                    coordinateSystem.Children.Add(line);
+
+
+ 
+                    coordinateSystem.Children.Add(interimCS);
+
+                    coordinateSystem = interimCS;
+                    
+                    
+                }
+
+                robot.RobotModel.Children.Add(baseCoordinateSystem);
+
                 Robots.Add(new RobotViewModel(robot));
+            }
+
+            this.viewportRobot.ZoomExtents(0);
 
             if (result != true)
                 return;
+        }
+
+        private double degreeToRadian(double angle)
+        {
+            return (Math.PI / 180) * angle;
         }
 
         private void DeleteRobotExecute(object obj)
@@ -143,8 +238,11 @@ namespace RobotEditor.ViewModel
 
         private void FitToViewExecute(object obj)
         {
+            TranslateTransform3D test = new TranslateTransform3D(3000.0, 0.0, 0.0);
+            SelectedCarbody.Model.CarbodyModel.Transform = test;
 
-            this.viewport.ZoomExtents(0);
+
+            //this.viewport.ZoomExtents(0);
             RaisePropertyChanged();
         }
 
@@ -320,13 +418,16 @@ namespace RobotEditor.ViewModel
             //viewport.Viewport.Children.Add();
 
             SelectedCarbody.boundingBox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(SelectedCarbody.carbodyModel.Content.Bounds.Location, SelectedCarbody.carbodyModel.Content.Bounds.Size), Diameter = 2.0 };
-            Models.Add(SelectedCarbody.boundingBox);
-            
+            CarbodyModels.Add(SelectedCarbody.boundingBox);
 
+
+
+            /*
             foreach (Point3D xy in SelectedCarbody.Model.CarbodyAsMesh.Positions)
             {
                 Console.WriteLine(xy.X);
             }
+            */
 
             RaisePropertyChanged();
         }
