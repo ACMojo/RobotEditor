@@ -436,17 +436,42 @@ namespace RobotEditor.ViewModel
 
                 RootNode.AppendChild(Child);
 
-                
 
+                JointViewModel oldJoint = null;
                 int i = 0;
                 foreach (var joint in _selectedRobot.Joints)
                 {
+                    
+
                     i++;
                     XmlNode JointNode = doc.CreateElement("RobotNode");
                     XmlAttribute JointNodeAttribute = doc.CreateAttribute("name");
-                    JointNodeAttribute.InnerText = "joint " + i;
+                    JointNodeAttribute.InnerText = "joint " + i; 
                     JointNode.Attributes.Append(JointNodeAttribute);
-                    Robot.AppendChild(JointNode);
+                    
+
+                    if (i > 1)
+                    {
+                        XmlNode TransformNode = doc.CreateElement("Transform");
+                        XmlNode DHNode = doc.CreateElement("DH");
+                        XmlAttribute DHNodeAttribute = doc.CreateAttribute("a");
+                        DHNodeAttribute.InnerText = oldJoint.A.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("d");
+                        DHNodeAttribute.InnerText = oldJoint.D.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("alpha");
+                        DHNodeAttribute.InnerText = oldJoint.Alpha.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("theta");
+                        DHNodeAttribute.InnerText = oldJoint.Theta.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("units");
+                        DHNodeAttribute.InnerText = "degree";
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        TransformNode.AppendChild(DHNode);
+                        JointNode.AppendChild(TransformNode);
+                    }
 
                     XmlNode JointTypeNode = doc.CreateElement("Joint");
                     XmlAttribute JointTypeNodeAttribute = doc.CreateAttribute("type");
@@ -475,51 +500,80 @@ namespace RobotEditor.ViewModel
                     JointTypeNode.AppendChild(LimitsNode);
                     JointNode.AppendChild(JointTypeNode);
 
-                    Child = doc.CreateElement("Child");
-                    ChildAttribute = doc.CreateAttribute("name");
-                    ChildAttribute.InnerText = "node " + i;
-                    Child.Attributes.Append(ChildAttribute);
-                    JointNode.AppendChild(Child);
-
-
-                    XmlNode LinkNode = doc.CreateElement("RobotNode");
-                    XmlAttribute LinkNodeAttribute = doc.CreateAttribute("name");
-                    LinkNodeAttribute.InnerText = "node " + i;
-                    LinkNode.Attributes.Append(LinkNodeAttribute);
-
-                    XmlNode TransformNode = doc.CreateElement("Transform");
-                    XmlNode DHNode = doc.CreateElement("DH");
-                    XmlAttribute DHNodeAttribute = doc.CreateAttribute("a");
-                    DHNodeAttribute.InnerText = joint.A.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("d");
-                    DHNodeAttribute.InnerText = joint.D.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("alpha");
-                    DHNodeAttribute.InnerText = joint.Alpha.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("theta");
-                    DHNodeAttribute.InnerText = joint.Theta.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("units");
-                    DHNodeAttribute.InnerText = "degree";
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    TransformNode.AppendChild(DHNode);
-                    LinkNode.AppendChild(TransformNode);
-
                     if (i < _selectedRobot.Joints.Count)
                     {
                         Child = doc.CreateElement("Child");
                         ChildAttribute = doc.CreateAttribute("name");
-                        ChildAttribute.InnerText = "joint " + (i + 1);
+                        ChildAttribute.InnerText = "joint " + (i+1);
                         Child.Attributes.Append(ChildAttribute);
-                        LinkNode.AppendChild(Child);
+                        JointNode.AppendChild(Child);
+                    }
+                    
+
+                    Robot.AppendChild(JointNode);
+
+                    if (i == _selectedRobot.Joints.Count)
+                    {
+                        Child = doc.CreateElement("Child");
+                        ChildAttribute = doc.CreateAttribute("name");
+                        ChildAttribute.InnerText = "tcp";
+                        Child.Attributes.Append(ChildAttribute);
+                        JointNode.AppendChild(Child);
+
+
+                        XmlNode TCPNode = doc.CreateElement("RobotNode");
+                        XmlAttribute TCPNodeAttribute = doc.CreateAttribute("name");
+                        TCPNodeAttribute.InnerText = "tcp";
+                        TCPNode.Attributes.Append(TCPNodeAttribute);
+
+                        XmlNode TransformNode = doc.CreateElement("Transform");
+                        XmlNode DHNode = doc.CreateElement("DH");
+                        XmlAttribute DHNodeAttribute = doc.CreateAttribute("a");
+                        DHNodeAttribute.InnerText = joint.A.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("d");
+                        DHNodeAttribute.InnerText = joint.D.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("alpha");
+                        DHNodeAttribute.InnerText = joint.Alpha.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("theta");
+                        DHNodeAttribute.InnerText = joint.Theta.ToString();
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        DHNodeAttribute = doc.CreateAttribute("units");
+                        DHNodeAttribute.InnerText = "degree";
+                        DHNode.Attributes.Append(DHNodeAttribute);
+                        TransformNode.AppendChild(DHNode);
+                        TCPNode.AppendChild(TransformNode);
+
+                        Robot.AppendChild(TCPNode);
+
                     }
 
-                    Robot.AppendChild(LinkNode);
-                
-                }                
+                    oldJoint = joint;
 
+                }
+
+                XmlNode RobotNodeSet = doc.CreateElement("RobotNodeSet");
+                XmlAttribute RobotNodeSetAttribute = doc.CreateAttribute("name");
+                RobotNodeSetAttribute.InnerText = "robotNodeSet";
+                RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
+                RobotNodeSetAttribute = doc.CreateAttribute("kinematicRoot");
+                RobotNodeSetAttribute.InnerText = "root";
+                RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
+                RobotNodeSetAttribute = doc.CreateAttribute("tcp");
+                RobotNodeSetAttribute.InnerText = "tcp";
+                RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
+
+                for (int j = 0; j < _selectedRobot.Joints.Count; j++)
+                {
+                    Child = doc.CreateElement("Node");
+                    ChildAttribute = doc.CreateAttribute("name");
+                    ChildAttribute.InnerText = "joint " + (j + 1);
+                    Child.Attributes.Append(ChildAttribute);
+                    RobotNodeSet.AppendChild(Child);
+                }
+                Robot.AppendChild(RobotNodeSet);
                 doc.Save(@saveFileDialog.FileName);
             }
 
@@ -564,8 +618,7 @@ namespace RobotEditor.ViewModel
             SelectedCarbody.boundingBox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(SelectedCarbody.carbodyModel.Content.Bounds.Location, SelectedCarbody.carbodyModel.Content.Bounds.Size), Diameter = 2.0 };
             CarbodyModels.Add(SelectedCarbody.boundingBox);
 
-
-
+            
             /*
             foreach (Point3D xy in SelectedCarbody.Model.CarbodyAsMesh.Positions)
             {
