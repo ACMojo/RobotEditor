@@ -19,6 +19,7 @@ namespace RobotEditor.ViewModel
         {
             Model = joint;
 
+            _errors.Add(nameof(Nr), string.Empty);
             _errors.Add(nameof(A), string.Empty);
             _errors.Add(nameof(Alpha), string.Empty);
             _errors.Add(nameof(D), string.Empty);
@@ -52,6 +53,29 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
+
+        public int Nr
+        {
+            get { return Model.nr; }
+            set
+            {
+                if (value.Equals(Model.nr))
+                    return;
+
+                /*if (value < 0)
+                {
+                    _errors[nameof(A)] = "Too small";
+                    return;
+                }*/
+
+                _errors[nameof(Nr)] = string.Empty;
+
+                Model.nr = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
 
         public double A
         {
@@ -153,11 +177,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.maxLim))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(MaxLim)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(MaxLim)] = string.Empty;
 
@@ -177,11 +201,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.minLim))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(MinLim)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(MinLim)] = string.Empty;
 
@@ -200,11 +224,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.speed))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(Speed)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(Speed)] = string.Empty;
 
@@ -223,11 +247,11 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.acceleration))
                     return;
 
-                if (value < 0)
+                /*if (value < 0)
                 {
                     _errors[nameof(Acceleration)] = "Too small";
                     return;
-                }
+                }*/
 
                 _errors[nameof(Acceleration)] = string.Empty;
 

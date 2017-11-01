@@ -39,6 +39,7 @@ namespace RobotEditor.ViewModel
             AddRobot = new DelegateCommand<object>(AddRobotExecute, AddRobotCanExecute);
             DeleteRobot = new DelegateCommand<object>(DeleteRobotExecute, DeleteRobotCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
+            EditRobot = new DelegateCommand<object>(EditRobotExecute, EditRobotCanExecute);
 
             this.viewportCarbody = viewportCarbody;
             this.viewportRobot = viewportRobot;
@@ -64,6 +65,7 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> AddCarbody { get; }
         public DelegateCommand<object> DeleteCarbody { get; }
         public DelegateCommand<object> FitToView { get; }
+        public DelegateCommand<object> EditRobot { get; }
 
 
         public RobotViewModel SelectedRobot
@@ -91,6 +93,7 @@ namespace RobotEditor.ViewModel
 
                 DeleteRobot.RaisePropertyChanged();
                 CreateXML.RaisePropertyChanged();
+                EditRobot.RaisePropertyChanged();
 
                 this.viewportRobot.ZoomExtents(0);
             }
@@ -144,8 +147,91 @@ namespace RobotEditor.ViewModel
 
             if (result == true)
             {
+                //var coordinateSystem = new CoordinateSystemVisual3D();
+                //var baseCoordinateSystem = coordinateSystem;
+
+                //baseCoordinateSystem.XAxisColor = Colors.Yellow;
+                //baseCoordinateSystem.YAxisColor = Colors.Yellow;
+                //baseCoordinateSystem.ZAxisColor = Colors.Yellow;
+
+                //baseCoordinateSystem.ArrowLengths = 100.0;
+
+
+                //int i = 0;
+                //foreach (Joint joint in robot.Joints)
+                //{
+                //    i++;
+                //    var interimCS = new CoordinateSystemVisual3D();
+
+                //    if (i == robot.Joints.Count)
+                //    {
+                //        interimCS.XAxisColor = Colors.Magenta;
+                //        interimCS.YAxisColor = Colors.Magenta;
+                //        interimCS.ZAxisColor = Colors.Magenta;
+                //    }
+                //    interimCS.ArrowLengths = 100.0;
+
+
+                //    var DH_Matrix = new Matrix3D(
+                //        Math.Cos(degreeToRadian(joint.theta)),
+                //        Math.Sin(degreeToRadian(joint.theta)),
+                //        0.0,
+                //        0.0,
+                //        -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                //        Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                //        Math.Sin(degreeToRadian(joint.alpha)),
+                //        0.0,
+                //        Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                //        -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                //        Math.Cos(degreeToRadian(joint.alpha)),
+                //        0.0,
+                //        joint.a * Math.Cos(degreeToRadian(joint.theta)),
+                //        joint.a * Math.Sin(degreeToRadian(joint.theta)),
+                //        joint.d,
+                //        1.0
+                //        );
+
+
+                //    interimCS.Transform = new MatrixTransform3D(DH_Matrix);
+
+                //    LinesVisual3D line = new LinesVisual3D();
+                //    line.Thickness = 5.0;
+                //    Point3DCollection PCollection = new Point3DCollection();
+                //    PCollection.Add(new Point3D(0.0, 0.0, 0.0));
+                //    PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
+                //    line.Color = Colors.Gray;
+                //    line.Points = PCollection;
+                //    coordinateSystem.Children.Add(line);
+
+
+
+                //    coordinateSystem.Children.Add(interimCS);
+
+                //    coordinateSystem = interimCS;
+
+
+                //}
+
+                //robot.RobotModel.Children.Add(baseCoordinateSystem);
+
+                robot.RobotModel.Children.Clear();
+                drawRobotModel(robot);
+                //drawVoxelMap(robot);
+                Robots.Add(new RobotViewModel(robot));
+            }
+
+            this.viewportRobot.ZoomExtents(0);
+
+            if (result != true)
+                return;
+        }
+
+
+        private void drawRobotModel(Robot robot)
+        {
                 var coordinateSystem = new CoordinateSystemVisual3D();
                 var baseCoordinateSystem = coordinateSystem;
+
                 baseCoordinateSystem.XAxisColor = Colors.Yellow;
                 baseCoordinateSystem.YAxisColor = Colors.Yellow;
                 baseCoordinateSystem.ZAxisColor = Colors.Yellow;
@@ -186,10 +272,11 @@ namespace RobotEditor.ViewModel
                         joint.d,
                         1.0
                         );
-          
+
 
                     interimCS.Transform = new MatrixTransform3D(DH_Matrix);
 
+                    
                     LinesVisual3D line = new LinesVisual3D();
                     line.Thickness = 5.0;
                     Point3DCollection PCollection = new Point3DCollection();
@@ -198,26 +285,83 @@ namespace RobotEditor.ViewModel
                     line.Color = Colors.Gray;
                     line.Points = PCollection;
                     coordinateSystem.Children.Add(line);
-
-
- 
+                
                     coordinateSystem.Children.Add(interimCS);
 
                     coordinateSystem = interimCS;
-                    
-                    
                 }
 
+                //robot.RobotModel.Children.Clear();
                 robot.RobotModel.Children.Add(baseCoordinateSystem);
+        }
 
-                Robots.Add(new RobotViewModel(robot));
+
+        private void drawVoxelMap(Robot robot)
+        {
+            robot.RobotModel.Children.Clear();
+            for (int i = 0; i < 120; i++)
+            {
+                for (int j = 0; j < 120; j++)
+                {
+                    for (int k = 0; k < 120; k++)
+                    {
+                        /*var vm = new MeshGeometryVisual3D();
+                        var mb = new MeshBuilder();
+                        mb.AddBox(robot.VoxelMap[i, j, k].PositionFromRobotBase, 10.0, 10.0, 10.0);
+                        vm.MeshGeometry = mb.ToMesh();
+                        vm.Material = MaterialHelper.CreateMaterial(robot.VoxelMap[i, j, k].Colour);
+                        robot.RobotModel.Children.Add(vm);
+                         */
+
+
+                        PointsVisual3D line = new PointsVisual3D();
+                        line.Size = 5.0;
+                        TranslateTransform3D tr = new TranslateTransform3D();
+                        tr.OffsetX = i * 6;
+                        tr.OffsetY = j * 6;
+                        tr.OffsetZ = k * 6;
+
+                        line.Transform = tr;
+                        line.Color = Colors.Gray;
+                        robot.RobotModel.Children.Add(line);
+
+                        
+                    }
+                }
+            }
+            //robot.RobotModel.Children.Clear();
+            //robot.RobotModel.Children.Add(baseCoordinateSystem);
+
+            //return robot;
+
+        }
+
+
+        private bool EditRobotCanExecute(object arg)
+        {
+            return SelectedRobot != null;
+        }
+
+
+
+        private void EditRobotExecute(object obj)
+        {
+            //var robot = new Robot(0, "Roboter " + Robots.Count);
+            var newRobot = new RobotValues { DataContext = new RobotViewModel(_selectedRobot.Model) };
+            var result = newRobot.ShowDialog();
+
+            if (result == true)
+            {
+                RobotModels.Remove(_selectedRobot.robotModel);
+                //_selectedRobot.robotModel = new ModelVisual3D();
+                drawRobotModel(_selectedRobot.Model);
+                RobotModels.Add(_selectedRobot.robotModel);
+                this.viewportRobot.ZoomExtents(0);
             }
 
-            this.viewportRobot.ZoomExtents(0);
-
-            if (result != true)
-                return;
         }
+
+
 
         private double degreeToRadian(double angle)
         {

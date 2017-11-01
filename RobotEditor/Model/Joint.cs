@@ -8,6 +8,7 @@ namespace RobotEditor.Model
     class Joint
     {
 
+        public int nr { get; set; }
         public double a { get; set;  }
         public double alpha { get; set;  }
         public double d { get; set;  }
@@ -20,8 +21,9 @@ namespace RobotEditor.Model
         public double speed { get; set; }
         public double acceleration { get; set; }
 
-        public Joint(double a, double alpha, double d, double theta, double maxLim, double minLim, JointTypes jTypes, double speed, double acceleration)
+        public Joint(int Nr, double a, double alpha, double d, double theta, double maxLim, double minLim, JointTypes jTypes, double speed, double acceleration)
         {
+            this.nr = Nr;
             this.a = a;
             this.alpha = alpha;
             this.d = d;
@@ -33,8 +35,9 @@ namespace RobotEditor.Model
             this.acceleration = acceleration;
         }
 
-        public Joint()
+        public Joint(int Nr)
         {
+            nr = Nr;
             a = 0.0;
             alpha = 0.0;
             d = 0.0;

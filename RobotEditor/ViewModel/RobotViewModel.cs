@@ -85,6 +85,19 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        public Voxel[,,] voxelMap
+        {
+            get { return Model.VoxelMap; }
+            set
+            {
+                if (value.Equals(Model.VoxelMap))
+                    return;
+
+                Model.VoxelMap = value;
+
+                RaisePropertyChanged();
+            }
+        }
 
 
         public string Name
@@ -112,7 +125,7 @@ namespace RobotEditor.ViewModel
 
         private void AddJointExecute(object obj)
         {
-            var joint = new Joint();
+            var joint = new Joint(Model.Joints.Count+1);
 
             Joints.Add(new JointViewModel(joint));
 

@@ -39,6 +39,7 @@
             <Button x:Name="button_deleteRobot" Content="Delete Robot" HorizontalAlignment="Left" Margin="638,232,0,0" VerticalAlignment="Top" Width="75" Command="{Binding DeleteRobot}"/>
             <Button x:Name="button_CreateXML" Content="Create XML" HorizontalAlignment="Left" Margin="510,266,0,0" VerticalAlignment="Top" Width="100" Command="{Binding CreateXML}"/>
             <h:HelixViewport3D x:Name="view_Robot" CameraRotationMode="Trackball" ModelUpDirection="0,1,0" Margin="10,10,348,43" ItemsSource="{Binding Path=RobotModels}"/>
+            <Button x:Name="button_EditRobot" Content="Edit Robot" HorizontalAlignment="Left" Margin="638,266,0,0" VerticalAlignment="Top" Width="75" Command="{Binding EditRobot}"/>
         </Grid>
     </Grid>
 </Window>
