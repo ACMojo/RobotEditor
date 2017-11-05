@@ -12,16 +12,20 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
+using VirtualRobotWrapper;
 
 using Microsoft.Win32;
 using System.Xml;
+
+using MathGeoLibWrapper;
+
 using RobotEditor.Model;
 using RobotEditor.View;
 
 namespace RobotEditor.ViewModel
 {
     internal class MainWindowViewModel : BaseViewModel
-
+        
     {
 
         private RobotViewModel _selectedRobot;
@@ -382,11 +386,7 @@ namespace RobotEditor.ViewModel
 
         private void FitToViewExecute(object obj)
         {
-            TranslateTransform3D test = new TranslateTransform3D(3000.0, 0.0, 0.0);
-            SelectedCarbody.Model.CarbodyModel.Transform = test;
-
-
-            //this.viewport.ZoomExtents(0);
+            viewportCarbody.ZoomExtents(0);
             RaisePropertyChanged();
         }
 
@@ -575,6 +575,29 @@ namespace RobotEditor.ViewModel
                 }
                 Robot.AppendChild(RobotNodeSet);
                 doc.Save(@saveFileDialog.FileName);
+
+
+
+
+                VirtualRobotManipulability test = new VirtualRobotManipulability();
+                if (test.Init(0, null, saveFileDialog.FileName, "robotNodeSet", "root", "tcp") == true)
+                {
+                    ManipulabilityVoxel[] vox = test.GetManipulability((float)Math.PI / 2, (float)100.0, 10000);
+
+                    PointsVisual3D line = new PointsVisual3D();
+                    line.Size = 5.0;
+                    TranslateTransform3D tr = new TranslateTransform3D();
+
+                    tr.OffsetX = vox[0].x;
+                    tr.OffsetY = vox[0].y;
+                    tr.OffsetZ = vox[0].z;
+
+                    line.Transform = tr;
+                    line.Color = Colors.Gray;
+
+                    SelectedRobot.robotModel.Children.Add(line);
+
+                }
             }
 
             RaisePropertyChanged();
@@ -601,7 +624,7 @@ namespace RobotEditor.ViewModel
         private void DeleteCarbodyExecute(object obj)
         {
             Carbodies.Remove(_selectedCarbody);
-
+            
             RaisePropertyChanged();
         }
 
@@ -613,18 +636,36 @@ namespace RobotEditor.ViewModel
 
         private void CalcBoundingBoxExecute(object obj)
         {
-            //viewport.Viewport.Children.Add();
-
-            SelectedCarbody.boundingBox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(SelectedCarbody.carbodyModel.Content.Bounds.Location, SelectedCarbody.carbodyModel.Content.Bounds.Size), Diameter = 2.0 };
-            CarbodyModels.Add(SelectedCarbody.boundingBox);
-
-            
-            /*
-            foreach (Point3D xy in SelectedCarbody.Model.CarbodyAsMesh.Positions)
+            double[][] PointCloud = new double[SelectedCarbody.Model.CarbodyAsMesh.Positions.Count][];
+            int i = 0;
+            foreach (Point3D pointOnCarbody in SelectedCarbody.Model.CarbodyAsMesh.Positions)
             {
-                Console.WriteLine(xy.X);
+                PointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z }; 
+                i++;
             }
-            */
+            OBBWrapper OBBCalculator = new OBBWrapper(PointCloud);
+
+            var BoxPos = new Point3D(OBBCalculator.Position[0], OBBCalculator.Position[1], OBBCalculator.Position[2]);
+            var BoxSize = new Size3D(OBBCalculator.HalfExtents[0]*2, OBBCalculator.HalfExtents[1]*2, OBBCalculator.HalfExtents[2]*2);
+            var bbox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(BoxPos, BoxSize), Diameter = 2.0 };
+
+            RotateTransform3D BoxRot3D = new RotateTransform3D();
+            AxisAngleRotation3D BoxRot = new AxisAngleRotation3D(new Vector3D(1, 0, 0), OBBCalculator.Axis[0][0]);
+            Transform3DGroup BoxTransformGroup = new Transform3DGroup();
+            BoxRot3D.Rotation = BoxRot;
+            BoxTransformGroup.Children.Add(BoxRot3D);
+
+            BoxRot = new AxisAngleRotation3D(new Vector3D(0, 1, 0), OBBCalculator.Axis[1][1]);
+            BoxRot3D.Rotation = BoxRot;
+            BoxTransformGroup.Children.Add(BoxRot3D);
+
+            BoxRot = new AxisAngleRotation3D(new Vector3D(0, 0, 1), OBBCalculator.Axis[2][2]);
+            BoxRot3D.Rotation = BoxRot;
+            BoxTransformGroup.Children.Add(BoxRot3D);
+
+            bbox.Transform = BoxTransformGroup;
+
+            viewportCarbody.Viewport.Children.Add(bbox);
 
             RaisePropertyChanged();
         }
