@@ -75,6 +75,7 @@
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\BoundingBox.cs" />
     <Compile Include="ViewModel\CarbodyViewModel.cs" />
+    <Compile Include="ViewModel\ColorGradient.cs" />
     <Compile Include="ViewModel\DelegateCommand.cs" />
     <Compile Include="ViewModel\JointViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />

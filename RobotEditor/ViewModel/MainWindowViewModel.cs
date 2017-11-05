@@ -47,15 +47,18 @@ namespace RobotEditor.ViewModel
 
             this.viewportCarbody = viewportCarbody;
             this.viewportRobot = viewportRobot;
-            this.viewportCarbody.ZoomExtents(0);
-            this.viewportRobot.ZoomExtents(0);
 
 
             CarbodyModels.Add(new DefaultLights());
-            CarbodyModels.Add(new CoordinateSystemVisual3D());
+            CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+            this.viewportCarbody.ZoomExtents(0);
 
             RobotModels.Add(new DefaultLights());
-            //RobotModels.Add(new CoordinateSystemVisual3D());
+            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0} );
+            
+            this.viewportRobot.ZoomExtents(0);
+
+            RaisePropertyChanged();
         }
 
 
@@ -146,6 +149,12 @@ namespace RobotEditor.ViewModel
         private void AddRobotExecute(object obj)
         {
             var robot = new Robot(0, "Roboter " + Robots.Count);
+            robot.Joints.Add(new Joint(1,0.0, -90.0, 0.0, 90.0, 160.0, -160.0, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(2, 431.0, 0.0, 149.0, 0.0, 45.0, -225, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(3, -20.0, 90.0, 0.0, 90.0, 225, -45, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(4, 0.0, -90.0, 433.0, 0.0, 170, -110, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(5, 0.0, 90.0, 0.0, 0.0, 100, -100, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(6, 0.0, 0.0, 56.0, 0.0, 266, -266, JointTypes.Rotational, 0.0, 0.0));
             var newRobot = new RobotValues { DataContext = new RobotViewModel(robot) };
             var result = newRobot.ShowDialog();
 
@@ -579,23 +588,43 @@ namespace RobotEditor.ViewModel
 
 
 
-                VirtualRobotManipulability test = new VirtualRobotManipulability();
-                if (test.Init(0, null, saveFileDialog.FileName, "robotNodeSet", "root", "tcp") == true)
+                VirtualRobotManipulability VrManip = new VirtualRobotManipulability();
+                if (VrManip.Init(0, null, @saveFileDialog.FileName, "robotNodeSet", "root", "tcp") == true)
                 {
-                    ManipulabilityVoxel[] vox = test.GetManipulability((float)Math.PI / 2, (float)100.0, 10000);
+                    ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 1000000);
 
-                    PointsVisual3D line = new PointsVisual3D();
-                    line.Size = 5.0;
-                    TranslateTransform3D tr = new TranslateTransform3D();
 
-                    tr.OffsetX = vox[0].x;
-                    tr.OffsetY = vox[0].y;
-                    tr.OffsetZ = vox[0].z;
+                    ManipulabilityVoxel voxOld = new ManipulabilityVoxel();
+                    ColorGradient colorCalculator = new ColorGradient();
+                    double maxValue = 0.0;
+                    for (int j = 0; j < vox.Length; j++)
+                    {
+                        // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
 
-                    line.Transform = tr;
-                    line.Color = Colors.Gray;
+                        if (vox[j].x == voxOld.x && vox[j].y == voxOld.y && vox[j].z == voxOld.z)
+                        {
+                            if (vox[j].value > maxValue)
+                            {
+                                maxValue = vox[j].value;
+                            }                       
+                        }
+                        else
+                        {
+                            var vm = new MeshGeometryVisual3D();
+                            var mb = new MeshBuilder();
+                            mb.AddBox(new Point3D(voxOld.x * 100, voxOld.y * 100, voxOld.z * 100), 10.0, 10.0, 10.0);
+                            vm.MeshGeometry = mb.ToMesh();
+                            if (maxValue > 0.2)
+                            {
+                                Console.WriteLine(maxValue);
+                            }
+                            vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(maxValue,0.4));
+                            SelectedRobot.robotModel.Children.Add(vm);
 
-                    SelectedRobot.robotModel.Children.Add(line);
+                            voxOld = vox[j];
+                            maxValue = vox[j].value;
+                        }
+                    }
 
                 }
             }
@@ -645,25 +674,33 @@ namespace RobotEditor.ViewModel
             }
             OBBWrapper OBBCalculator = new OBBWrapper(PointCloud);
 
-            var BoxPos = new Point3D(OBBCalculator.Position[0], OBBCalculator.Position[1], OBBCalculator.Position[2]);
+            var BoxPos = new Point3D(-OBBCalculator.HalfExtents[0], -OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
             var BoxSize = new Size3D(OBBCalculator.HalfExtents[0]*2, OBBCalculator.HalfExtents[1]*2, OBBCalculator.HalfExtents[2]*2);
             var bbox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(BoxPos, BoxSize), Diameter = 2.0 };
+   
+            var DH_Matrix = new Matrix3D(
+                    OBBCalculator.Axis[0][0],
+                    OBBCalculator.Axis[0][1],
+                    OBBCalculator.Axis[0][2],
+                0.0,
+                    OBBCalculator.Axis[1][0],
+                    OBBCalculator.Axis[1][1],
+                    OBBCalculator.Axis[1][2],
+                0.0,
+                    OBBCalculator.Axis[2][0],
+                    OBBCalculator.Axis[2][1],
+                    OBBCalculator.Axis[2][2],
+                0.0,
+                    OBBCalculator.Position[0],
+                    OBBCalculator.Position[1],
+                    OBBCalculator.Position[2],
+                1.0
+            );
 
-            RotateTransform3D BoxRot3D = new RotateTransform3D();
-            AxisAngleRotation3D BoxRot = new AxisAngleRotation3D(new Vector3D(1, 0, 0), OBBCalculator.Axis[0][0]);
-            Transform3DGroup BoxTransformGroup = new Transform3DGroup();
-            BoxRot3D.Rotation = BoxRot;
-            BoxTransformGroup.Children.Add(BoxRot3D);
 
-            BoxRot = new AxisAngleRotation3D(new Vector3D(0, 1, 0), OBBCalculator.Axis[1][1]);
-            BoxRot3D.Rotation = BoxRot;
-            BoxTransformGroup.Children.Add(BoxRot3D);
+            
+            bbox.Transform = new MatrixTransform3D(DH_Matrix);
 
-            BoxRot = new AxisAngleRotation3D(new Vector3D(0, 0, 1), OBBCalculator.Axis[2][2]);
-            BoxRot3D.Rotation = BoxRot;
-            BoxTransformGroup.Children.Add(BoxRot3D);
-
-            bbox.Transform = BoxTransformGroup;
 
             viewportCarbody.Viewport.Children.Add(bbox);
 
