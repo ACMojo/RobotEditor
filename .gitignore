@@ -1,0 +1,15 @@
+*.scc
+*.vsscc
+*.vssscc
+*.vspscc
+*.user
+*.suo
+.vs
+obj
+bin
+Temp
+Debug
+Release
+/.vs
+/RobotEditor/obj
+/RobotEditor/bin
