@@ -129,4 +129,9 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy /E /I /Q /H /R /Y "$(ProjectDir)\..\RobotWrapper\*.dll" "$(TargetDir)"
+
+echo Copied *.dll from $(ProjectDir)\..\RobotWrapper to $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

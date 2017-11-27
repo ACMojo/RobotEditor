@@ -37,7 +37,12 @@ Class VirtualRobotWrapper.VirtualRobotManipulability: AutoLayout, AnsiClass, Cla
     Void .ctor(): PrivateScope, Public, HideBySig, SpecialName, RTSpecialName
   Interfaces:
     System.IDisposable
+  Fields:
+    Single[] MinBox : Public
+    Single[] MaxBox : Public
+    Single MaxManipulability : Public
   Methods:
     Init(Int32, String[], String, String, String, String): PrivateScope, Public, HideBySig
-    GetManipulability(Single, Single, Int32): PrivateScope, Public, HideBySig
+    GetManipulability(Single, Single, Int32, Boolean(HasFieldMarshal), Boolean(HasFieldMarshal), Boolean(HasFieldMarshal), Single): PrivateScope, Public, HideBySig
+    GetManipulability(Single, Single, Int32, Boolean(HasFieldMarshal), Boolean(HasFieldMarshal)): PrivateScope, Public, HideBySig
     Dispose(): PrivateScope, Public, Final, Virtual, HideBySig

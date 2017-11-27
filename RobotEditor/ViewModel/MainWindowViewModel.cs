@@ -585,44 +585,49 @@ namespace RobotEditor.ViewModel
                 Robot.AppendChild(RobotNodeSet);
                 doc.Save(@saveFileDialog.FileName);
 
-
-
-
-                VirtualRobotManipulability VrManip = new VirtualRobotManipulability();
-                if (VrManip.Init(0, null, @saveFileDialog.FileName, "robotNodeSet", "root", "tcp") == true)
+                float[] maxB;
+                float[] minB;
+                float maxManip;
+                using (var VrManip = new VirtualRobotManipulability())
                 {
-                    ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 1000000);
-
-
-                    ManipulabilityVoxel voxOld = new ManipulabilityVoxel();
-                    ColorGradient colorCalculator = new ColorGradient();
-                    double maxValue = 0.0;
-                    for (int j = 0; j < vox.Length; j++)
+                    if (VrManip.Init(0, null, @saveFileDialog.FileName, "robotNodeSet", "root", "tcp"))
                     {
-                        // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
+                        ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 1000000, false, false, false, 50f);
 
-                        if (vox[j].x == voxOld.x && vox[j].y == voxOld.y && vox[j].z == voxOld.z)
+                        minB = VrManip.MinBox;
+                        maxB = VrManip.MaxBox;
+                        maxManip = VrManip.MaxManipulability;
+
+                        ManipulabilityVoxel voxOld = new ManipulabilityVoxel();
+                        ColorGradient colorCalculator = new ColorGradient();
+                        double maxValue = 0.0;
+                        for (int j = 0; j < vox.Length; j++)
                         {
-                            if (vox[j].value > maxValue)
+                            // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
+
+                            if (vox[j].x == voxOld.x && vox[j].y == voxOld.y && vox[j].z == voxOld.z)
                             {
-                                maxValue = vox[j].value;
+                                if (vox[j].value > maxValue)
+                                {
+                                    maxValue = vox[j].value;
+                                }
                             }                       
-                        }
-                        else
-                        {
-                            var vm = new MeshGeometryVisual3D();
-                            var mb = new MeshBuilder();
-                            mb.AddBox(new Point3D(voxOld.x * 100, voxOld.y * 100, voxOld.z * 100), 10.0, 10.0, 10.0);
-                            vm.MeshGeometry = mb.ToMesh();
-                            if (maxValue > 0.2)
+                            else
                             {
-                                Console.WriteLine(maxValue);
-                            }
-                            vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(maxValue,0.4));
-                            SelectedRobot.robotModel.Children.Add(vm);
+                                var vm = new MeshGeometryVisual3D();
+                                var mb = new MeshBuilder();
+                                mb.AddBox(new Point3D(minB[0] + voxOld.x * 100, minB[1] + voxOld.y * 100, minB[2] + voxOld.z * 100), 10.0, 10.0, 10.0);
+                                vm.MeshGeometry = mb.ToMesh();
+                                if (maxValue > 0.2)
+                                {
+                                    Console.WriteLine(maxValue);
+                                }
+                                vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(maxValue, 0.4));
+                                SelectedRobot.robotModel.Children.Add(vm);
 
-                            voxOld = vox[j];
-                            maxValue = vox[j].value;
+                                voxOld = vox[j];
+                                maxValue = vox[j].value;
+                            }
                         }
                     }
 
