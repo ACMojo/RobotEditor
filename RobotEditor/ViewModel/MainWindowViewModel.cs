@@ -12,9 +12,11 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
+
 using VirtualRobotWrapper;
 
 using Microsoft.Win32;
+
 using System.Xml;
 
 using MathGeoLibWrapper;
@@ -25,9 +27,8 @@ using RobotEditor.View;
 namespace RobotEditor.ViewModel
 {
     internal class MainWindowViewModel : BaseViewModel
-        
-    {
 
+    {
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
 
@@ -44,23 +45,22 @@ namespace RobotEditor.ViewModel
             DeleteRobot = new DelegateCommand<object>(DeleteRobotExecute, DeleteRobotCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
             EditRobot = new DelegateCommand<object>(EditRobotExecute, EditRobotCanExecute);
+            HitTest = new DelegateCommand<object>(HitTestExecute, HitTestCanExecute);
 
             this.viewportCarbody = viewportCarbody;
             this.viewportRobot = viewportRobot;
-
 
             CarbodyModels.Add(new DefaultLights());
             CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             this.viewportCarbody.ZoomExtents(0);
 
             RobotModels.Add(new DefaultLights());
-            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0} );
-            
+            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+
             this.viewportRobot.ZoomExtents(0);
 
             RaisePropertyChanged();
         }
-
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
         public ObservableCollection<CarbodyViewModel> Carbodies { get; } = new ObservableCollection<CarbodyViewModel>();
@@ -73,7 +73,7 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> DeleteCarbody { get; }
         public DelegateCommand<object> FitToView { get; }
         public DelegateCommand<object> EditRobot { get; }
-
+        public DelegateCommand<object> HitTest { get; }
 
         public RobotViewModel SelectedRobot
         {
@@ -94,7 +94,6 @@ namespace RobotEditor.ViewModel
                 {
                     RobotModels.Add(_selectedRobot.robotModel);
                 }
-
 
                 RaisePropertyChanged();
 
@@ -131,6 +130,7 @@ namespace RobotEditor.ViewModel
 
                 DeleteCarbody.RaisePropertyChanged();
                 CalcBoundingBox.RaisePropertyChanged();
+                HitTest.RaisePropertyChanged();
 
                 this.viewportCarbody.ZoomExtents(0);
             }
@@ -144,12 +144,10 @@ namespace RobotEditor.ViewModel
             return true;
         }
 
-
-
         private void AddRobotExecute(object obj)
         {
             var robot = new Robot(0, "Roboter " + Robots.Count);
-            robot.Joints.Add(new Joint(1,0.0, -90.0, 0.0, 90.0, 160.0, -160.0, JointTypes.Rotational, 0.0, 0.0));
+            robot.Joints.Add(new Joint(1, 0.0, -90.0, 0.0, 90.0, 160.0, -160.0, JointTypes.Rotational, 0.0, 0.0));
             robot.Joints.Add(new Joint(2, 431.0, 0.0, 149.0, 0.0, 45.0, -225, JointTypes.Rotational, 0.0, 0.0));
             robot.Joints.Add(new Joint(3, -20.0, 90.0, 0.0, 90.0, 225, -45, JointTypes.Rotational, 0.0, 0.0));
             robot.Joints.Add(new Joint(4, 0.0, -90.0, 433.0, 0.0, 170, -110, JointTypes.Rotational, 0.0, 0.0));
@@ -169,7 +167,6 @@ namespace RobotEditor.ViewModel
 
                 //baseCoordinateSystem.ArrowLengths = 100.0;
 
-
                 //int i = 0;
                 //foreach (Joint joint in robot.Joints)
                 //{
@@ -183,7 +180,6 @@ namespace RobotEditor.ViewModel
                 //        interimCS.ZAxisColor = Colors.Magenta;
                 //    }
                 //    interimCS.ArrowLengths = 100.0;
-
 
                 //    var DH_Matrix = new Matrix3D(
                 //        Math.Cos(degreeToRadian(joint.theta)),
@@ -204,7 +200,6 @@ namespace RobotEditor.ViewModel
                 //        1.0
                 //        );
 
-
                 //    interimCS.Transform = new MatrixTransform3D(DH_Matrix);
 
                 //    LinesVisual3D line = new LinesVisual3D();
@@ -216,12 +211,9 @@ namespace RobotEditor.ViewModel
                 //    line.Points = PCollection;
                 //    coordinateSystem.Children.Add(line);
 
-
-
                 //    coordinateSystem.Children.Add(interimCS);
 
                 //    coordinateSystem = interimCS;
-
 
                 //}
 
@@ -239,75 +231,69 @@ namespace RobotEditor.ViewModel
                 return;
         }
 
-
         private void drawRobotModel(Robot robot)
         {
-                var coordinateSystem = new CoordinateSystemVisual3D();
-                var baseCoordinateSystem = coordinateSystem;
+            var coordinateSystem = new CoordinateSystemVisual3D();
+            var baseCoordinateSystem = coordinateSystem;
 
-                baseCoordinateSystem.XAxisColor = Colors.Yellow;
-                baseCoordinateSystem.YAxisColor = Colors.Yellow;
-                baseCoordinateSystem.ZAxisColor = Colors.Yellow;
+            baseCoordinateSystem.XAxisColor = Colors.Yellow;
+            baseCoordinateSystem.YAxisColor = Colors.Yellow;
+            baseCoordinateSystem.ZAxisColor = Colors.Yellow;
 
-                baseCoordinateSystem.ArrowLengths = 100.0;
+            baseCoordinateSystem.ArrowLengths = 100.0;
 
+            int i = 0;
+            foreach (Joint joint in robot.Joints)
+            {
+                i++;
+                var interimCS = new CoordinateSystemVisual3D();
 
-                int i = 0;
-                foreach (Joint joint in robot.Joints)
+                if (i == robot.Joints.Count)
                 {
-                    i++;
-                    var interimCS = new CoordinateSystemVisual3D();
-
-                    if (i == robot.Joints.Count)
-                    {
-                        interimCS.XAxisColor = Colors.Magenta;
-                        interimCS.YAxisColor = Colors.Magenta;
-                        interimCS.ZAxisColor = Colors.Magenta;
-                    }
-                    interimCS.ArrowLengths = 100.0;
-
-
-                    var DH_Matrix = new Matrix3D(
-                        Math.Cos(degreeToRadian(joint.theta)),
-                        Math.Sin(degreeToRadian(joint.theta)),
-                        0.0,
-                        0.0,
-                        -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                        Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                        Math.Sin(degreeToRadian(joint.alpha)),
-                        0.0,
-                        Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                        -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                        Math.Cos(degreeToRadian(joint.alpha)),
-                        0.0,
-                        joint.a * Math.Cos(degreeToRadian(joint.theta)),
-                        joint.a * Math.Sin(degreeToRadian(joint.theta)),
-                        joint.d,
-                        1.0
-                        );
-
-
-                    interimCS.Transform = new MatrixTransform3D(DH_Matrix);
-
-                    
-                    LinesVisual3D line = new LinesVisual3D();
-                    line.Thickness = 5.0;
-                    Point3DCollection PCollection = new Point3DCollection();
-                    PCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                    PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
-                    line.Color = Colors.Gray;
-                    line.Points = PCollection;
-                    coordinateSystem.Children.Add(line);
-                
-                    coordinateSystem.Children.Add(interimCS);
-
-                    coordinateSystem = interimCS;
+                    interimCS.XAxisColor = Colors.Magenta;
+                    interimCS.YAxisColor = Colors.Magenta;
+                    interimCS.ZAxisColor = Colors.Magenta;
                 }
+                interimCS.ArrowLengths = 100.0;
 
-                //robot.RobotModel.Children.Clear();
-                robot.RobotModel.Children.Add(baseCoordinateSystem);
+                var DH_Matrix = new Matrix3D(
+                    Math.Cos(degreeToRadian(joint.theta)),
+                    Math.Sin(degreeToRadian(joint.theta)),
+                    0.0,
+                    0.0,
+                    -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                    Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
+                    Math.Sin(degreeToRadian(joint.alpha)),
+                    0.0,
+                    Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                    -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
+                    Math.Cos(degreeToRadian(joint.alpha)),
+                    0.0,
+                    joint.a * Math.Cos(degreeToRadian(joint.theta)),
+                    joint.a * Math.Sin(degreeToRadian(joint.theta)),
+                    joint.d,
+                    1.0
+                );
+
+                interimCS.Transform = new MatrixTransform3D(DH_Matrix);
+
+                LinesVisual3D line = new LinesVisual3D();
+                line.Thickness = 5.0;
+                Point3DCollection PCollection = new Point3DCollection();
+                PCollection.Add(new Point3D(0.0, 0.0, 0.0));
+                PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
+                line.Color = Colors.Gray;
+                line.Points = PCollection;
+                coordinateSystem.Children.Add(line);
+
+                coordinateSystem.Children.Add(interimCS);
+
+                coordinateSystem = interimCS;
+            }
+
+            //robot.RobotModel.Children.Clear();
+            robot.RobotModel.Children.Add(baseCoordinateSystem);
         }
-
 
         private void drawVoxelMap(Robot robot)
         {
@@ -326,7 +312,6 @@ namespace RobotEditor.ViewModel
                         robot.RobotModel.Children.Add(vm);
                          */
 
-
                         PointsVisual3D line = new PointsVisual3D();
                         line.Size = 5.0;
                         TranslateTransform3D tr = new TranslateTransform3D();
@@ -337,8 +322,6 @@ namespace RobotEditor.ViewModel
                         line.Transform = tr;
                         line.Color = Colors.Gray;
                         robot.RobotModel.Children.Add(line);
-
-                        
                     }
                 }
             }
@@ -346,16 +329,45 @@ namespace RobotEditor.ViewModel
             //robot.RobotModel.Children.Add(baseCoordinateSystem);
 
             //return robot;
-
         }
 
+        private bool HitTestCanExecute(object o)
+        {
+            return SelectedCarbody != null;
+        }
+
+        private void HitTestExecute(object o)
+        {
+            RayHitTestParameters hitParams =
+                new RayHitTestParameters(
+                    new Point3D(1000, 0, 0),
+                    new Vector3D(-1, 0, 0)
+                );
+            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+        }
+
+        private HitTestResultBehavior HitTestResultCallback(HitTestResult result)
+        {
+            // Did we hit 3D?
+            var rayResult = result as RayHitTestResult;
+
+            // Did we hit a MeshGeometry3D?
+            var rayMeshResult = rayResult as RayMeshGeometry3DHitTestResult;
+
+            if (rayMeshResult != null)
+            {
+                // Yes we did!
+                Console.WriteLine(rayMeshResult.DistanceToRayOrigin);
+                return HitTestResultBehavior.Stop;
+            }
+
+            return HitTestResultBehavior.Continue;
+        }
 
         private bool EditRobotCanExecute(object arg)
         {
             return SelectedRobot != null;
         }
-
-
 
         private void EditRobotExecute(object obj)
         {
@@ -371,10 +383,7 @@ namespace RobotEditor.ViewModel
                 RobotModels.Add(_selectedRobot.robotModel);
                 this.viewportRobot.ZoomExtents(0);
             }
-
         }
-
-
 
         private double degreeToRadian(double angle)
         {
@@ -404,21 +413,18 @@ namespace RobotEditor.ViewModel
             return true;
         }
 
-
         private bool AddCarbodyCanExecute(object arg)
         {
             return true;
         }
-
 
         private void CreateXMLExecute(object obj)
         {
             var saveFileDialog = new SaveFileDialog();
             if (saveFileDialog.ShowDialog() == true)
             {
-                XmlDocument doc = new XmlDocument();    
-               
-     
+                XmlDocument doc = new XmlDocument();
+
                 XmlNode Robot = doc.CreateElement("Robot");
                 XmlAttribute RobotAttribute = doc.CreateAttribute("Type");
                 RobotAttribute.InnerText = _selectedRobot.Name;
@@ -429,7 +435,6 @@ namespace RobotEditor.ViewModel
                 Robot.Attributes.Append(RobotAttribute);
 
                 doc.AppendChild(Robot);
-                
 
                 XmlNode RootNode = doc.CreateElement("RobotNode");
                 XmlAttribute RootNodeAttribute = doc.CreateAttribute("name");
@@ -445,19 +450,15 @@ namespace RobotEditor.ViewModel
 
                 RootNode.AppendChild(Child);
 
-
                 JointViewModel oldJoint = null;
                 int i = 0;
                 foreach (var joint in _selectedRobot.Joints)
                 {
-                    
-
                     i++;
                     XmlNode JointNode = doc.CreateElement("RobotNode");
                     XmlAttribute JointNodeAttribute = doc.CreateAttribute("name");
-                    JointNodeAttribute.InnerText = "joint " + i; 
+                    JointNodeAttribute.InnerText = "joint " + i;
                     JointNode.Attributes.Append(JointNodeAttribute);
-                    
 
                     if (i > 1)
                     {
@@ -501,7 +502,6 @@ namespace RobotEditor.ViewModel
                     {
                         JointTypeNodeAttribute.InnerText = "revolute";
                         LimitsNodeAttribute.InnerText = "degree";
-
                     }
                     LimitsNode.Attributes.Append(LimitsNodeAttribute);
 
@@ -513,11 +513,10 @@ namespace RobotEditor.ViewModel
                     {
                         Child = doc.CreateElement("Child");
                         ChildAttribute = doc.CreateAttribute("name");
-                        ChildAttribute.InnerText = "joint " + (i+1);
+                        ChildAttribute.InnerText = "joint " + (i + 1);
                         Child.Attributes.Append(ChildAttribute);
                         JointNode.AppendChild(Child);
                     }
-                    
 
                     Robot.AppendChild(JointNode);
 
@@ -528,7 +527,6 @@ namespace RobotEditor.ViewModel
                         ChildAttribute.InnerText = "tcp";
                         Child.Attributes.Append(ChildAttribute);
                         JointNode.AppendChild(Child);
-
 
                         XmlNode TCPNode = doc.CreateElement("RobotNode");
                         XmlAttribute TCPNodeAttribute = doc.CreateAttribute("name");
@@ -556,11 +554,9 @@ namespace RobotEditor.ViewModel
                         TCPNode.AppendChild(TransformNode);
 
                         Robot.AppendChild(TCPNode);
-
                     }
 
                     oldJoint = joint;
-
                 }
 
                 XmlNode RobotNodeSet = doc.CreateElement("RobotNodeSet");
@@ -582,6 +578,7 @@ namespace RobotEditor.ViewModel
                     Child.Attributes.Append(ChildAttribute);
                     RobotNodeSet.AppendChild(Child);
                 }
+
                 Robot.AppendChild(RobotNodeSet);
                 doc.Save(@saveFileDialog.FileName);
 
@@ -642,23 +639,24 @@ namespace RobotEditor.ViewModel
             return SelectedRobot != null;
         }
 
-
         private void AddCarbodyExecute(object obj)
         {
             var FileDialog = new OpenFileDialog();
             if (FileDialog.ShowDialog() == true)
             {
                 var mi = new ModelImporter();
-                var carbody = new Carbody(FileDialog.FileName, FileDialog.SafeFileName, new ModelVisual3D { Content = mi.Load(FileDialog.FileName, null, true) });
+                var carbody = new Carbody(
+                    FileDialog.FileName,
+                    FileDialog.SafeFileName,
+                    new ModelVisual3D { Content = mi.Load(FileDialog.FileName, null, true) });
                 Carbodies.Add(new CarbodyViewModel(carbody));
             }
         }
 
-
         private void DeleteCarbodyExecute(object obj)
         {
             Carbodies.Remove(_selectedCarbody);
-            
+
             RaisePropertyChanged();
         }
 
@@ -667,59 +665,51 @@ namespace RobotEditor.ViewModel
             return SelectedCarbody != null;
         }
 
-
         private void CalcBoundingBoxExecute(object obj)
         {
             double[][] PointCloud = new double[SelectedCarbody.Model.CarbodyAsMesh.Positions.Count][];
             int i = 0;
             foreach (Point3D pointOnCarbody in SelectedCarbody.Model.CarbodyAsMesh.Positions)
             {
-                PointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z }; 
+                PointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z };
                 i++;
             }
+
             OBBWrapper OBBCalculator = new OBBWrapper(PointCloud);
 
             var BoxPos = new Point3D(-OBBCalculator.HalfExtents[0], -OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
-            var BoxSize = new Size3D(OBBCalculator.HalfExtents[0]*2, OBBCalculator.HalfExtents[1]*2, OBBCalculator.HalfExtents[2]*2);
+            var BoxSize = new Size3D(OBBCalculator.HalfExtents[0] * 2, OBBCalculator.HalfExtents[1] * 2, OBBCalculator.HalfExtents[2] * 2);
             var bbox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(BoxPos, BoxSize), Diameter = 2.0 };
-   
+
             var DH_Matrix = new Matrix3D(
-                    OBBCalculator.Axis[0][0],
-                    OBBCalculator.Axis[0][1],
-                    OBBCalculator.Axis[0][2],
+                OBBCalculator.Axis[0][0],
+                OBBCalculator.Axis[0][1],
+                OBBCalculator.Axis[0][2],
                 0.0,
-                    OBBCalculator.Axis[1][0],
-                    OBBCalculator.Axis[1][1],
-                    OBBCalculator.Axis[1][2],
+                OBBCalculator.Axis[1][0],
+                OBBCalculator.Axis[1][1],
+                OBBCalculator.Axis[1][2],
                 0.0,
-                    OBBCalculator.Axis[2][0],
-                    OBBCalculator.Axis[2][1],
-                    OBBCalculator.Axis[2][2],
+                OBBCalculator.Axis[2][0],
+                OBBCalculator.Axis[2][1],
+                OBBCalculator.Axis[2][2],
                 0.0,
-                    OBBCalculator.Position[0],
-                    OBBCalculator.Position[1],
-                    OBBCalculator.Position[2],
+                OBBCalculator.Position[0],
+                OBBCalculator.Position[1],
+                OBBCalculator.Position[2],
                 1.0
             );
 
-
-            
             bbox.Transform = new MatrixTransform3D(DH_Matrix);
-
 
             viewportCarbody.Viewport.Children.Add(bbox);
 
             RaisePropertyChanged();
         }
 
-        
-
         private bool CalcBoundingBoxCanExecute(object arg)
         {
             return SelectedCarbody != null;
         }
-
-
-
     }
 }
