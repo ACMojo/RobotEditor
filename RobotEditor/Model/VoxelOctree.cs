@@ -37,7 +37,7 @@ namespace RobotEditor.Model
 
         public int Level { get; }
 
-        public VoxelNode Root => Nodes[0];
+        public VoxelNodeInner Root => (VoxelNodeInner)Nodes[0];
 
         public VoxelNode[] Nodes { get; }
 
@@ -77,7 +77,10 @@ namespace RobotEditor.Model
                 return null;
 
             var level = CalculateNodeLevel(index);
-            if (level <= 0)
+            if (level == 0)
+                return Root;
+
+            if (level < 0)
                 return null;
 
             index = index % NodePathFactorPerLevel[level];
