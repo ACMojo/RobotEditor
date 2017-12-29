@@ -31,6 +31,7 @@ namespace RobotEditor.ViewModel
     {
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
+        private VoxelOctree octree;
 
         private readonly IHelixViewport3D viewportCarbody;
         private readonly IHelixViewport3D viewportRobot;
@@ -60,6 +61,8 @@ namespace RobotEditor.ViewModel
             this.viewportRobot.ZoomExtents(0);
 
             RaisePropertyChanged();
+
+            octree = VoxelOctree.Create(6000, 100);
         }
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
@@ -338,20 +341,15 @@ namespace RobotEditor.ViewModel
 
         private void HitTestExecute(object o)
         {
-            RayHitTestParameters hitParams =
-                new RayHitTestParameters(
-                    new Point3D(1000, 0, 0),
-                    new Vector3D(-1, 0, 0)
-                );
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+            
         }
 
-        private HitTestResultBehavior HitTestResultCallback(HitTestResult result)
+        private HitTestResultBehavior HitTestResultCallback(RayHitTestParameters parameters, HitTestResult result)
         {
          
             // Did we hit 3D?
-            var rayResult = result as RayHitTestResult;
-            
+            var rayResult = result as RayHitTestResult;            
+
             // Did we hit a MeshGeometry3D?
             var rayMeshResult = rayResult as RayMeshGeometry3DHitTestResult;
 
@@ -361,9 +359,20 @@ namespace RobotEditor.ViewModel
 
                 // Used to show surface hits of ray
                 CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0, Transform = new TranslateTransform3D(rayMeshResult.PointHit.X, rayMeshResult.PointHit.Y, rayMeshResult.PointHit.Z) });
+                
+                if(octree.Set((int)Math.Floor(rayMeshResult.PointHit.X / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Y / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Z / 100.0), 1))
+                {
+                    //Console.WriteLine("Erfolgreich");
+                }
+                else
+                {
+                    var value = octree.Get((int)Math.Floor(rayMeshResult.PointHit.X / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Y / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Z / 100.0));
+                    if (double.IsNaN(value))
+                        Console.WriteLine($"Nicht erfolgreich bei: {rayMeshResult.PointHit.X} {rayMeshResult.PointHit.Y} {rayMeshResult.PointHit.Z}");
+                    else
+                        ;
+                }
 
-                Console.WriteLine("X: " + rayMeshResult.PointHit.X + "Y: " + rayMeshResult.PointHit.Y + "Z: " + rayMeshResult.PointHit.Z);
-        
                 //Console.WriteLine(rayMeshResult.DistanceToRayOrigin);
                 return HitTestResultBehavior.Stop;
 
@@ -414,6 +423,9 @@ namespace RobotEditor.ViewModel
         {
             viewportCarbody.ZoomExtents(0);
             RaisePropertyChanged();
+
+            octree.Set(-6, 27, 9, 1);
+            octree.Set(27, -6, 9, 1);
 
             //var octreeBooth = VoxelOctree.Create(6000d, 100d);
             //Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeBooth.Level, octreeBooth.Nodes.Length);
@@ -918,7 +930,7 @@ namespace RobotEditor.ViewModel
                 startPoint,
                 new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
             );
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(hitParams, h), hitParams);
                   
 
             // Ray from side B
@@ -927,7 +939,7 @@ namespace RobotEditor.ViewModel
                 EndPoint,
                 new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
             );
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(hitParams, h), hitParams);
             
         }
 

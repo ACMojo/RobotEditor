@@ -18,8 +18,10 @@ namespace RobotEditor.Model
             Nodes = new VoxelNode[size];
             Nodes[0] = new VoxelNodeInner();
 
+            // Length of Array segment per level (1)
             NodePathFactorPerLevel = new int[Level];
-            StartIndexPerLevel = new int[Level];
+            // Start points in Array for each level (2)
+            StartIndexPerLevel = new int[Level];                
 
             var index = 0;
             for (var i = 0; i < Level; i++)
@@ -54,14 +56,14 @@ namespace RobotEditor.Model
 
         public static VoxelOctree Create(double dimension, double stepSize)
         {
-            var steps = dimension / stepSize;
+            var leafNodeCount = dimension / stepSize;
 
-            return Create(steps * steps * steps);
+            return Create(leafNodeCount * leafNodeCount * leafNodeCount);
         }
 
-        public static VoxelOctree Create(double steps)
+        public static VoxelOctree Create(double leafNodeCount)
         {
-            var level = (int)Math.Ceiling(Math.Log(steps, 8));
+            var level = (int)Math.Ceiling(Math.Log(leafNodeCount, 8));
             if (level < 1)
                 return null;
 
@@ -153,9 +155,10 @@ namespace RobotEditor.Model
             return Get(nodeIndex);
         }
 
+        // X, Y, Z from center of cube
         public bool Set(int x, int y, int z, double value)
         {
-            if (double.IsNaN(value) || value <= 0)
+            if (double.IsNaN(value) || Math.Abs(value) < 0.0000001)
                 return false;
 
             var nodeIndex = CalculateNodeIndex(x, y, z);
@@ -176,7 +179,7 @@ namespace RobotEditor.Model
 
         public bool Set(int[] path, double value)
         {
-            if (double.IsNaN(value) || value <= 0)
+            if (double.IsNaN(value) || Math.Abs(value) < 0.0000001)
                 return false;
 
             var nodeIndex = CalculateNodeIndex(path);
@@ -255,18 +258,19 @@ namespace RobotEditor.Model
 
         private int CalculateNodeIndex(int x, int y, int z)
         {
+            // Find center of cube in octree
             var path = new int[Level];
             path[0] = 5;
             for (var i = 1; i < Level; i++)
                 path[i] = 2;
 
+            if (z != 0 && !Search(path, Math.Abs(z), Math.Sign(z) * 4, new[] { 4, 5, 6, 7 }))
+                return -1;
+
             if (y != 0 && !Search(path, Math.Abs(y), Math.Sign(y) * 1, new[] { 1, 3, 5, 7 }))
                 return -1;
 
-            if (x != 0 && !Search(path, Math.Abs(x), Math.Sign(x) * 2, new[] { 0, 1, 4, 5 }))
-                return -1;
-
-            if (z != 0 && !Search(path, Math.Abs(z), Math.Sign(z) * 4, new[] { 4, 5, 6, 7 }))
+            if (x != 0 && !Search(path, Math.Abs(x), Math.Sign(x) * -2, new[] { 2, 3, 6, 7 }))
                 return -1;
 
             var nodeIndex = CalculateNodeIndex(path);
