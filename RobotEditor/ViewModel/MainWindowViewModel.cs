@@ -285,7 +285,7 @@ namespace RobotEditor.ViewModel
                 line.Color = Colors.Gray;
                 line.Points = PCollection;
                 coordinateSystem.Children.Add(line);
-                
+
                 coordinateSystem.Children.Add(interimCS);
 
                 coordinateSystem = interimCS;
@@ -357,9 +357,13 @@ namespace RobotEditor.ViewModel
             if (rayMeshResult != null)
             {
                 // Yes we did!
-                CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0, Transform = new TranslateTransform3D(rayMeshResult.PointHit.X, rayMeshResult.PointHit.Y, rayMeshResult.PointHit.Z) });
+                CarbodyModels.Add(
+                    new CoordinateSystemVisual3D()
+                    {
+                        ArrowLengths = 100.0,
+                        Transform = new TranslateTransform3D(rayMeshResult.PointHit.X, rayMeshResult.PointHit.Y, rayMeshResult.PointHit.Z)
+                    });
 
-        
                 //Console.WriteLine(rayMeshResult.DistanceToRayOrigin);
                 return HitTestResultBehavior.Stop;
             }
@@ -409,6 +413,75 @@ namespace RobotEditor.ViewModel
         {
             viewportCarbody.ZoomExtents(0);
             RaisePropertyChanged();
+
+            //var octreeBooth = VoxelOctree.Create(6000d, 100d);
+            //Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeBooth.Level, octreeBooth.Nodes.Length);
+
+            //octreeBooth.Add(5, 0, 0, 2);
+            //octreeBooth.Add(0, 5, 0, 3);
+            //octreeBooth.Add(0, 0, 5, 4);
+            //octreeBooth.Add(5, 5, 5, 7);
+            //octreeBooth.Add(0, 0, -32, 234234);
+            //foreach (var node in octreeBooth.GetLeafNodes())
+            //{
+            //    if (node != null)
+            //        Console.WriteLine(node.Value);
+            //}
+
+            ////var node1 = (VoxelNodeLeaf)octreeBooth.Nodes[octreeBooth.GetNodeIndex(5, 5, 5)];
+            ////Console.WriteLine(node1.Value);
+
+            //var octreeRobot = VoxelOctree.Create(3000d, 100d);
+            //Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeRobot.Level, octreeRobot.Nodes.Length);
+            //octreeRobot.Add(5, 0, 0, 6);
+            //octreeRobot.Add(0, 5, 0, 7);
+            //octreeRobot.Add(0, 0, 5, 8);
+            //octreeRobot.Add(5, 5, 5, 9);
+            //foreach (var node in octreeRobot.GetLeafNodes())
+            //{
+            //    if (node != null)
+            //        Console.WriteLine(node.Value);
+            //}
+
+            //double maxValue = 0;
+            //VoxelNodeInner targetNode = null;
+            //foreach (var node in octreeBooth.GetAncestorNodes(octreeBooth.Level - octreeRobot.Level))
+            //{
+            //    if (node == null)
+            //        continue;
+
+            //    var innerNode = (VoxelNodeInner)node;
+            //    if (targetNode == null)
+            //    {
+            //        maxValue = innerNode.Max;
+            //        targetNode = innerNode;
+            //    }
+            //    else if (!double.IsNaN(innerNode.Max) && maxValue < innerNode.Max)
+            //    {
+            //        maxValue = innerNode.Max;
+            //        targetNode = innerNode;
+            //    }
+            //}
+
+            //var count = 0;
+            //var leafNodesRobot = octreeRobot.GetLeafNodes().ToArray();
+            //var result = 0d;
+            //foreach (var leafNodeBooth in octreeBooth.GetLeafNodes(targetNode, octreeBooth.Level - octreeRobot.Level))
+            //{
+            //    var leafNodeRobot = leafNodesRobot[count];
+
+            //    count++;
+
+            //    if (leafNodeBooth == null || double.IsNaN(leafNodeBooth.Value))
+            //        continue;
+
+            //    if (leafNodeRobot == null || double.IsNaN(leafNodeRobot.Value))
+            //        continue;
+
+            //    result += leafNodeBooth.Value * leafNodeRobot.Value;
+            //}
+
+            //Console.WriteLine(@"Result: {0}", result);
         }
 
         private bool FitToViewCanExecute(object arg)
@@ -595,12 +668,9 @@ namespace RobotEditor.ViewModel
                         //ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false);
                         ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false, false, 50f);
 
-
                         minB = VrManip.MinBox;
                         maxB = VrManip.MaxBox;
                         maxManip = VrManip.MaxManipulability;
-
-
 
                         ManipulabilityVoxel voxOld = new ManipulabilityVoxel();
                         ColorGradient colorCalculator = new ColorGradient();
@@ -615,7 +685,7 @@ namespace RobotEditor.ViewModel
                                 {
                                     maxValue = vox[j].value;
                                 }
-                            }                       
+                            }
                             else
                             {
                                 var vm = new MeshGeometryVisual3D();
@@ -623,7 +693,7 @@ namespace RobotEditor.ViewModel
                                 mb.AddBox(new Point3D(minB[0] + voxOld.x * 100, minB[1] + voxOld.y * 100, minB[2] + voxOld.z * 100), 10.0, 10.0, 10.0);
                                 vm.MeshGeometry = mb.ToMesh();
 
-                                if(maxValue > 0.005)
+                                if (maxValue > 0.005)
                                 {
                                     Console.WriteLine("groesser " + maxValue);
                                 }
@@ -635,7 +705,6 @@ namespace RobotEditor.ViewModel
                             }
                         }
                     }
-
                 }
             }
 
@@ -688,7 +757,7 @@ namespace RobotEditor.ViewModel
             var BoxPos = new Point3D(-OBBCalculator.HalfExtents[0], -OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
             var BoxSize = new Size3D(OBBCalculator.HalfExtents[0] * 2, OBBCalculator.HalfExtents[1] * 2, OBBCalculator.HalfExtents[2] * 2);
             var bbox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(BoxPos, BoxSize), Diameter = 2.0 };
-            
+
             var DH_Matrix = new Matrix3D(
                 OBBCalculator.Axis[0][0],
                 OBBCalculator.Axis[0][1],
@@ -714,32 +783,31 @@ namespace RobotEditor.ViewModel
 
             viewportCarbody.Viewport.Children.Add(bbox);
 
-            for (int j = 0; j < (OBBCalculator.HalfExtents[0]*2) / 100.0; j++)
+            for (int j = 0; j < (OBBCalculator.HalfExtents[0] * 2) / 100.0; j++)
             {
                 for (int k = 0; k < (OBBCalculator.HalfExtents[1] * 2) / 100.0; k++)
                 {
-                     DH_Matrix = new Matrix3D(
-                     OBBCalculator.Axis[0][0],
-                     OBBCalculator.Axis[0][1],
-                     OBBCalculator.Axis[0][2],
-                     0.0,
-                     OBBCalculator.Axis[1][0],
-                     OBBCalculator.Axis[1][1],
-                     OBBCalculator.Axis[1][2],
-                     0.0,
-                     OBBCalculator.Axis[2][0],
-                     OBBCalculator.Axis[2][1],
-                     OBBCalculator.Axis[2][2],
-                     0.0,
-                     OBBCalculator.Position[0] + k * 100.0,
-                     OBBCalculator.Position[1],
-                     OBBCalculator.Position[2] + j * 100.0,
-                     1.0
-                     );
+                    DH_Matrix = new Matrix3D(
+                        OBBCalculator.Axis[0][0],
+                        OBBCalculator.Axis[0][1],
+                        OBBCalculator.Axis[0][2],
+                        0.0,
+                        OBBCalculator.Axis[1][0],
+                        OBBCalculator.Axis[1][1],
+                        OBBCalculator.Axis[1][2],
+                        0.0,
+                        OBBCalculator.Axis[2][0],
+                        OBBCalculator.Axis[2][1],
+                        OBBCalculator.Axis[2][2],
+                        0.0,
+                        OBBCalculator.Position[0] + k * 100.0,
+                        OBBCalculator.Position[1],
+                        OBBCalculator.Position[2] + j * 100.0,
+                        1.0
+                    );
 
-                     Point3D startPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], OBBCalculator.HalfExtents[2]);
-                     Point3D EndPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
-
+                    Point3D startPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], OBBCalculator.HalfExtents[2]);
+                    Point3D EndPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
 
                     MatrixTransform3D transformToBoundingBox = new MatrixTransform3D(DH_Matrix);
                     startPoint = transformToBoundingBox.Transform(startPoint);
@@ -747,49 +815,45 @@ namespace RobotEditor.ViewModel
 
                     RayHitTestParameters hitParams =
                         new RayHitTestParameters(
-                        startPoint,
-                        new Vector3D(EndPoint.X- startPoint.X, EndPoint.Y- startPoint.Y, EndPoint.Z- startPoint.Z)
-                    );
+                            startPoint,
+                            new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
-
 
                     hitParams =
                         new RayHitTestParameters(
-                        EndPoint,
-                        new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
-                    );
+                            EndPoint,
+                            new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
                 }
             }
-
-
 
             for (int j = 0; j < (OBBCalculator.HalfExtents[0] * 2) / 100.0; j++)
             {
                 for (int k = 0; k < (OBBCalculator.HalfExtents[2] * 2) / 100.0; k++)
                 {
                     DH_Matrix = new Matrix3D(
-                    OBBCalculator.Axis[0][0],
-                    OBBCalculator.Axis[0][1],
-                    OBBCalculator.Axis[0][2],
-                    0.0,
-                    OBBCalculator.Axis[1][0],
-                    OBBCalculator.Axis[1][1],
-                    OBBCalculator.Axis[1][2],
-                    0.0,
-                    OBBCalculator.Axis[2][0],
-                    OBBCalculator.Axis[2][1],
-                    OBBCalculator.Axis[2][2],
-                    0.0,
-                    OBBCalculator.Position[0],
-                    OBBCalculator.Position[1] + k * 100.0,
-                    OBBCalculator.Position[2] + j * 100.0,
-                    1.0
+                        OBBCalculator.Axis[0][0],
+                        OBBCalculator.Axis[0][1],
+                        OBBCalculator.Axis[0][2],
+                        0.0,
+                        OBBCalculator.Axis[1][0],
+                        OBBCalculator.Axis[1][1],
+                        OBBCalculator.Axis[1][2],
+                        0.0,
+                        OBBCalculator.Axis[2][0],
+                        OBBCalculator.Axis[2][1],
+                        OBBCalculator.Axis[2][2],
+                        0.0,
+                        OBBCalculator.Position[0],
+                        OBBCalculator.Position[1] + k * 100.0,
+                        OBBCalculator.Position[2] + j * 100.0,
+                        1.0
                     );
 
                     Point3D StartPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
                     Point3D EndPoint = new Point3D(OBBCalculator.HalfExtents[0], -OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
-
 
                     MatrixTransform3D transformToBoundingBox = new MatrixTransform3D(DH_Matrix);
                     StartPoint = transformToBoundingBox.Transform(StartPoint);
@@ -797,17 +861,16 @@ namespace RobotEditor.ViewModel
 
                     RayHitTestParameters hitParams =
                         new RayHitTestParameters(
-                        StartPoint,
-                        new Vector3D(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y, EndPoint.Z - StartPoint.Z)
-                    );
+                            StartPoint,
+                            new Vector3D(EndPoint.X - StartPoint.X, EndPoint.Y - StartPoint.Y, EndPoint.Z - StartPoint.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
-
 
                     hitParams =
                         new RayHitTestParameters(
-                        EndPoint,
-                        new Vector3D(StartPoint.X - EndPoint.X, StartPoint.Y - EndPoint.Y, StartPoint.Z - EndPoint.Z)
-                    );
+                            EndPoint,
+                            new Vector3D(StartPoint.X - EndPoint.X, StartPoint.Y - EndPoint.Y, StartPoint.Z - EndPoint.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
                 }
             }
@@ -817,27 +880,26 @@ namespace RobotEditor.ViewModel
                 for (int k = 0; k < (OBBCalculator.HalfExtents[2] * 2) / 100.0; k++)
                 {
                     DH_Matrix = new Matrix3D(
-                    OBBCalculator.Axis[0][0],
-                    OBBCalculator.Axis[0][1],
-                    OBBCalculator.Axis[0][2],
-                    0.0,
-                    OBBCalculator.Axis[1][0],
-                    OBBCalculator.Axis[1][1],
-                    OBBCalculator.Axis[1][2],
-                    0.0,
-                    OBBCalculator.Axis[2][0],
-                    OBBCalculator.Axis[2][1],
-                    OBBCalculator.Axis[2][2],
-                    0.0,
-                    OBBCalculator.Position[0] + j * 100.0,
-                    OBBCalculator.Position[1] + k * 100.0,
-                    OBBCalculator.Position[2],
-                    1.0
+                        OBBCalculator.Axis[0][0],
+                        OBBCalculator.Axis[0][1],
+                        OBBCalculator.Axis[0][2],
+                        0.0,
+                        OBBCalculator.Axis[1][0],
+                        OBBCalculator.Axis[1][1],
+                        OBBCalculator.Axis[1][2],
+                        0.0,
+                        OBBCalculator.Axis[2][0],
+                        OBBCalculator.Axis[2][1],
+                        OBBCalculator.Axis[2][2],
+                        0.0,
+                        OBBCalculator.Position[0] + j * 100.0,
+                        OBBCalculator.Position[1] + k * 100.0,
+                        OBBCalculator.Position[2],
+                        1.0
                     );
 
                     Point3D StartPoiut = new Point3D(-OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
                     Point3D EndPoint = new Point3D(OBBCalculator.HalfExtents[0], OBBCalculator.HalfExtents[1], -OBBCalculator.HalfExtents[2]);
-
 
                     MatrixTransform3D transformToBoundingBox = new MatrixTransform3D(DH_Matrix);
                     StartPoiut = transformToBoundingBox.Transform(StartPoiut);
@@ -859,24 +921,20 @@ namespace RobotEditor.ViewModel
                     vm2.Material = MaterialHelper.CreateMaterial(Colors.Red);
                     CarbodyModels.Add(vm2);*/
 
-
                     //vm.Transform = new MatrixTransform3D(DH_Matrix);
-
-
 
                     RayHitTestParameters hitParams =
                         new RayHitTestParameters(
-                        StartPoiut,
-                        new Vector3D(EndPoint.X - StartPoiut.X, EndPoint.Y - StartPoiut.Y, EndPoint.Z - StartPoiut.Z)
-                    );
+                            StartPoiut,
+                            new Vector3D(EndPoint.X - StartPoiut.X, EndPoint.Y - StartPoiut.Y, EndPoint.Z - StartPoiut.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
-
 
                     hitParams =
                         new RayHitTestParameters(
-                        EndPoint,
-                        new Vector3D(StartPoiut.X - EndPoint.X, StartPoiut.Y - EndPoint.Y, StartPoiut.Z - EndPoint.Z)
-                    );
+                            EndPoint,
+                            new Vector3D(StartPoiut.X - EndPoint.X, StartPoiut.Y - EndPoint.Y, StartPoiut.Z - EndPoint.Z)
+                        );
                     VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
                 }
             }
