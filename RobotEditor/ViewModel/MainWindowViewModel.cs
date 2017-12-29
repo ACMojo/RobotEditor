@@ -460,23 +460,7 @@ namespace RobotEditor.ViewModel
             //    }
             //}
 
-            //var count = 0;
-            //var leafNodesRobot = octreeRobot.GetLeafNodes().ToArray();
-            //var result = 0d;
-            //foreach (var leafNodeBooth in octreeBooth.GetLeafNodes(targetNode))
-            //{
-            //    var leafNodeRobot = leafNodesRobot[count];
-
-            //    count++;
-
-            //    if (leafNodeBooth == null || double.IsNaN(leafNodeBooth.Value))
-            //        continue;
-
-            //    if (leafNodeRobot == null || double.IsNaN(leafNodeRobot.Value))
-            //        continue;
-
-            //    result += leafNodeBooth.Value * leafNodeRobot.Value;
-            //}
+            //var result = octreeBooth.Multiply(targetNode, octreeRobot);
 
             //Console.WriteLine(@"Result: {0}", result);
         }
