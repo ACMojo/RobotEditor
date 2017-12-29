@@ -417,26 +417,23 @@ namespace RobotEditor.ViewModel
             //var octreeBooth = VoxelOctree.Create(6000d, 100d);
             //Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeBooth.Level, octreeBooth.Nodes.Length);
 
-            //octreeBooth.Add(5, 0, 0, 2);
-            //octreeBooth.Add(0, 5, 0, 3);
-            //octreeBooth.Add(0, 0, 5, 4);
-            //octreeBooth.Add(5, 5, 5, 7);
-            //octreeBooth.Add(0, 0, -32, 234234);
+            //octreeBooth.Set(5, 0, 0, 2);
+            //octreeBooth.Set(0, 5, 0, 3);
+            //octreeBooth.Set(0, 0, 5, 4);
+            //octreeBooth.Set(5, 5, 5, 7);
+            //octreeBooth.Set(0, 0, -32, 234234);
             //foreach (var node in octreeBooth.GetLeafNodes())
             //{
             //    if (node != null)
             //        Console.WriteLine(node.Value);
             //}
 
-            ////var node1 = (VoxelNodeLeaf)octreeBooth.Nodes[octreeBooth.GetNodeIndex(5, 5, 5)];
-            ////Console.WriteLine(node1.Value);
-
             //var octreeRobot = VoxelOctree.Create(3000d, 100d);
             //Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeRobot.Level, octreeRobot.Nodes.Length);
-            //octreeRobot.Add(5, 0, 0, 6);
-            //octreeRobot.Add(0, 5, 0, 7);
-            //octreeRobot.Add(0, 0, 5, 8);
-            //octreeRobot.Add(5, 5, 5, 9);
+            //octreeRobot.Set(5, 0, 0, 6);
+            //octreeRobot.Set(0, 5, 0, 7);
+            //octreeRobot.Set(0, 0, 5, 8);
+            //octreeRobot.Set(5, 5, 5, 9);
             //foreach (var node in octreeRobot.GetLeafNodes())
             //{
             //    if (node != null)
@@ -466,7 +463,7 @@ namespace RobotEditor.ViewModel
             //var count = 0;
             //var leafNodesRobot = octreeRobot.GetLeafNodes().ToArray();
             //var result = 0d;
-            //foreach (var leafNodeBooth in octreeBooth.GetLeafNodes(targetNode, octreeBooth.Level - octreeRobot.Level))
+            //foreach (var leafNodeBooth in octreeBooth.GetLeafNodes(targetNode))
             //{
             //    var leafNodeRobot = leafNodesRobot[count];
 
