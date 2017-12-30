@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 namespace RobotEditor.Model
@@ -21,7 +20,7 @@ namespace RobotEditor.Model
             // Length of Array segment per level (1)
             NodePathFactorPerLevel = new int[Level];
             // Start points in Array for each level (2)
-            StartIndexPerLevel = new int[Level];                
+            StartIndexPerLevel = new int[Level];
 
             var index = 0;
             for (var i = 0; i < Level; i++)
@@ -42,7 +41,7 @@ namespace RobotEditor.Model
 
         public VoxelNodeInner Root => (VoxelNodeInner)Nodes[0];
 
-        public VoxelNode[] Nodes { get; }
+        public VoxelNode[] Nodes { get; private set; }
 
         public int[] NodePathFactorPerLevel { get; }
 
@@ -86,7 +85,7 @@ namespace RobotEditor.Model
             if (level < 0)
                 return null;
 
-            index = index % NodePathFactorPerLevel[level];
+            index = (index - StartIndexPerLevel[level]) / 8;
             index += StartIndexPerLevel[level - 1];
 
             var parentNode = (VoxelNodeInner)Nodes[index];
@@ -137,13 +136,86 @@ namespace RobotEditor.Model
 
             var startIndex = StartIndexLeafNodes;
 
-            var previousLeafNodeCount = Array.IndexOf(Nodes, node) / NodePathFactorPerLevel[level];
+            var nodeIndex = Array.IndexOf(Nodes, node);
+            var previousLeafNodeCount = nodeIndex - StartIndexPerLevel[level - 1];
             startIndex += previousLeafNodeCount * leafNodeCount;
 
             var endIndex = startIndex + leafNodeCount;
 
             for (var i = startIndex; i < endIndex; i++)
                 yield return (VoxelNodeLeaf)Nodes[i];
+        }
+
+        public IEnumerable<VoxelNode> GetChildNodes(VoxelNodeInner node)
+        {
+            var level = CalculateNodeLevel(node) + 1;
+
+            var startIndex = StartIndexPerLevel[level];
+
+            var nodeIndex = Array.IndexOf(Nodes, node);
+            var previousLeafNodeCount = nodeIndex - StartIndexPerLevel[level - 1];
+            startIndex += previousLeafNodeCount * 8;
+
+            var endIndex = startIndex + 8;
+
+            for (var i = startIndex; i < endIndex; i++)
+                yield return Nodes[i];
+        }
+
+        private void SetChildNodes(VoxelNodeInner node, IEnumerable<VoxelNode> children)
+        {
+            var level = CalculateNodeLevel(node) + 1;
+
+            var startIndex = StartIndexPerLevel[level];
+
+            var nodeIndex = Array.IndexOf(Nodes, node);
+            var previousLeafNodeCount = nodeIndex - StartIndexPerLevel[level - 1];
+            startIndex += previousLeafNodeCount * 8;
+
+            var count = 0;
+            foreach (var child in children)
+            {
+                Nodes[startIndex + count] = child;
+
+                count++;
+            }
+        }
+
+        public void RotateX()
+        {
+            //var tempTree = new VoxelOctree(Level)
+            //{
+            //    Nodes =
+            //    {
+            //        [1] = Nodes[5],
+            //        [2] = Nodes[6],
+            //        [3] = Nodes[1],
+            //        [4] = Nodes[2],
+            //        [5] = Nodes[7],
+            //        [6] = Nodes[8],
+            //        [7] = Nodes[3],
+            //        [8] = Nodes[4]
+            //    }
+            //};
+
+            var tempTree = new VoxelOctree(Level)
+            {
+                Nodes =
+                {
+                    [1] = Nodes[1],
+                    [2] = Nodes[2],
+                    [3] = Nodes[3],
+                    [4] = Nodes[4],
+                    [5] = Nodes[5],
+                    [6] = Nodes[6],
+                    [7] = Nodes[7],
+                    [8] = Nodes[8]
+                }
+            };
+
+            CopyChildNodesBelowLevel1(tempTree);
+
+            Nodes = tempTree.Nodes;
         }
 
         public double Get(int x, int y, int z)
@@ -253,7 +325,13 @@ namespace RobotEditor.Model
             if (index <= 0)
                 return -1;
 
-            return (int)Math.Log(index, 8d);
+            for (var i = StartIndexPerLevel.Length - 1; i >= 0; i--)
+            {
+                if (index >= StartIndexPerLevel[i])
+                    return i;
+            }
+
+            return -1;
         }
 
         private int CalculateNodeIndex(int x, int y, int z)
@@ -281,8 +359,10 @@ namespace RobotEditor.Model
         private int CalculateNodeIndex(int[] path)
         {
             var index = 0;
-            for (var i = 0; i < path.Length; i++)
-                index += NodePathFactorPerLevel[i] + path[i];
+            for (var i = 0; i < path.Length - 1; i++)
+                index += NodePathFactorPerLevel[i + 1] * path[i];
+
+            index += path[path.Length - 1];
 
             return index;
         }
@@ -375,6 +455,29 @@ namespace RobotEditor.Model
             path[level] -= factor;
 
             return SearchWithFactor(path, level - 1, factor, jumpLimits);
+        }
+
+        private void CopyChildNodesBelowLevel1(VoxelOctree tree)
+        {
+            for (var i = 1; i < 9; i++)
+            {
+                var node = (VoxelNodeInner)Nodes[i];
+                CopyChildNodes(node, tree);
+            }
+        }
+
+        private void CopyChildNodes(VoxelNodeInner node, VoxelOctree tree)
+        {
+            var childNodes = GetChildNodes(node).ToArray();
+
+            tree.SetChildNodes(node, childNodes);
+
+            foreach (var child in childNodes)
+            {
+                var childInner = child as VoxelNodeInner;
+                if (childInner != null)
+                    CopyChildNodes(childInner, tree);
+            }
         }
 
         #endregion
