@@ -183,33 +183,18 @@ namespace RobotEditor.Model
 
         public void RotateX()
         {
-            //var tempTree = new VoxelOctree(Level)
-            //{
-            //    Nodes =
-            //    {
-            //        [1] = Nodes[5],
-            //        [2] = Nodes[6],
-            //        [3] = Nodes[1],
-            //        [4] = Nodes[2],
-            //        [5] = Nodes[7],
-            //        [6] = Nodes[8],
-            //        [7] = Nodes[3],
-            //        [8] = Nodes[4]
-            //    }
-            //};
-
             var tempTree = new VoxelOctree(Level)
             {
                 Nodes =
                 {
-                    [1] = Nodes[1],
-                    [2] = Nodes[2],
-                    [3] = Nodes[3],
-                    [4] = Nodes[4],
-                    [5] = Nodes[5],
-                    [6] = Nodes[6],
-                    [7] = Nodes[7],
-                    [8] = Nodes[8]
+                    [1] = Nodes[5],
+                    [2] = Nodes[6],
+                    [3] = Nodes[1],
+                    [4] = Nodes[2],
+                    [5] = Nodes[7],
+                    [6] = Nodes[8],
+                    [7] = Nodes[3],
+                    [8] = Nodes[4]
                 }
             };
 
@@ -360,7 +345,7 @@ namespace RobotEditor.Model
         {
             var index = 0;
             for (var i = 0; i < path.Length - 1; i++)
-                index += NodePathFactorPerLevel[i + 1] * path[i];
+                index += NodePathFactorPerLevel[i + 1] * (path[i] + 1);
 
             index += path[path.Length - 1];
 
