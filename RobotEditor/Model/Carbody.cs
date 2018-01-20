@@ -15,6 +15,7 @@ namespace RobotEditor.Model
         public string Name { get; set; }
         public ModelVisual3D carbodyModel;
         public MeshGeometry3D CarbodyAsMesh { get; set; }
+        public VoxelOctree octree;
 
         public ModelVisual3D CarbodyModel
         {
@@ -38,6 +39,16 @@ namespace RobotEditor.Model
             Path = path;
             Name = name;
             CarbodyModel = model; 
+        }
+
+        public void UpdateMesh()
+        {
+            var mbs = ((Model3DGroup)carbodyModel.Content).Children.Cast<GeometryModel3D>();
+            foreach (var mb in mbs)
+            {
+                CarbodyAsMesh = (MeshGeometry3D)mb.Geometry; ;
+            }
+
         }
     }
 }

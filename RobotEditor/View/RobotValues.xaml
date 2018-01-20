@@ -7,7 +7,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:RobotEditor.Model"
         mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=viewModel:RobotViewModel, IsDesignTimeCreatable=false}"
+        d:DataContext="{d:DesignInstance Type=viewModel:ResultViewModel, IsDesignTimeCreatable=false}"
         Title="RobotValues" Height="296" Width="1147.4">
     <Window.Resources>
         <ObjectDataProvider x:Key="JTypes"

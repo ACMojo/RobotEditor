@@ -15,6 +15,7 @@ namespace RobotEditor.Model
         public ModelVisual3D robotModel;
         public MeshGeometry3D RobotAsMesh { get; set; }
         public Voxel[,,] VoxelMap;
+        public VoxelOctree octree { get; set; }
 
         public Robot(int nrOfJoints, string name)
         {

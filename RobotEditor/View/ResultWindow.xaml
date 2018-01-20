@@ -1,0 +1,29 @@
+﻿<Window
+    x:Class="RobotEditor.View.ResultWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:h="http://helix-toolkit.org/wpf"
+    xmlns:viewModel="clr-namespace:RobotEditor.ViewModel"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=viewModel:RobotViewModel, IsDesignTimeCreatable=false}"
+    Title="ResultWindow"
+    Height="544"
+    Width="785"
+    MinWidth="530"
+    MinHeight="785">
+
+    <Grid HorizontalAlignment="Left" Height="741" Margin="10,10,0,0" VerticalAlignment="Top" Width="765">
+        <Button x:Name="button_Start" Content="Start" HorizontalAlignment="Left" Margin="611,198,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Start}"/>
+        <h:HelixViewport3D
+            x:Name="view_Result"
+            CameraRotationMode="Trackball"
+            ModelUpDirection="0,1,0"
+            Margin="0,0,292,392"
+            ZoomExtentsWhenLoaded="True"
+        />
+        <Button x:Name="button_FitToView" Content="Fit to view" HorizontalAlignment="Left" Margin="611,237,0,0" VerticalAlignment="Top" Width="75" Command="{Binding FitToView}"/>
+    </Grid>
+
+</Window>

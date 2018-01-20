@@ -89,6 +89,7 @@
     </ApplicationDefinition>
     <Compile Include="Model\Carbody.cs" />
     <Compile Include="Model\Joint.cs" />
+    <Compile Include="Model\Booth.cs" />
     <Compile Include="Model\Robot.cs" />
     <Compile Include="Model\Voxel.cs" />
     <Compile Include="Model\VoxelNodeLeaf.cs" />
@@ -103,10 +104,18 @@
     <Compile Include="ViewModel\DelegateCommand.cs" />
     <Compile Include="ViewModel\JointViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="ViewModel\ResultViewModel.cs" />
     <Compile Include="ViewModel\RobotViewModel.cs" />
+    <Compile Include="View\ResultWindow.xaml.cs">
+      <DependentUpon>ResultWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\RobotValues.xaml.cs">
       <DependentUpon>RobotValues.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\ResultWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

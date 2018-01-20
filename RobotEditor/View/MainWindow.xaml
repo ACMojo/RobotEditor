@@ -8,18 +8,18 @@
     xmlns:viewModel="clr-namespace:RobotEditor.ViewModel"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewModel:MainWindowViewModel, IsDesignTimeCreatable=false}"
-    Title="MainWindow"
-    Height="437.882"
-    Width="1593.059"
-    MinWidth="1590"
-    MinHeight="437">
-    <Grid>
+    Title="Decision Model"
+    Height="788.085"
+    Width="959.599"
+    MinWidth="940"
+    MinHeight="785">
+    <Grid HorizontalAlignment="Left" Width="919">
         <Grid
             HorizontalAlignment="Left"
-            Height="396"
+            Height="630"
             Margin="3,7,0,0"
             VerticalAlignment="Top"
-            Width="715">
+            Width="447">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition
                     Width="9*" />
@@ -30,9 +30,9 @@
                 x:Name="view_Carbody"
                 CameraRotationMode="Trackball"
                 ModelUpDirection="0,1,0"
-                Margin="234,10,0,52"
-                Grid.Column="1"
-                ItemsSource="{Binding Path=CarbodyModels}" />
+                Margin="10,274,24,22"
+                ZoomExtentsWhenLoaded="True"
+                ItemsSource="{Binding Path=CarbodyModels}" Grid.ColumnSpan="2" />
             <Button
                 x:Name="button_AddCarbody"
                 Content="Add Carbody"
@@ -46,18 +46,10 @@
                 x:Name="button_FitToView"
                 Content="Fit to view"
                 HorizontalAlignment="Left"
-                Margin="540,366,0,0"
+                Margin="287,235,0,0"
                 VerticalAlignment="Top"
-                Width="97"
+                Width="93"
                 Command="{Binding FitToView}"
-                Grid.Column="1" />
-            <Button
-                Content="Hit test"
-                HorizontalAlignment="Left"
-                Margin="440,366,0,0"
-                VerticalAlignment="Top"
-                Width="97"
-                Command="{Binding HitTest}"
                 Grid.Column="1" />
             <DataGrid
                 x:Name="Carbodies_Grid"
@@ -66,7 +58,7 @@
                 Height="168"
                 Margin="10,10,0,0"
                 VerticalAlignment="Top"
-                Width="203"
+                Width="413"
                 ItemsSource="{Binding Carbodies}"
                 AutoGenerateColumns="False"
                 SelectedItem="{Binding SelectedCarbody}"
@@ -76,7 +68,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Header="Carbody"
-                        Width="200"
+                        Width="410"
                         Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -84,34 +76,24 @@
                 x:Name="button_DeleteCarbody"
                 Content="Delete Carbody"
                 HorizontalAlignment="Left"
-                Margin="52,200,0,0"
+                Margin="10,235,0,0"
                 VerticalAlignment="Top"
-                Width="93"
-                Grid.Column="1"
-                Command="{Binding DeleteCarbody}" />
-            <Button
-                x:Name="button_BoundingBox"
-                Content="Calc OOB"
-                Grid.Column="1"
-                HorizontalAlignment="Left"
-                Margin="52,235,0,0"
-                VerticalAlignment="Top"
-                Width="93"
-                Command="{Binding CalcBoundingBox}" />
+                Width="90"
+                Command="{Binding DeleteCarbody}" Grid.ColumnSpan="2" />
         </Grid>
         <Grid
             HorizontalAlignment="Left"
-            Height="387"
-            Margin="814,10,0,0"
+            Height="630"
+            Margin="474,7,0,0"
             VerticalAlignment="Top"
-            Width="736">
+            Width="447">
             <DataGrid
                 x:Name="Robots_Grid"
                 HorizontalAlignment="Left"
-                Height="174"
-                Margin="510,10,0,0"
+                Height="168"
+                Margin="10,10,0,0"
                 VerticalAlignment="Top"
-                Width="203"
+                Width="413"
                 ItemsSource="{Binding Robots}"
                 AutoGenerateColumns="False"
                 SelectedItem="{Binding SelectedRobot}"
@@ -121,7 +103,7 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Header="Robot"
-                        Width="200"
+                        Width="410"
                         Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
                 </DataGrid.Columns>
             </DataGrid>
@@ -129,7 +111,7 @@
                 x:Name="button_CreateRobot"
                 Content="Add Robot"
                 HorizontalAlignment="Left"
-                Margin="510,232,0,0"
+                Margin="10,200,0,0"
                 VerticalAlignment="Top"
                 Width="100"
                 Command="{Binding AddRobot}" />
@@ -137,15 +119,15 @@
                 x:Name="button_deleteRobot"
                 Content="Delete Robot"
                 HorizontalAlignment="Left"
-                Margin="638,232,0,0"
+                Margin="10,235,0,0"
                 VerticalAlignment="Top"
-                Width="75"
+                Width="100"
                 Command="{Binding DeleteRobot}" />
             <Button
                 x:Name="button_CreateXML"
                 Content="Create XML"
                 HorizontalAlignment="Left"
-                Margin="510,266,0,0"
+                Margin="151,200,0,0"
                 VerticalAlignment="Top"
                 Width="100"
                 Command="{Binding CreateXML}" />
@@ -153,16 +135,21 @@
                 x:Name="view_Robot"
                 CameraRotationMode="Trackball"
                 ModelUpDirection="0,1,0"
-                Margin="10,10,348,43"
-                ItemsSource="{Binding Path=RobotModels}" />
+                Margin="10,274,32,22"
+                ZoomExtentsWhenLoaded="True"
+                ItemsSource="{Binding Path=RobotModels}" HorizontalAlignment="Left" Width="413" Height="334" />
             <Button
                 x:Name="button_EditRobot"
                 Content="Edit Robot"
                 HorizontalAlignment="Left"
-                Margin="638,266,0,0"
+                Margin="151,235,0,0"
                 VerticalAlignment="Top"
                 Width="75"
                 Command="{Binding EditRobot}" />
         </Grid>
+        <Button x:Name="button_Compare" Content="Start comparison" HorizontalAlignment="Left" Margin="24,713,0,0" Width="128" Height="23" VerticalAlignment="Top" Command="{Binding Compare}"/>
+        <Slider x:Name="slider_Precision" HorizontalAlignment="Left" Margin="24,670,0,0" Width="220" TickFrequency="10" Maximum="500" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Minimum="10" Height="22" VerticalAlignment="Top"/>
+        <TextBox Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="249,669,0,0" Width="68" Height="23" VerticalAlignment="Top"/>
+
     </Grid>
 </Window>
