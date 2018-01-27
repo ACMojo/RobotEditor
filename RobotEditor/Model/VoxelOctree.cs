@@ -359,75 +359,78 @@ namespace RobotEditor.Model
             int centerBoundX = 0;
             int centerBoundY = 0;
             int centerBoundZ = 0;
+            int j = 0;
 
             for (var i = 0; i < Level; i++)
             {
+                j = Level - 2 - i;
                 if(x>=centerBoundX)
                 {
-                    centerBoundX = (int)Math.Pow(2, i) * 100;
+                    centerBoundX += (int)Math.Pow(2, j) * 100;
                     if (y>=centerBoundY)
                     {
-                        centerBoundY = (int)Math.Pow(2, i) * 100;
+                        centerBoundY += (int)Math.Pow(2, j) * 100;
                         if (z>=centerBoundZ)
                         {
                             path[i] = 5;
-                            centerBoundZ = (int)Math.Pow(2, i) * 100;
+                            centerBoundZ += (int)Math.Pow(2, j) * 100;
                         }
                         else
                         {
                             path[i] = 1;
-                            centerBoundZ = -(int)Math.Pow(2, i) * 100;
+                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
                         }
                     }
                     else
                     {
-                        centerBoundY = -(int)Math.Pow(2, i) * 100;
+                        centerBoundY += -(int)Math.Pow(2, j) * 100;
                         if (z >= centerBoundZ)
                         {
                             path[i] = 4;
-                            centerBoundZ = (int)Math.Pow(2, i) * 100;
+                            centerBoundZ += (int)Math.Pow(2, j) * 100;
                         }
                         else
                         {
                             path[i] = 0;
-                            centerBoundZ = -(int)Math.Pow(2, i) * 100;
+                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
                         }                                                   
                     }
                 }
                 else
                 {
-                    centerBoundX = -(int)Math.Pow(2, i) * 100;
+                    centerBoundX += -(int)Math.Pow(2, j) * 100;
                     if (y >= centerBoundY)
                     {
-                        centerBoundY = (int)Math.Pow(2, i) * 100;
+                        centerBoundY += (int)Math.Pow(2, j) * 100;
                         if (z >= centerBoundZ)
                         {
                             path[i] = 7;
-                            centerBoundZ = (int)Math.Pow(2, i) * 100;
+                            centerBoundZ += (int)Math.Pow(2, j) * 100;
                         }
                         else
                         {
                             path[i] = 3;
-                            centerBoundZ = -(int)Math.Pow(2, i) * 100;
+                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
                         }
                     }
                     else
                     {
-                        centerBoundY = -(int)Math.Pow(2, i) * 100;
+                        centerBoundY += -(int)Math.Pow(2, j) * 100;
                         if (z >= centerBoundZ)
                         {
                             path[i] = 6;
-                            centerBoundZ = (int)Math.Pow(2, i) * 100;
+                            centerBoundZ += (int)Math.Pow(2, j) * 100;
                         }
                         else
                         {
                             path[i] = 2;
-                            centerBoundZ = -(int)Math.Pow(2, i) * 100;
+                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
                         }
                     }
-                }               
+                }
+                //Console.WriteLine("path" + path[i]);
             }
-
+            
                 var nodeIndex = CalculateNodeIndex(path);
 
             return nodeIndex;
@@ -435,11 +438,12 @@ namespace RobotEditor.Model
 
         private int CalculateNodeIndex(int[] path)
         {
-            var index = 1;
-            for (var i = 0; i < path.Length - 1; i++)
-                index += NodePathFactorPerLevel[i + 1] * (path[i]+1);
+            var index = 0;
+            for (var i = 0; i < path.Length; i++)
+                index += (path[i]+1) * NodePathFactorPerLevel[path.Length - 1 - i];
+               
 
-            index += path[path.Length - 1];
+            //index += path[path.Length - 1];
 
             return index;
         }

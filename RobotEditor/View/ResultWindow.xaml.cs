@@ -1,4 +1,5 @@
-﻿using RobotEditor.ViewModel;
+﻿using RobotEditor.Model;
+using RobotEditor.ViewModel;
 
 namespace RobotEditor.View
 {
@@ -9,11 +10,11 @@ namespace RobotEditor.View
     {
         #region Instance
 
-        public ResultWindow()
+        public ResultWindow(VoxelOctree value)
         {
             InitializeComponent();
 
-            DataContext = new ResultViewModel(view_Result);
+            DataContext = new ResultViewModel(view_Result, value);
         }
 
         #endregion

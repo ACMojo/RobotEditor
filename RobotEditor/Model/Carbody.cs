@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
+using MathGeoLibWrapper;
 
 namespace RobotEditor.Model
 {
@@ -26,9 +27,10 @@ namespace RobotEditor.Model
                 var mbs = ((Model3DGroup)value.Content).Children.Cast<GeometryModel3D>();
                 foreach (var mb in mbs)
                 {
-                    CarbodyAsMesh = (MeshGeometry3D)mb.Geometry; ;
+                    CarbodyAsMesh = (MeshGeometry3D)mb.Geometry;
                 }
             }
+            
 
         }
         public BoundingBoxVisual3D BoundingBox { get; set; }
@@ -46,7 +48,7 @@ namespace RobotEditor.Model
             var mbs = ((Model3DGroup)carbodyModel.Content).Children.Cast<GeometryModel3D>();
             foreach (var mb in mbs)
             {
-                CarbodyAsMesh = (MeshGeometry3D)mb.Geometry; ;
+                CarbodyAsMesh = (MeshGeometry3D)mb.Geometry;
             }
 
         }

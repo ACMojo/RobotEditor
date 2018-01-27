@@ -32,6 +32,7 @@ namespace RobotEditor.ViewModel
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
         private VoxelOctree octree;
+        private VoxelOctree octreeTemp;
 
         private readonly IHelixViewport3D viewportCarbody;
         private readonly IHelixViewport3D viewportRobot;
@@ -50,9 +51,9 @@ namespace RobotEditor.ViewModel
 
             this.viewportCarbody = viewportCarbody;
             this.viewportRobot = viewportRobot;
+            octree = VoxelOctree.Create(10000, 100d);
 
 
-            
             CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             CarbodyModels.Add(new DefaultLights());
 
@@ -61,9 +62,6 @@ namespace RobotEditor.ViewModel
 
             RaisePropertyChanged();
             
-           
-
-            octree = VoxelOctree.Create(6000, 100);
         }
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
@@ -86,19 +84,18 @@ namespace RobotEditor.ViewModel
 
         private void CompareExecute(object obj)
         {
+            
             foreach(var carbody in Carbodies)
             {
-                
+                SelectedCarbody = carbody;
                 // Get points out of 3D carbody modell
-                double[][] PointCloud = new double[SelectedCarbody.carbodyModel.Children..CarbodyAsMesh.Positions.Count][];
+                double[][] PointCloud = new double[SelectedCarbody.Model.CarbodyAsMesh.Positions.Count][];
                 int i = 0;
-                foreach (Point3D pointOnCarbody in carbody.Model.CarbodyAsMesh.Positions)
+                foreach (Point3D pointOnCarbody in SelectedCarbody.Model.CarbodyAsMesh.Positions)
                 {
                     PointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z };
                     i++;
                 }
-
-                carbody.Model.UpdateMesh();
 
                 // Call wrapper for bounding box calculation
                 OBBWrapper OBBCalculator = new OBBWrapper(PointCloud);
@@ -109,7 +106,8 @@ namespace RobotEditor.ViewModel
                 // Draw box with calculate lengths
                 var boxPosVector = new Vector3D(-OBBCalculator.HalfExtents[0],-OBBCalculator.HalfExtents[1],-OBBCalculator.HalfExtents[2]);
                 var BoxSize = new Size3D(Math.Abs(OBBCalculator.HalfExtents[0]) * 2, Math.Abs(OBBCalculator.HalfExtents[1]) * 2, Math.Abs(OBBCalculator.HalfExtents[2] * 2));
-
+               
+                octreeTemp = VoxelOctree.Create(Math.Abs(OBBCalculator.HalfExtents.Max()) * 4, 100d);
 
                 // Move bounding box on correct position
 
@@ -142,12 +140,14 @@ namespace RobotEditor.ViewModel
                 // Move center to fit box 
                 center.TranslatePrepend(boxPosVector);
                 var bbox = new BoundingBoxVisual3D { BoundingBox = new Rect3D(new Point3D(), BoxSize), Diameter = 20.0 };
+
+                
+                //bbox.Transform = new MatrixTransform3D(Matrix3D.Multiply(center, carbody.Model.CarbodyModel.GetTransform().Inverse()));
                 bbox.Transform = new MatrixTransform3D(center);
 
                 this.viewportCarbody.ZoomExtents(0);
-
-                viewportCarbody.Viewport.Children.Add(bbox);
-                viewportCarbody.Viewport.Children.Add(rootFrame);
+                //SelectedCarbody.carbodyModel.Children.Add(bbox);
+                SelectedCarbody.carbodyModel.Children.Add(rootFrame);
                 
 
                 // Perform hit test
@@ -242,10 +242,18 @@ namespace RobotEditor.ViewModel
                         matrixEnd.TranslatePrepend(vector);
                     }
                 }
+
+                octree.Add(octreeTemp);
             }
 
-           
-            var comparison = new ResultWindow();
+
+            //octree = VoxelOctree.Create(400, 100d);
+            //octree.Set(-790, -790, -790, 1);
+            //octree.Set(-1, -1, -1, 2);
+            //octree.Set(790, -790, -790, 1);
+            //octree.Set(1, -1, -1, 2);
+            
+            var comparison = new ResultWindow(octree);
             var result = comparison.ShowDialog();
 
             if (result == true)
@@ -572,9 +580,13 @@ namespace RobotEditor.ViewModel
                 // Yes we did!
 
                 // Used to show surface hits of ray
-                
-                CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0, Transform = new TranslateTransform3D(rayMeshResult.PointHit.X, rayMeshResult.PointHit.Y, rayMeshResult.PointHit.Z) });
-                
+                var coordinateSystem = new CoordinateSystemVisual3D() { ArrowLengths = 100.0, Transform = new TranslateTransform3D(rayMeshResult.PointHit.X, rayMeshResult.PointHit.Y, rayMeshResult.PointHit.Z) };
+                var PointTest = rayMeshResult.PointHit;
+                PointTest = Point3D.Multiply(PointTest, SelectedCarbody.Model.CarbodyModel.GetTransform());
+
+                SelectedCarbody.Model.CarbodyModel.Children.Add(coordinateSystem);
+                //Console.WriteLine(coordinateSystem.GetTransform().OffsetX + " " + PointTest.X + " " + coordinateSystem.GetTransform().OffsetY + " " + PointTest.Y + " " + coordinateSystem.GetTransform().OffsetZ + " " + PointTest.Z);
+                octreeTemp.Set((int)PointTest.X, (int)PointTest.Y, (int)PointTest.Z, 1.0);
 
                 /*
                 if (octree.Set((int)Math.Floor(rayMeshResult.PointHit.X / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Y / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Z / 100.0), 1))
@@ -938,7 +950,7 @@ namespace RobotEditor.ViewModel
                                 mb.AddBox(new Point3D(minB[0] + voxOld.x * 100, minB[1] + voxOld.y * 100, minB[2] + voxOld.z * 100), 10.0, 10.0, 10.0);
                                 vm.MeshGeometry = mb.ToMesh();
 
-                                vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(maxValue, 1.0));
+                                vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(maxValue, 1.0, 0.0));
                                 SelectedRobot.robotModel.Children.Add(vm);
 
                                 voxOld = vox[j];
@@ -1427,8 +1439,8 @@ namespace RobotEditor.ViewModel
 
             //move carbody front to world     
             Console.WriteLine("Positoon vorher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
-            SelectedCarbody.carbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-            
+            SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
+            //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
             Console.WriteLine("Position nachher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
 
 
@@ -1511,7 +1523,7 @@ namespace RobotEditor.ViewModel
             mb.AddBox(startPoint, 10.0, 10.0, 10.0);
             vm.MeshGeometry = mb.ToMesh();
             vm.Material = MaterialHelper.CreateMaterial(Colors.Red);
-            //CarbodyModels.Add(vm);
+           //SelectedCarbody.Model.CarbodyModel.Children.Add(vm);
 
 
             var vm2 = new MeshGeometryVisual3D();
@@ -1519,7 +1531,7 @@ namespace RobotEditor.ViewModel
             mb2.AddBox(EndPoint, 10.0, 10.0, 10.0);
             vm2.MeshGeometry = mb2.ToMesh();
             vm2.Material = MaterialHelper.CreateMaterial(Colors.Red);
-            //CarbodyModels.Add(vm2);
+            //SelectedCarbody.Model.CarbodyModel.Children.Add(vm2);
 
 
 

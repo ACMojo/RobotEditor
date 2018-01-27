@@ -17,16 +17,16 @@ namespace RobotEditor.ViewModel
         #region Fields
 
         private readonly IHelixViewport3D viewportResult;
-
+        public VoxelOctree octree;
         #endregion
 
         #region Instance
 
-        public ResultViewModel(HelixViewport3D viewportResult)
+        public ResultViewModel(HelixViewport3D viewportResult, VoxelOctree value)
         {
             Start = new DelegateCommand<object>(StartExecute, StartCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
-
+            octree = value;
 
             this.viewportResult = viewportResult;
             viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
@@ -46,28 +46,51 @@ namespace RobotEditor.ViewModel
 
         private void StartExecute(object obj)
         {
-            var octreeBooth = VoxelOctree.Create(800d, 100d);
-            octreeBooth.Set(0, 0, 0, 1);
-            octreeBooth.Set(250, -150, -150, 2);
-            octreeBooth.Set(50, -50, 350, 3);
-            octreeBooth.Set(200, 450, 250, 4);
-            Console.WriteLine(@"Level: {0} / Nodes: {1}", octreeBooth.Level, octreeBooth.Nodes.Length);
+            
+            //var octreeBooth = VoxelOctree.Create(800d, 100d);
+            //octreeBooth.Set(0, 0, 0, 1);
+            //octreeBooth.Set(50, -50, -50, 2);
+            //octreeBooth.Set(50, -50, 50, 3);
+            //octreeBooth.Set(50, 50, 50, 4);
+            
+            
+            Console.WriteLine(@"Level: {0} / Nodes: {1}", octree.Level, octree.Nodes.Length);
 
             //draw last level
-            int i = 0;
-            foreach (var node in octreeBooth.GetLeafNodes())
-            {
+            int i = octree.StartIndexLeafNodes-1;
+            int maxValue = 0;
 
+            for (int h = octree.StartIndexPerLevel[octree.Level-2]; h < octree.StartIndexPerLevel[octree.Level - 1]; h++)
+            {
+                if (octree.Nodes[h] == null)
+                    continue;
+
+                if(((VoxelNodeInner)octree.Nodes[h]).Max > maxValue)
+                {
+                    maxValue = (int)((VoxelNodeInner)octree.Nodes[h]).Max;
+
+                }
+            }
+
+
+            foreach (var node in octree.GetLeafNodes())
+            {
+                i++;
+                if (node == null)
+                    continue;
+
+                
                 var vm = new MeshGeometryVisual3D();
                 var mb = new MeshBuilder();
                 var StartOffset = new Point3D(0, 0, 0);
 
                 int n = 0;
                 int k = i;
-                for (int j = 0; j < octreeBooth.Level; j++)
+                for (int j = 0; j < octree.Level; j++)
                 {
-                    n = k % 8;
-                    k = (int)Math.Floor(k / 8d);
+                    n = (k- octree.StartIndexPerLevel[octree.Level - 1 - j]) % 8;
+                    
+
 
                     switch (n)
                     {
@@ -115,6 +138,11 @@ namespace RobotEditor.ViewModel
                             Console.WriteLine("Fehler");
                             break;
                     }
+                    if (j < octree.Level - 1)
+                    {
+                        k = octree.StartIndexPerLevel[octree.Level - 2 - j] + ((k - octree.StartIndexPerLevel[octree.Level - 1 - j]) / 8);
+                    }
+                    //k = (int)Math.Floor((double)k / 8);
 
                 }
 
@@ -151,6 +179,16 @@ namespace RobotEditor.ViewModel
                 }
                 */
 
+                if(node != null)
+                {
+                    ColorGradient colorCalculator = new ColorGradient();
+                    vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(node.Value, maxValue, 1.0));
+                    mb.AddBox(new Point3D(StartOffset.X, StartOffset.Y, StartOffset.Z), 100.0, 100.0, 100.0);
+                    vm.MeshGeometry = mb.ToMesh();
+                    viewportResult.Viewport.Children.Add(vm);
+                }
+
+                /*
                 if (node == null)
                 {
                     vm.Material = MaterialHelper.CreateMaterial(Colors.White);
@@ -179,16 +217,15 @@ namespace RobotEditor.ViewModel
                             break;
                     }
 
-                }
+                   
 
 
-                mb.AddBox(new Point3D(StartOffset.X, StartOffset.Y, StartOffset.Z), 10.0, 10.0, 10.0);
-              
-                vm.MeshGeometry = mb.ToMesh();               
-                viewportResult.Viewport.Children.Add(vm);
+                }*/
 
 
-                i++;
+
+
+                
 
             }
 

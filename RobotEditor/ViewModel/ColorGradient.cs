@@ -30,9 +30,10 @@ namespace RobotEditor.ViewModel
                 //Color.FromArgb(Alpha, 0xFF, 0xFF, 0xFF) // White
             });
         }
-        public Color GetColorForValue(double val, double maxVal)
+        public Color GetColorForValue(double val, double maxVal, double minVal)
         {
-            double valPerc = val / (maxVal);// value%
+            double valPerc = (val - minVal) / (maxVal - minVal);
+            //double valPerc = val / (maxVal);// value%
             double colorPerc = 1d / (ColorsOfMap.Count - 1);// % of each block of color. the last is the "100% Color"
             double blockOfColor = valPerc / colorPerc;// the integer part repersents how many block to skip
             int blockIdx = (int)Math.Truncate(blockOfColor);// Idx of 
@@ -40,7 +41,9 @@ namespace RobotEditor.ViewModel
             double percOfColor = valPercResidual / colorPerc;// % of color of this block that will be filled
 
             Color cTarget = ColorsOfMap[blockIdx];
-            Color cNext = cNext = ColorsOfMap[blockIdx + 1];
+            Color cNext = val == maxVal ? ColorsOfMap[blockIdx] : ColorsOfMap[blockIdx + 1];
+
+            //Color cNext = cNext = ColorsOfMap[blockIdx + 1];
 
             var deltaR = cNext.R - cTarget.R;
             var deltaG = cNext.G - cTarget.G;
