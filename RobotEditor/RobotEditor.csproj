@@ -99,8 +99,9 @@
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
     <Compile Include="ViewModel\BoundingBox.cs" />
+    <Compile Include="ViewModel\BoothViewModel.cs" />
     <Compile Include="ViewModel\CarbodyViewModel.cs" />
-    <Compile Include="ViewModel\ColorGradient.cs" />
+    <Compile Include="Helper\ColorGradient.cs" />
     <Compile Include="ViewModel\DelegateCommand.cs" />
     <Compile Include="ViewModel\JointViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -151,6 +152,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

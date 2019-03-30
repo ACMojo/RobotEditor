@@ -31,7 +31,13 @@ namespace RobotEditor.ViewModel
             this.viewportResult = viewportResult;
             viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             viewportResult.Viewport.Children.Add(new DefaultLights());
+
+            Booths.Add(new BoothViewModel(new Booth("Puma 560", 1560.1, 181.23)));
+            Booths.Add(new BoothViewModel(new Booth("Fanuc P250", 6531.45, 267.09)));
+            Booths.Add(new BoothViewModel(new Booth("EcoRP L033", 6441.34, 254.99)));
         }
+
+        public ObservableCollection<BoothViewModel> Booths { get; } = new ObservableCollection<BoothViewModel>();
 
 
         #endregion
@@ -181,8 +187,7 @@ namespace RobotEditor.ViewModel
 
                 if(node != null)
                 {
-                    ColorGradient colorCalculator = new ColorGradient();
-                    vm.Material = MaterialHelper.CreateMaterial(colorCalculator.GetColorForValue(node.Value, maxValue, 1.0));
+                    vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 1.0));
                     mb.AddBox(new Point3D(StartOffset.X, StartOffset.Y, StartOffset.Z), 100.0, 100.0, 100.0);
                     vm.MeshGeometry = mb.ToMesh();
                     viewportResult.Viewport.Children.Add(vm);

@@ -85,21 +85,6 @@ namespace RobotEditor.ViewModel
             }
         }
 
-        public Voxel[,,] voxelMap
-        {
-            get { return Model.VoxelMap; }
-            set
-            {
-                if (value.Equals(Model.VoxelMap))
-                    return;
-
-                Model.VoxelMap = value;
-
-                RaisePropertyChanged();
-            }
-        }
-
-
         public string Name
         {
             get { return Model.Name; }

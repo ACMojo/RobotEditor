@@ -9,21 +9,56 @@
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance Type=viewModel:RobotViewModel, IsDesignTimeCreatable=false}"
     Title="ResultWindow"
-    Height="544"
-    Width="785"
+    Height="630"
+    Width="881"
     MinWidth="530"
-    MinHeight="785">
+    MinHeight="630">
 
-    <Grid HorizontalAlignment="Left" Height="741" Margin="10,10,0,0" VerticalAlignment="Top" Width="765">
-        <Button x:Name="button_Start" Content="Start" HorizontalAlignment="Left" Margin="611,198,0,0" VerticalAlignment="Top" Width="75" Command="{Binding Start}"/>
+    <Grid HorizontalAlignment="Left" Height="586" Margin="10,10,0,0" VerticalAlignment="Top" Width="861">
+        <Button x:Name="button_Start" Content="Start comparison" HorizontalAlignment="Left" Margin="633,255,0,0" VerticalAlignment="Top" Width="123" Command="{Binding Start}"/>
         <h:HelixViewport3D
             x:Name="view_Result"
             CameraRotationMode="Trackball"
             ModelUpDirection="0,1,0"
-            Margin="0,0,292,392"
+            Margin="0,0,388,295"
             ZoomExtentsWhenLoaded="True"
         />
-        <Button x:Name="button_FitToView" Content="Fit to view" HorizontalAlignment="Left" Margin="611,237,0,0" VerticalAlignment="Top" Width="75" Command="{Binding FitToView}"/>
+        <Button x:Name="button_FitToView" Content="Fit to view" HorizontalAlignment="Left" Margin="379,296,0,0" VerticalAlignment="Top" Width="94" Command="{Binding FitToView}"/>
+        <Slider x:Name="slider_NoOfRobots" HorizontalAlignment="Left" Margin="547,184,0,0" Width="220" Maximum="8" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Minimum="2" Height="22" VerticalAlignment="Top" Value="2" SmallChange="2" TickFrequency="2" LargeChange="2"/>
+        <TextBox x:Name="textBox_NrOfRobots" Text="{Binding Value, ElementName=slider_NoOfRobots, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="772,183,0,0" Width="68" Height="23" VerticalAlignment="Top"/>
+        <Label x:Name="label_NoOfRobots" Content="Number of robots:" HorizontalAlignment="Left" Margin="547,153,0,0" VerticalAlignment="Top" Width="114"/>
+        <ComboBox x:Name="comboBox_SearchMethod" HorizontalAlignment="Left" Margin="721,46,0,0" VerticalAlignment="Top" Width="119" SelectedIndex="1">
+            <ListBoxItem Content="CPLEX"/>
+            <ListBoxItem Content="DFS"/>
+            <ListBoxItem Content="Brute Force"/>
+        </ComboBox>
+        <Label x:Name="label_Method" Content="Method:" HorizontalAlignment="Left" Margin="547,42,0,0" VerticalAlignment="Top" Width="114"/>
+        <TextBox x:Name="textBox_NrOfSearchCycles" HorizontalAlignment="Left" Margin="772,101,0,0" Width="68" Height="23" VerticalAlignment="Top" Text="150"/>
+        <Label x:Name="label_NoOfSearchCycles" Content="Number of search cycles:" HorizontalAlignment="Left" Margin="547,97,0,0" VerticalAlignment="Top" Width="150"/>
+        <DataGrid
+            x:Name="Robots_Grid"
+            HorizontalAlignment="Left"
+            Height="168"
+            Margin="0,343,0,0"
+            VerticalAlignment="Top"
+            Width="851"
+            ItemsSource="{Binding Booths}"
+            AutoGenerateColumns="False"
+            SelectedItem="{Binding SelectedRobot}"
+            SelectionMode="Single"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False">
+            <DataGrid.Columns>
+                <DataGridTextColumn
+                    Header="Robot"
+                    Width="351"
+                    Binding="{Binding Path=RobotName, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" IsReadOnly="true" />
+                <DataGridTextColumn Binding="{Binding Path=BestMatch, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" IsReadOnly="true" ClipboardContentBinding="{x:Null}" Header="Best Match" Width="250"/>
+                <DataGridTextColumn Binding="{Binding Path=ComputationTime, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" IsReadOnly="true" ClipboardContentBinding="{x:Null}" Header="Computation time" Width="250"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button x:Name="button_OK" Content="OK" HorizontalAlignment="Left" Margin="363,541,0,0" VerticalAlignment="Top" Width="123" Command="{Binding Start}"/>
+        <GroupBox Header="Settings" HorizontalAlignment="Left" Height="281" Margin="530,10,0,0" VerticalAlignment="Top" Width="321"/>
     </Grid>
 
 </Window>

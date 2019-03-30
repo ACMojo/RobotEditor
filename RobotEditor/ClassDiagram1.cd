@@ -1,0 +1,729 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="RobotEditor.App" Collapsed="true">
+    <Position X="21" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>App.xaml.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.ColorGradient" Collapsed="true">
+    <Position X="35" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAABAAABAAAAAAAAA=</HashCode>
+      <FileName>Helper\ColorGradient.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.BaseViewModel" Collapsed="true">
+    <Position X="11.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\BaseViewModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="RobotEditor.ViewModel.BoundingBox" Collapsed="true">
+    <Position X="28" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIADAAgQAAkABQgAYAAAAwAAAAAQKCAQuMAAA=</HashCode>
+      <FileName>ViewModel\BoundingBox.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.CarbodyViewModel" Collapsed="true">
+    <Position X="7.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAABAAAIAAAEAAAQAAAAAAAAgAAgAAAAAAAA=</HashCode>
+      <FileName>ViewModel\CarbodyViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Model" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.DelegateCommand&lt;T&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="22.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAEACAAQAAECAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ViewModel\DelegateCommand.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="RobotEditor.ViewModel.JointViewModel" Collapsed="true">
+    <Position X="14.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAACFAAQAACAAAAAABAAgAABBAAAgEJAAAAAA=</HashCode>
+      <FileName>ViewModel\JointViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Model" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="RobotEditor.ViewModel.MainWindowViewModel" Collapsed="true">
+    <Position X="11.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAMAAAAZBcsAgSSoBpABG0CRGABAgMAgBRADNAADAg=</HashCode>
+      <FileName>ViewModel\MainWindowViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.ResultViewModel" Collapsed="true">
+    <Position X="9.75" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAQCAAAAAQAAAAAAAAAAAAAAkAABAAAAAEAAA=</HashCode>
+      <FileName>ViewModel\ResultViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.ViewModel.RobotViewModel" Collapsed="true">
+    <Position X="16.25" Y="10" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAIAAAAADhAACAAkAAAIAQAAFAAAgAAAAgAAAAAAAA=</HashCode>
+      <FileName>ViewModel\RobotViewModel.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Model" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RobotEditor.Model.Booth" Collapsed="true">
+    <Position X="26.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAA=</HashCode>
+      <FileName>Model\Booth.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.Carbody">
+    <Position X="4.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAgCACAAAMAAAwIBsAEABAQAACAAFAAAABAAAIAIQAA=</HashCode>
+      <FileName>Model\Carbody.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Octree" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RobotEditor.Model.Joint">
+    <Position X="14.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAACAAAAAAAAIAAAAEAAAQQsAAAQAAAAAAA=</HashCode>
+      <FileName>Model\Joint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.Robot">
+    <Position X="16.75" Y="11.75" Width="1.5" />
+    <Members>
+      <Property Name="Octree" Hidden="true" />
+    </Members>
+    <NestedTypes>
+      <Enum Name="RobotEditor.Model.Robot.RobotTypes" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Model\Robot.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAAAAAAAAgAAAAIAQAAAAAAgAAAAAAAIIAAAA=</HashCode>
+      <FileName>Model\Robot.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Octree" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RobotEditor.Model.Voxel" Collapsed="true">
+    <Position X="31.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAABAAAAA=</HashCode>
+      <FileName>Model\Voxel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.VoxelNode" Collapsed="true">
+    <Position X="10.25" Y="13" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Model\VoxelNode.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.VoxelNodeInner" Collapsed="true">
+    <Position X="9" Y="15" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAABAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Model\VoxelNodeInner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.VoxelNodeLeaf" Collapsed="true">
+    <Position X="10.75" Y="15" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Model\VoxelNodeLeaf.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Model.VoxelOctree">
+    <Position X="6.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAZgUEAAAAAABCBAAAIBBABQAAEAQEQBIAAQAIQgCAA=</HashCode>
+      <FileName>Model\VoxelOctree.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Nodes" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="RobotEditor.Annotations.CanBeNullAttribute" Collapsed="true">
+    <Position X="29.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.NotNullAttribute" Collapsed="true">
+    <Position X="35" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.ItemNotNullAttribute" Collapsed="true">
+    <Position X="33.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.ItemCanBeNullAttribute" Collapsed="true">
+    <Position X="31.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.StringFormatMethodAttribute" Collapsed="true">
+    <Position X="24.5" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.ValueProviderAttribute" Collapsed="true">
+    <Position X="29.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.InvokerParameterNameAttribute" Collapsed="true">
+    <Position X="29.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.NotifyPropertyChangedInvocatorAttribute" Collapsed="true">
+    <Position X="33.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.ContractAnnotationAttribute" Collapsed="true">
+    <Position X="21" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAIAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.LocalizationRequiredAttribute" Collapsed="true">
+    <Position X="21" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.CannotApplyEqualityOperatorAttribute" Collapsed="true">
+    <Position X="31.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.BaseTypeRequiredAttribute" Collapsed="true">
+    <Position X="24.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.UsedImplicitlyAttribute" Collapsed="true">
+    <Position X="28" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.MeansImplicitUseAttribute" Collapsed="true">
+    <Position X="26.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.PublicAPIAttribute" Collapsed="true">
+    <Position X="24.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.InstantHandleAttribute" Collapsed="true">
+    <Position X="28" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.PureAttribute" Collapsed="true">
+    <Position X="26.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.MustUseReturnValueAttribute" Collapsed="true">
+    <Position X="28" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.ProvidesContextAttribute" Collapsed="true">
+    <Position X="22.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.PathReferenceAttribute" Collapsed="true">
+    <Position X="21" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.SourceTemplateAttribute" Collapsed="true">
+    <Position X="22.75" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.MacroAttribute" Collapsed="true">
+    <Position X="22.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAACAAAAAAAAAQAAACAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcAreaMasterLocationFormatAttribute" Collapsed="true">
+    <Position X="35" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcAreaPartialViewLocationFormatAttribute" Collapsed="true">
+    <Position X="21" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcAreaViewLocationFormatAttribute" Collapsed="true">
+    <Position X="22.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcMasterLocationFormatAttribute" Collapsed="true">
+    <Position X="31.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcPartialViewLocationFormatAttribute" Collapsed="true">
+    <Position X="21" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcViewLocationFormatAttribute" Collapsed="true">
+    <Position X="31.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcActionAttribute" Collapsed="true">
+    <Position X="29.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcAreaAttribute" Collapsed="true">
+    <Position X="33.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcControllerAttribute" Collapsed="true">
+    <Position X="24.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcMasterAttribute" Collapsed="true">
+    <Position X="29.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcModelTypeAttribute" Collapsed="true">
+    <Position X="33.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcPartialViewAttribute" Collapsed="true">
+    <Position X="35" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcSuppressViewErrorAttribute" Collapsed="true">
+    <Position X="22.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcDisplayTemplateAttribute" Collapsed="true">
+    <Position X="26.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcEditorTemplateAttribute" Collapsed="true">
+    <Position X="28" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcTemplateAttribute" Collapsed="true">
+    <Position X="24.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcViewAttribute" Collapsed="true">
+    <Position X="26.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcViewComponentAttribute" Collapsed="true">
+    <Position X="28" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcViewComponentViewAttribute" Collapsed="true">
+    <Position X="29.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMvcActionSelectorAttribute" Collapsed="true">
+    <Position X="31.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.HtmlElementAttributesAttribute" Collapsed="true">
+    <Position X="26.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.HtmlAttributeValueAttribute" Collapsed="true">
+    <Position X="24.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorSectionAttribute" Collapsed="true">
+    <Position X="22.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.CollectionAccessAttribute" Collapsed="true">
+    <Position X="33.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AssertionMethodAttribute" Collapsed="true">
+    <Position X="22.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AssertionConditionAttribute" Collapsed="true">
+    <Position X="21" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.TerminatesProgramAttribute" Collapsed="true">
+    <Position X="26" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.LinqTunnelAttribute" Collapsed="true">
+    <Position X="35" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.NoEnumerationAttribute" Collapsed="true">
+    <Position X="29.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RegexPatternAttribute" Collapsed="true">
+    <Position X="29.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.NoReorderAttribute" Collapsed="true">
+    <Position X="31.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.XamlItemsControlAttribute" Collapsed="true">
+    <Position X="35" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.XamlItemBindingOfItemsControlAttribute" Collapsed="true">
+    <Position X="33.25" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspChildControlTypeAttribute" Collapsed="true">
+    <Position X="22.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAACAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspDataFieldAttribute" Collapsed="true">
+    <Position X="24.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspDataFieldsAttribute" Collapsed="true">
+    <Position X="26.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspMethodPropertyAttribute" Collapsed="true">
+    <Position X="28" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspRequiredAttributeAttribute" Collapsed="true">
+    <Position X="33.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.AspTypePropertyAttribute" Collapsed="true">
+    <Position X="35" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorImportNamespaceAttribute" Collapsed="true">
+    <Position X="31.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorInjectionAttribute" Collapsed="true">
+    <Position X="33.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorDirectiveAttribute" Collapsed="true">
+    <Position X="28" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorPageBaseTypeAttribute" Collapsed="true">
+    <Position X="21" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorHelperCommonAttribute" Collapsed="true">
+    <Position X="29.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorLayoutAttribute" Collapsed="true">
+    <Position X="35" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorWriteLiteralMethodAttribute" Collapsed="true">
+    <Position X="24.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorWriteMethodAttribute" Collapsed="true">
+    <Position X="26.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Annotations.RazorWriteMethodParameterAttribute" Collapsed="true">
+    <Position X="28" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Properties.Resources" Collapsed="true">
+    <Position X="31.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAABEAAAAQAAAAAAAAAAAAAAAIA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.Properties.Settings" Collapsed="true">
+    <Position X="21" Y="8.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RobotEditor.View.MainWindow" BaseTypeListCollapsed="true">
+    <Position X="10" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>View\MainWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="RobotEditor.View.ResultWindow" BaseTypeListCollapsed="true">
+    <Position X="13.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>View\ResultWindow.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="RobotEditor.View.RobotValues" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="35" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>View\RobotValues.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Enum Name="RobotEditor.Model.JointTypes" Collapsed="true">
+    <Position X="28" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAA=</HashCode>
+      <FileName>Model\Joint.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="RobotEditor.Annotations.ImplicitUseKindFlags" Collapsed="true">
+    <Position X="24.5" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAABAEAAAAAAIAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="RobotEditor.Annotations.ImplicitUseTargetFlags" Collapsed="true">
+    <Position X="26.25" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAIAAAAAAAAAAAAAAEAAAAAAQ=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="RobotEditor.Annotations.CollectionAccessType" Collapsed="true">
+    <Position X="22.75" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAkAAAAAAAAAgAAAAEAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="RobotEditor.Annotations.AssertionConditionType" Collapsed="true">
+    <Position X="21" Y="9.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAAAAAAACAAAAAAAAgAAAIAAAAAAA=</HashCode>
+      <FileName>Properties\Annotations.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
