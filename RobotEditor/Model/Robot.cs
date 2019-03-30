@@ -83,20 +83,12 @@ namespace RobotEditor.Model
 
         public List<Joint> Joints { get; } = new List<Joint>();
         public string Name { get; set; }
-        public MeshGeometry3D RobotAsMesh { get; set; }
         public VoxelOctree Octree { get; set; }
 
         public ModelVisual3D RobotModel
         {
             get { return _robotModel; }
-            set
-            {
-                _robotModel = value;
-
-                var mbs = ((Model3DGroup)value.Content).Children.Cast<GeometryModel3D>();
-                foreach (var mb in mbs)
-                    RobotAsMesh = (MeshGeometry3D)mb.Geometry;
-            }
+            set { _robotModel = value; }
         }
 
         #endregion

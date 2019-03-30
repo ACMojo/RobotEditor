@@ -39,7 +39,7 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
         bool Init(int argc, string[] argv, string file, string robotNodeSetName, string baseName, string tcpName);
 
         [OperationContract, ProtoBehavior]
-        ManipulabilityVoxel[] GetManipulability(
+        ManipulabilityVoxel[] GetManipulabilityWithPenalty(
             float discrTr,
             float discrRot,
             int loops,

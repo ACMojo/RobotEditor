@@ -86,7 +86,7 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
 
         #region Public methods
 
-        public ManipulabilityVoxel[] GetManipulability(
+        public ManipulabilityVoxel[] GetManipulabilityWithPenalty(
             float discrTr,
             float discrRot,
             int loops,
@@ -99,7 +99,7 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
             {
                 WaitForStart();
 
-                return Pipe.GetManipulability(
+                return Pipe.GetManipulabilityWithPenalty(
                     discrTr,
                     discrRot,
                     loops,
@@ -115,7 +115,7 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
 
                 Restart();
 
-                return Pipe.GetManipulability(
+                return Pipe.GetManipulabilityWithPenalty(
                     discrTr,
                     discrRot,
                     loops,

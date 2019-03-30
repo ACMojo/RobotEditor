@@ -29,7 +29,7 @@ namespace VirtualRobotWrapperRunner.VirtualRobotManipulability
         public bool IsRemote => false;
 
         public float[] MinBox => _instance.MinBox;
-        public float[] MaxBox => _instance.MinBox;
+        public float[] MaxBox => _instance.MaxBox;
         public float MaxManipulability => _instance.MaxManipulability;
 
         #endregion
@@ -41,7 +41,7 @@ namespace VirtualRobotWrapperRunner.VirtualRobotManipulability
             return _instance.Init(argc, argv, file, robotNodeSetName, baseName, tcpName);
         }
 
-        public ManipulabilityVoxel[] GetManipulability(
+        public ManipulabilityVoxel[] GetManipulabilityWithPenalty(
             float discrTr,
             float discrRot,
             int loops,
