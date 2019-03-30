@@ -23,6 +23,7 @@ namespace RobotEditor.ViewModel
         private readonly IHelixViewport3D _viewportCarbody;
         private readonly IHelixViewport3D _viewportRobot;
         private IObbWrapper _obbCalculator;
+        private IVirtualRobotManipulability _vrManip;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
         private readonly Booth _booth;
@@ -60,6 +61,7 @@ namespace RobotEditor.ViewModel
             RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
 
             _obbCalculator = new RemoteObbWrapper();
+            _vrManip = new RemoteVirtualRobotManipulability();
 
             RaisePropertyChanged();
         }
@@ -178,6 +180,9 @@ namespace RobotEditor.ViewModel
         {
             _obbCalculator?.Dispose();
             _obbCalculator = null;
+
+            _vrManip?.Dispose();
+            _vrManip = null;
         }
 
         #endregion
@@ -610,58 +615,55 @@ namespace RobotEditor.ViewModel
             float[] minB;
             float maxManip;
 
-            using (IVirtualRobotManipulability vrManip = new RemoteVirtualRobotManipulability())
+            string path = AppDomain.CurrentDomain.BaseDirectory + SelectedRobot.Model.Name;
+            if (_vrManip.Init(0, null, path, "robotNodeSet", "root", "tcp"))
             {
-                string path = AppDomain.CurrentDomain.BaseDirectory + "/" + SelectedRobot.Model.Name;
-                if (vrManip.Init(0, null, @path, "robotNodeSet", "root", "tcp"))
+                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
+
+                minB = _vrManip.MinBox;
+                maxB = _vrManip.MaxBox;
+
+                // Calc size of cube depending on reachability of robot
+                double octreeSize;
+                if (Math.Abs(_vrManip.MaxBox.Max()) > Math.Abs(_vrManip.MinBox.Max()))
+                    octreeSize = Math.Abs(_vrManip.MaxBox.Max()) * 2;
+                else
+                    octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
+
+                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
+
+                maxManip = _vrManip.MaxManipulability;
+
+                ManipulabilityVoxel voxOld = vox[0];
+                double maxValue = vox[0].Value;
+                for (int j = 1; j < vox.Length; j++)
                 {
-                    ManipulabilityVoxel[] vox = vrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
+                    // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
 
-                    minB = vrManip.MinBox;
-                    maxB = vrManip.MaxBox;
-
-                    // Calc size of cube depending on reachability of robot
-                    double octreeSize;
-                    if (Math.Abs(vrManip.MaxBox.Max()) > Math.Abs(vrManip.MinBox.Max()))
-                        octreeSize = Math.Abs(vrManip.MaxBox.Max()) * 2;
-                    else
-                        octreeSize = Math.Abs(vrManip.MinBox.Max()) * 2;
-
-                    SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
-
-                    maxManip = vrManip.MaxManipulability;
-
-                    ManipulabilityVoxel voxOld = vox[0];
-                    double maxValue = vox[0].Value;
-                    for (int j = 1; j < vox.Length; j++)
+                    if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
                     {
-                        // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
-
-                        if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
-                        {
-                            if (vox[j].Value > maxValue)
-                                maxValue = vox[j].Value;
-                        }
-                        else
-                        {
-                            if (!SelectedRobot.Model.Octree.Set(
-                                    (int)(minB[0] + voxOld.X * 100),
-                                    (int)(minB[1] + voxOld.Y * 100),
-                                    (int)(minB[2] + voxOld.Z * 100),
-                                    maxValue))
-                            {
-                                var value = _booth.Octree.Get(
-                                    (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
-                                    (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
-                                    (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
-                                if (double.IsNaN(value))
-                                    Console.WriteLine(
-                                        $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
-                            }
-
-                            voxOld = vox[j];
+                        if (vox[j].Value > maxValue)
                             maxValue = vox[j].Value;
+                    }
+                    else
+                    {
+                        if (!SelectedRobot.Model.Octree.Set(
+                                (int)(minB[0] + voxOld.X * 100),
+                                (int)(minB[1] + voxOld.Y * 100),
+                                (int)(minB[2] + voxOld.Z * 100),
+                                maxValue))
+                        {
+                            var value = _booth.Octree.Get(
+                                (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
+                                (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
+                                (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
+                            if (double.IsNaN(value))
+                                Console.WriteLine(
+                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
                         }
+
+                        voxOld = vox[j];
+                        maxValue = vox[j].Value;
                     }
                 }
             }
