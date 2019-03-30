@@ -36,6 +36,7 @@ namespace RobotEditor.ViewModel
             HitPoints = new DelegateCommand<object>(HitPointsExecute, HitPointsCanExecute);
             RayOrigins = new DelegateCommand<object>(RayOriginsExecute, RayOriginsCanExecute);
             BoundingBox = new DelegateCommand<object>(BoundingBoxExecute, BoundingBoxCanExecute);
+            Manipulability = new DelegateCommand<object>(ManipulabilityExecute, ManipulabilityCanExecute);
             SymmetryPlane = new DelegateCommand<object>(SymmetryPlaneExecute, SymmetryPlaneCanExecute);
 
             this.viewportCarbody = viewportCarbody;
@@ -58,6 +59,7 @@ namespace RobotEditor.ViewModel
         public bool IsCheckedRayOrigins { get; set; }
         public bool IsCheckedBoundingBox { get; set; }
         public bool IsCheckedSymmetryPlane { get; set; }
+        public bool IsCheckedManipulability { get; set; }
 
 
         #region Public delegates
@@ -75,6 +77,7 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> EditRobot { get; }
         public DelegateCommand<object> BoundingBox { get; }
         public DelegateCommand<object> SymmetryPlane { get; }
+        public DelegateCommand<object> Manipulability { get; }
 
         #endregion
 
@@ -184,6 +187,23 @@ namespace RobotEditor.ViewModel
         private bool FitToViewRobotCanExecute(object arg)
         {
             return true;
+        }
+
+        private bool ManipulabilityCanExecute(object arg)
+        {
+            return SelectedRobot != null;
+        }
+
+        private void ManipulabilityExecute(object obj)
+        {
+            if (IsCheckedManipulability)
+            {
+                SelectedRobot.Model.show3DManipulabilityOctree();
+            }
+            else
+            {
+                SelectedRobot.Model.hide3DManipulabilityOctree();
+            }
         }
 
         #endregion
@@ -350,6 +370,7 @@ namespace RobotEditor.ViewModel
                 CreateXML.RaisePropertyChanged();
                 EditRobot.RaisePropertyChanged();
                 Compare.RaisePropertyChanged();
+                Manipulability.RaisePropertyChanged();
 
                 this.viewportRobot.ZoomExtents(0);
             }
@@ -405,8 +426,6 @@ namespace RobotEditor.ViewModel
         public ObservableCollection<Visual3D> CarbodyModels { get; } = new ObservableCollection<Visual3D>();
         public ObservableCollection<Visual3D> RobotModels { get; } = new ObservableCollection<Visual3D>();
 
-
-
         private void AddRobotExecute(object obj)
         {
             var robot = new Robot(Robot.RobotTypes.Puma560);
@@ -415,71 +434,16 @@ namespace RobotEditor.ViewModel
 
             if (result == true)
             {
-                //var coordinateSystem = new CoordinateSystemVisual3D();
-                //var baseCoordinateSystem = coordinateSystem;
-
-                //baseCoordinateSystem.XAxisColor = Colors.Yellow;
-                //baseCoordinateSystem.YAxisColor = Colors.Yellow;
-                //baseCoordinateSystem.ZAxisColor = Colors.Yellow;
-
-                //baseCoordinateSystem.ArrowLengths = 100.0;
-
-                //int i = 0;
-                //foreach (Joint joint in robot.Joints)
-                //{
-                //    i++;
-                //    var interimCS = new CoordinateSystemVisual3D();
-
-                //    if (i == robot.Joints.Count)
-                //    {
-                //        interimCS.XAxisColor = Colors.Magenta;
-                //        interimCS.YAxisColor = Colors.Magenta;
-                //        interimCS.ZAxisColor = Colors.Magenta;
-                //    }
-                //    interimCS.ArrowLengths = 100.0;
-
-                //    var DH_Matrix = new Matrix3D(
-                //        Math.Cos(degreeToRadian(joint.theta)),
-                //        Math.Sin(degreeToRadian(joint.theta)),
-                //        0.0,
-                //        0.0,
-                //        -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                //        Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                //        Math.Sin(degreeToRadian(joint.alpha)),
-                //        0.0,
-                //        Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                //        -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                //        Math.Cos(degreeToRadian(joint.alpha)),
-                //        0.0,
-                //        joint.a * Math.Cos(degreeToRadian(joint.theta)),
-                //        joint.a * Math.Sin(degreeToRadian(joint.theta)),
-                //        joint.d,
-                //        1.0
-                //        );
-
-                //    interimCS.Transform = new MatrixTransform3D(DH_Matrix);
-
-                //    LinesVisual3D line = new LinesVisual3D();
-                //    line.Thickness = 5.0;
-                //    Point3DCollection PCollection = new Point3DCollection();
-                //    PCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                //    PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
-                //    line.Color = Colors.Gray;
-                //    line.Points = PCollection;
-                //    coordinateSystem.Children.Add(line);
-
-                //    coordinateSystem.Children.Add(interimCS);
-
-                //    coordinateSystem = interimCS;
-
-                //}
-
-                //robot.RobotModel.Children.Add(baseCoordinateSystem);
-
                 robot.RobotModel.Children.Clear();
-                drawRobotModel(robot);
                 //drawVoxelMap(robot);
-                Robots.Add(new RobotViewModel(robot));
+                SelectedRobot = new RobotViewModel(robot);
+                Robots.Add(SelectedRobot);
+
+                if (SelectedRobot != null)
+                {
+                    SelectedRobot.Model.show3DRobot();
+                    CalcManipulability();
+                }
             }
 
             this.viewportRobot.ZoomExtents(0);
@@ -488,72 +452,9 @@ namespace RobotEditor.ViewModel
                 return;
         }
 
-        private void drawRobotModel(Robot robot)
-        {
-            var coordinateSystem = new CoordinateSystemVisual3D();
-            var baseCoordinateSystem = coordinateSystem;
-
-            baseCoordinateSystem.XAxisColor = Colors.Yellow;
-            baseCoordinateSystem.YAxisColor = Colors.Yellow;
-            baseCoordinateSystem.ZAxisColor = Colors.Yellow;
-
-            baseCoordinateSystem.ArrowLengths = 100.0;
-
-            int i = 0;
-            foreach (Joint joint in robot.Joints)
-            {
-                i++;
-                var interimCS = new CoordinateSystemVisual3D();
-
-                if (i == robot.Joints.Count)
-                {
-                    interimCS.XAxisColor = Colors.Magenta;
-                    interimCS.YAxisColor = Colors.Magenta;
-                    interimCS.ZAxisColor = Colors.Magenta;
-                }
-                interimCS.ArrowLengths = 100.0;
-
-                var DH_Matrix = new Matrix3D(
-                    Math.Cos(degreeToRadian(joint.theta)),
-                    Math.Sin(degreeToRadian(joint.theta)),
-                    0.0,
-                    0.0,
-                    -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                    Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                    Math.Sin(degreeToRadian(joint.alpha)),
-                    0.0,
-                    Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                    -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                    Math.Cos(degreeToRadian(joint.alpha)),
-                    0.0,
-                    joint.a * Math.Cos(degreeToRadian(joint.theta)),
-                    joint.a * Math.Sin(degreeToRadian(joint.theta)),
-                    joint.d,
-                    1.0
-                );
-
-                interimCS.Transform = new MatrixTransform3D(DH_Matrix);
-
-                LinesVisual3D line = new LinesVisual3D();
-                line.Thickness = 5.0;
-                Point3DCollection PCollection = new Point3DCollection();
-                PCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
-                line.Color = Colors.Gray;
-                line.Points = PCollection;
-                coordinateSystem.Children.Add(line);
-                
-                coordinateSystem.Children.Add(interimCS);
-
-                coordinateSystem = interimCS;
-            }
-
-            //robot.RobotModel.Children.Clear();
-            robot.RobotModel.Children.Add(baseCoordinateSystem);
-        }
-
         private void drawVoxelMap(Robot robot)
         {
+            
             robot.RobotModel.Children.Clear();
             for (int i = 0; i < 120; i++)
             {
@@ -691,17 +592,13 @@ namespace RobotEditor.ViewModel
 
             if (result == true)
             {
-                RobotModels.Remove(_selectedRobot.robotModel);
+                Robots.Remove(_selectedRobot);
+                //RobotModels.Remove(_selectedRobot.robotModel);
                 //_selectedRobot.robotModel = new ModelVisual3D();
-                drawRobotModel(_selectedRobot.Model);
+                _selectedRobot.Model.show3DRobot();
                 RobotModels.Add(_selectedRobot.robotModel);
                 this.viewportRobot.ZoomExtents(0);
             }
-        }
-
-        private double degreeToRadian(double angle)
-        {
-            return (Math.PI / 180) * angle;
         }
 
         private void DeleteRobotExecute(object obj)
@@ -716,14 +613,22 @@ namespace RobotEditor.ViewModel
             return SelectedRobot != null;
         }
 
-
-
         private bool AddCarbodyCanExecute(object arg)
         {
             return true;
         }
 
         private void CreateXMLExecute(object obj)
+        {
+            SelectedRobot.Model.SaveRobotStructur();
+        }
+
+        private bool CreateXMLCanExecute(object arg)
+        {
+            return SelectedRobot != null;
+        }
+
+        private void CalcManipulability()
         {
             SelectedRobot.Model.SaveRobotStructur();
 
@@ -746,11 +651,11 @@ namespace RobotEditor.ViewModel
                     double octreeSize;
                     if (Math.Abs(VrManip.MaxBox.Max()) > Math.Abs(VrManip.MinBox.Max()))
                     {
-                        octreeSize = Math.Abs(VrManip.MaxBox.Max())*2;
+                        octreeSize = Math.Abs(VrManip.MaxBox.Max()) * 2;
                     }
                     else
                     {
-                        octreeSize = Math.Abs(VrManip.MinBox.Max())*2;
+                        octreeSize = Math.Abs(VrManip.MinBox.Max()) * 2;
                     }
 
                     SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
@@ -770,12 +675,12 @@ namespace RobotEditor.ViewModel
                             {
                                 maxValue = vox[j].value;
                             }
-                        }                       
+                        }
                         else
                         {
-                            if (!SelectedRobot.Model.Octree.Set((int)(minB[0] + voxOld.x*100), (int)(minB[1] + voxOld.y*100), (int)(minB[2] + voxOld.z*100), maxValue))
+                            if (!SelectedRobot.Model.Octree.Set((int)(minB[0] + voxOld.x * 100), (int)(minB[1] + voxOld.y * 100), (int)(minB[2] + voxOld.z * 100), maxValue))
                             {
-                                    
+
                                 var value = booth.Octree.Get((int)Math.Floor((minB[0] / 100.0) + voxOld.x), (int)Math.Floor((minB[1] / 100.0) + voxOld.y), (int)Math.Floor((minB[2] / 100.0) + voxOld.z));
                                 if (double.IsNaN(value))
                                     Console.WriteLine($"Nicht erfolgreich bei: { Math.Floor((minB[0] / 100.0) + voxOld.x) } { Math.Floor((minB[1] / 100.0) + voxOld.y) } { Math.Floor((minB[2] / 100.0) + voxOld.z) }");
@@ -786,147 +691,14 @@ namespace RobotEditor.ViewModel
                             voxOld = vox[j];
                             maxValue = vox[j].value;
                         }
-                    }
-
-                    int i = SelectedRobot.Model.Octree.StartIndexLeafNodes - 1;
-                    int maxValu = 0;
-
-                    for (int h = SelectedRobot.Model.Octree.StartIndexPerLevel[SelectedRobot.Model.Octree.Level - 2]; h < SelectedRobot.Model.Octree.StartIndexPerLevel[SelectedRobot.Model.Octree.Level - 1]; h++)
-                    {
-                        if (SelectedRobot.Model.Octree.Nodes[h] == null)
-                            continue;
-
-                        if (((VoxelNodeInner)SelectedRobot.Model.Octree.Nodes[h]).Max > maxValu)
-                        {
-                            maxValu = (int)((VoxelNodeInner)SelectedRobot.Model.Octree.Nodes[h]).Max;
-
-                        }
-                    }
-
-
-                    foreach (var node in SelectedRobot.Model.Octree.GetLeafNodes())
-                    {
-                        i++;
-                        if (node == null)
-                            continue;
-
-
-                        var vm = new MeshGeometryVisual3D();
-                        var mb = new MeshBuilder();
-                        var StartOffset = new Point3D(0, 0, 0);
-
-                        int n = 0;
-                        int k = i;
-                        for (int w = 0; w < SelectedRobot.Model.Octree.Level; w++)
-                        {
-                            n = (k - SelectedRobot.Model.Octree.StartIndexPerLevel[SelectedRobot.Model.Octree.Level - 1 - w]) % 8;
-
-
-
-                            switch (n)
-                            {
-                                case 0:
-                                    StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 1:
-                                    StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 2:
-                                    StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 3:
-                                    StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 4:
-                                    StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 5:
-                                    StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 6:
-                                    StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                case 7:
-                                    StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                                    StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
-                                    break;
-                                default:
-                                    Console.WriteLine("Fehler");
-                                    break;
-                            }
-                            if (w < SelectedRobot.Model.Octree.Level - 1)
-                            {
-                                k = SelectedRobot.Model.Octree.StartIndexPerLevel[SelectedRobot.Model.Octree.Level - 2 - w] + ((k - SelectedRobot.Model.Octree.StartIndexPerLevel[SelectedRobot.Model.Octree.Level - 1 - w]) / 8);
-                            }
-                            //k = (int)Math.Floor((double)k / 8);
-
-                        }
-
-                        /*
-                        switch (i%8)
-                        {
-                            case 0:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Red);
-                                break;
-                            case 1:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Purple);
-                                break;
-                            case 2:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Gray);
-                                break;
-                            case 3:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Green);
-                                break;
-                            case 4:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Orange);
-                                break;
-                            case 5:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.DarkBlue);
-                                break;
-                            case 6:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.LightBlue);
-                                break;
-                            case 7:
-                                vm.Material = MaterialHelper.CreateMaterial(Colors.Yellow);
-                                break;
-                            default:
-                                Console.WriteLine("Fehler");
-                                break;
-                        }
-                        */
-
-                        if (node != null)
-                        {
-                            vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
-                            mb.AddBox(new Point3D(StartOffset.X, StartOffset.Y, StartOffset.Z), 25.0, 25.0, 25.0);
-                            vm.MeshGeometry = mb.ToMesh();
-                            viewportRobot.Viewport.Children.Add(vm);
-
-                        }
-                    }
+                    }                 
                 }
-
             }
 
             RaisePropertyChanged();
         }
 
-        private bool CreateXMLCanExecute(object arg)
+        private bool CalcManipulabilityCanExecute(object arg)
         {
             return SelectedRobot != null;
         }
