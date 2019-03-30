@@ -2,7 +2,6 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -16,7 +15,6 @@ using RobotEditor.View;
 
 using VirtualRobotWrapperLib.OBB;
 using VirtualRobotWrapperLib.VirtualRobotManipulability;
-using System.Windows;
 
 namespace RobotEditor.ViewModel
 {
@@ -33,7 +31,6 @@ namespace RobotEditor.ViewModel
         private readonly Booth _booth;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
-
 
         private bool _isCheckedHitPoints;
         private bool _isCheckedRayOrigins;
@@ -67,8 +64,8 @@ namespace RobotEditor.ViewModel
             Manipulability = new DelegateCommand<object>(ManipulabilityExecute, ManipulabilityCanExecute);
             SymmetryPlane = new DelegateCommand<object>(SymmetryPlaneExecute, SymmetryPlaneCanExecute);
 
-            this._viewportCarbody = viewportCarbody;
-            this._viewportRobot = viewportRobot;
+            _viewportCarbody = viewportCarbody;
+            _viewportRobot = viewportRobot;
 
             _booth = new Booth(10000, 100d);
             _precision = 100.0;
@@ -82,7 +79,6 @@ namespace RobotEditor.ViewModel
             RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
 
             _obbCalculator = new RemoteObbWrapper();
-            
 
             RaisePropertyChanged();
         }
@@ -106,6 +102,7 @@ namespace RobotEditor.ViewModel
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
         public ObservableCollection<CarbodyViewModel> Carbodies { get; } = new ObservableCollection<CarbodyViewModel>();
+
         public bool IsCheckedHitPoints
         {
             get { return _isCheckedHitPoints; }
@@ -115,6 +112,7 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
+
         public bool IsCheckedRayOrigins
         {
             get { return _isCheckedRayOrigins; }
@@ -124,6 +122,7 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
+
         public bool IsCheckedBoundingBox
         {
             get { return _isCheckedBoundingBox; }
@@ -133,6 +132,7 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
+
         public bool IsCheckedSymmetryPlane
         {
             get { return _isCheckedSymmetryPlane; }
@@ -142,15 +142,17 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
+
         public bool IsCheckedManipulability
         {
-            get { return _isCheckedManipulability;  }
+            get { return _isCheckedManipulability; }
             set
             {
                 _isCheckedManipulability = value;
                 RaisePropertyChanged();
-            }      
+            }
         }
+
         public double Precision
         {
             get { return _precision; }
@@ -187,11 +189,10 @@ namespace RobotEditor.ViewModel
 
                 if (_selectedRobot != null)
                 {
-                   
                     _selectedRobot.Model.Hide3DManipulabilityOctree();
                     RobotModels.Remove(_selectedRobot.RobotModel);
                 }
-                
+
                 _selectedRobot = value;
 
                 if (_selectedRobot != null)
@@ -277,7 +278,6 @@ namespace RobotEditor.ViewModel
             _obbCalculator?.Dispose();
             _obbCalculator = null;
 
-            
             _vrManip?.Dispose();
             _vrManip = null;
         }
@@ -541,11 +541,12 @@ namespace RobotEditor.ViewModel
         private void AddRobotExecute(object obj)
         {
             int i = Robots.Count;
-            foreach(var Robot in Robots)
+            foreach (var Robot in Robots)
             {
                 if (Robot.Name == $"Robot_{i}")
                     i++;
             }
+
             var robot = new Robot(Robot.RobotTypes.Empty, i);
             var newRobot = new RobotValues { DataContext = new RobotViewModel(robot) };
             var result = newRobot.ShowDialog();
@@ -563,7 +564,6 @@ namespace RobotEditor.ViewModel
                 SelectedRobot = robotViewModel;
 
                 CalcManipulability();
-
             }
 
             _viewportRobot.ZoomExtents(0);
@@ -672,13 +672,12 @@ namespace RobotEditor.ViewModel
             {
                 CalcManipulability();
             }
-            
+
             SelectedRobot.Model.Show3DRobot();
             if (IsCheckedManipulability)
                 SelectedRobot.Model.Show3DManipulabilityOctree();
 
             _viewportRobot.ZoomExtents(0);
-
         }
 
         private void DeleteRobotExecute(object obj)
@@ -722,23 +721,36 @@ namespace RobotEditor.ViewModel
         private void AddCarbodyExecute(object obj)
         {
             var fileDialog = new OpenFileDialog();
-            if (fileDialog.ShowDialog() == true)
+            if (fileDialog.ShowDialog() != true)
+                return;
+
+            var fileName = fileDialog.FileName;
+            var safeFileName = fileDialog.SafeFileName;
+
+            var backgroundWorker = new BackgroundWorker();
+
+            backgroundWorker.DoWork += (s, e) =>
             {
                 var mi = new ModelImporter();
-
-                var carbody = new Carbody(
-                    _obbCalculator,
-                    fileDialog.FileName,
-                    fileDialog.SafeFileName,
-                    new ModelVisual3D { Content = mi.Load(fileDialog.FileName, null, true) });
-
-                var newCarbody = new CarbodyViewModel(carbody);
-                Carbodies.Add(newCarbody);
-                SelectedCarbody = newCarbody;
+                var importedModel = mi.Load(fileName, null, true);
+                Application.Current.Dispatcher.Invoke(
+                    () =>
+                    {
+                        var model = new ModelVisual3D { Content = importedModel };
+                        var carbody = new Carbody(_obbCalculator, fileName, safeFileName, model);
+                        var newCarbody = new CarbodyViewModel(carbody);
+                        Carbodies.Add(newCarbody);
+                        SelectedCarbody = newCarbody;
+                    });
 
                 if (SelectedCarbody != null)
                     CalcRefPosition();
-            }
+            };
+
+            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+            IsBusy = true;
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void DeleteCarbodyExecute(object obj)
@@ -852,7 +864,7 @@ namespace RobotEditor.ViewModel
             }
             */
 
-            HideAdditionGeometries();
+            Application.Current.Dispatcher.Invoke(HideAdditionGeometries);
 
             // Find symmetry plane
             int directionOfTop = 0;
@@ -940,7 +952,8 @@ namespace RobotEditor.ViewModel
                 for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50); k++)
                 {
                     savor[k] = double.NaN;
-                    RayHi(matrixStart, matrixEnd, ref savor[k], ref savor2[k], ref savor3[k]);
+                    var currentK = k;
+                    Application.Current.Dispatcher.Invoke(() => RayHi(matrixStart, matrixEnd, ref savor[currentK], ref savor2[currentK], ref savor3[currentK]));
 
                     stepDirection[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
                     vector = new Vector3D(stepDirection[0] * -50, stepDirection[1] * -50, stepDirection[2] * -50);
@@ -1100,16 +1113,20 @@ namespace RobotEditor.ViewModel
             topCoordinate.Transform = new MatrixTransform3D(centerOfTop);
             //viewportCarbody.Viewport.Children.Add(topCoordinate);
 
-            //move carbody front to world     
-            Console.WriteLine("Position vorher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
-            SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-            //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
-            Console.WriteLine("Position nachher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
+            Application.Current.Dispatcher.Invoke(
+                () =>
+                {
+                    //move carbody front to world     
+                    Console.WriteLine("Position vorher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
+                    SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
+                    //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
+                    Console.WriteLine("Position nachher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
 
-            ShowAdditionalGeometries();
+                    ShowAdditionalGeometries();
 
-            RayOrigins.RaisePropertyChanged();
-            HitPoints.RaisePropertyChanged();
+                    RayOrigins.RaisePropertyChanged();
+                    HitPoints.RaisePropertyChanged();
+                });
         }
 
         public void CalcManipulability()
@@ -1135,10 +1152,7 @@ namespace RobotEditor.ViewModel
                 else
                     octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
 
-                
                 SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, Precision);
-
-                
 
                 maxManip = _vrManip.MaxManipulability;
 

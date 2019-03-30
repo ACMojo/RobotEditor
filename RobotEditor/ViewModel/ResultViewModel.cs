@@ -25,7 +25,7 @@ namespace RobotEditor.ViewModel
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
             Octree = value;
 
-            this._viewportResult = viewportResult;
+            _viewportResult = viewportResult;
             viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             viewportResult.Viewport.Children.Add(new DefaultLights());
 

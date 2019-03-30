@@ -13,15 +13,15 @@
         public Joint(int nr, double a, double alpha, double d, double theta, double maxLim, double minLim, JointTypes jTypes, double speed, double acceleration)
         {
             Nr = nr;
-            this.A = a;
-            this.Alpha = alpha;
-            this.D = d;
-            this.Theta = theta;
-            this.MaxLim = maxLim;
-            this.MinLim = minLim;
+            A = a;
+            Alpha = alpha;
+            D = d;
+            Theta = theta;
+            MaxLim = maxLim;
+            MinLim = minLim;
             JTypes = jTypes;
-            this.Speed = speed;
-            this.Acceleration = acceleration;
+            Speed = speed;
+            Acceleration = acceleration;
         }
 
         public Joint(int nr)
