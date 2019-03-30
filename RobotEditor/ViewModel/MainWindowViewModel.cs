@@ -689,8 +689,9 @@ namespace RobotEditor.ViewModel
                     fileDialog.SafeFileName,
                     new ModelVisual3D { Content = mi.Load(fileDialog.FileName, null, true) });
 
-                SelectedCarbody = new CarbodyViewModel(carbody);
-                Carbodies.Add(SelectedCarbody);
+                var newCarbody = new CarbodyViewModel(carbody);
+                Carbodies.Add(newCarbody);
+                SelectedCarbody = newCarbody;
 
                 if (SelectedCarbody != null)
                     CalcRefPosition();
@@ -699,7 +700,9 @@ namespace RobotEditor.ViewModel
 
         private void DeleteCarbodyExecute(object obj)
         {
-            Carbodies.Remove(_selectedCarbody);
+            var currentlySelected = SelectedCarbody;
+            SelectedCarbody = Carbodies.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
+            Carbodies.Remove(currentlySelected);
 
             RaisePropertyChanged();
         }
