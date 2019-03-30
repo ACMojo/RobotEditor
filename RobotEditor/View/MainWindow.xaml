@@ -380,7 +380,7 @@
                     Content="Update"
                     Margin="5"
                     Width="150"
-                    Command="{Binding Compare}" />
+                    Command="{Binding Update}" />
             </StackPanel>
             <Button
                 x:Name="button_Compare"

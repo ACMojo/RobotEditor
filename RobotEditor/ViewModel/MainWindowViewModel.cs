@@ -48,6 +48,7 @@ namespace RobotEditor.ViewModel
             CreateXml = new DelegateCommand<object>(CreateXmlExecute, CreateXmlCanExecute);
             AddCarbody = new DelegateCommand<object>(AddCarbodyExecute, AddCarbodyCanExecute);
             Compare = new DelegateCommand<object>(CompareExecute, CompareCanExecute);
+            Update = new DelegateCommand<object>(UpdateExecute, UpdateCanExecute);
             DeleteCarbody = new DelegateCommand<object>(DeleteCarbodyExecute, DeleteCarbodyCanExecute);
             AddRobot = new DelegateCommand<object>(AddRobotExecute, AddRobotCanExecute);
             DeleteRobot = new DelegateCommand<object>(DeleteRobotExecute, DeleteRobotCanExecute);
@@ -136,6 +137,7 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> AddRobot { get; }
         public DelegateCommand<object> DeleteRobot { get; }
         public DelegateCommand<object> Compare { get; }
+        public DelegateCommand<object> Update { get; }
         public DelegateCommand<object> AddCarbody { get; }
         public DelegateCommand<object> DeleteCarbody { get; }
         public DelegateCommand<object> FitToViewCarbody { get; }
@@ -179,6 +181,7 @@ namespace RobotEditor.ViewModel
                 EditRobot.RaisePropertyChanged();
                 Compare.RaisePropertyChanged();
                 Manipulability.RaisePropertyChanged();
+                Update.RaisePropertyChanged();
 
                 _viewportRobot.ZoomExtents(0);
             }
@@ -226,6 +229,7 @@ namespace RobotEditor.ViewModel
                 BoundingBox.RaisePropertyChanged();
                 SymmetryPlane.RaisePropertyChanged();
                 Compare.RaisePropertyChanged();
+                Update.RaisePropertyChanged();
 
                 _viewportCarbody.ZoomExtents(0);
             }
@@ -273,6 +277,11 @@ namespace RobotEditor.ViewModel
         private bool CompareCanExecute(object arg)
         {
             return Robots.Count > 0 && Carbodies.Count > 0;
+        }
+
+        private bool UpdateCanExecute(object arg)
+        {
+            return Robots.Count > 0 || Carbodies.Count > 0;
         }
 
         private bool SymmetryPlaneCanExecute(object arg)
@@ -475,6 +484,11 @@ namespace RobotEditor.ViewModel
 
             if (result != true)
                 return;
+        }
+
+        private void UpdateExecute(object obj)
+        {
+            ;
         }
 
         private void AddRobotExecute(object obj)
