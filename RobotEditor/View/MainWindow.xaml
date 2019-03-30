@@ -12,86 +12,69 @@
     Height="800"
     Width="1000"
     MinHeight="600"
-    MinWidth="800">
-    <Grid>
-        <Grid.Resources>
-            <Style
-                TargetType="Button">
-                <Setter
-                    Property="Margin"
-                    Value="5,0,5,5" />
-                <Setter
-                    Property="VerticalAlignment"
-                    Value="Center" />
-                <Setter
-                    Property="Padding"
-                    Value="3" />
-            </Style>
-            <Style
-                TargetType="CheckBox">
-                <Setter
-                    Property="Margin"
-                    Value="5,0,5,5" />
-                <Setter
-                    Property="VerticalAlignment"
-                    Value="Center" />
-            </Style>
-            <Style
-                TargetType="Slider">
-                <Setter
-                    Property="Margin"
-                    Value="5,5,0,5" />
-                <Setter
-                    Property="VerticalAlignment"
-                    Value="Center" />
-            </Style>
-            <Style
-                TargetType="TextBox">
-                <Setter
-                    Property="Margin"
-                    Value="0,5,5,5" />
-                <Setter
-                    Property="VerticalAlignment"
-                    Value="Center" />
-                <Setter
-                    Property="VerticalContentAlignment"
-                    Value="Center" />
-            </Style>
-            <Style
-                TargetType="DataGrid">
-                <Setter
-                    Property="Margin"
-                    Value="5,5,5,5" />
-                <Setter
-                    Property="Background"
-                    Value="Transparent" />
-            </Style>
-            <Style
-                TargetType="{x:Type DataGridCell}">
-                <Style.Triggers>
-                    <Trigger
-                        Property="IsSelected"
-                        Value="true">
-                        <Setter
-                            Property="Background"
-                            Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                        <Setter
-                            Property="Foreground"
-                            Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
-                        <Setter
-                            Property="BorderBrush"
-                            Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                    </Trigger>
-                    <MultiDataTrigger>
-                        <MultiDataTrigger.Conditions>
-                            <Condition
-                                Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}"
-                                Value="True" />
-                            <Condition
-                                Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=IsKeyboardFocusWithin}"
-                                Value="False" />
-                        </MultiDataTrigger.Conditions>
-                        <MultiDataTrigger.Setters>
+    MinWidth="800"
+    SizeChanged="MainWindow_SizeChanged">
+    <AdornerDecorator>
+        <Grid
+            Name="mainGrid">
+            <Grid.Resources>
+                <Style
+                    TargetType="Button">
+                    <Setter
+                        Property="Margin"
+                        Value="5,0,5,5" />
+                    <Setter
+                        Property="VerticalAlignment"
+                        Value="Center" />
+                    <Setter
+                        Property="Padding"
+                        Value="3" />
+                </Style>
+                <Style
+                    TargetType="CheckBox">
+                    <Setter
+                        Property="Margin"
+                        Value="5,0,5,5" />
+                    <Setter
+                        Property="VerticalAlignment"
+                        Value="Center" />
+                </Style>
+                <Style
+                    TargetType="Slider">
+                    <Setter
+                        Property="Margin"
+                        Value="5,5,0,5" />
+                    <Setter
+                        Property="VerticalAlignment"
+                        Value="Center" />
+                </Style>
+                <Style
+                    TargetType="TextBox">
+                    <Setter
+                        Property="Margin"
+                        Value="0,5,5,5" />
+                    <Setter
+                        Property="VerticalAlignment"
+                        Value="Center" />
+                    <Setter
+                        Property="VerticalContentAlignment"
+                        Value="Center" />
+                </Style>
+                <Style
+                    TargetType="DataGrid">
+                    <Setter
+                        Property="Margin"
+                        Value="5,5,5,5" />
+                    <Setter
+                        Property="Background"
+                        Value="Transparent" />
+                </Style>
+                <Style
+                    TargetType="{x:Type DataGridCell}">
+                    <Style.Triggers>
+                        <Trigger
+                            Property="IsSelected"
+                            Value="true">
                             <Setter
                                 Property="Background"
                                 Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
@@ -101,292 +84,312 @@
                             <Setter
                                 Property="BorderBrush"
                                 Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                        </MultiDataTrigger.Setters>
-                    </MultiDataTrigger>
-                </Style.Triggers>
-            </Style>
-            <Style
-                TargetType="Border">
-                <Setter
-                    Property="Margin"
-                    Value="5,0,5,0" />
-            </Style>
-            <Style
-                TargetType="{x:Type h:HelixViewport3D}">
-                <Setter
-                    Property="Margin"
-                    Value="6,1,6,1" />
-            </Style>
-        </Grid.Resources>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition
-                Width="50*" />
-            <ColumnDefinition
-                Width="50*" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition
-                Height="50*" />
-            <RowDefinition
-                Height="50*" />
-            <RowDefinition
-                Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <Grid
-            Grid.Column="0"
-            Grid.Row="0">
+                        </Trigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition
+                                    Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}"
+                                    Value="True" />
+                                <Condition
+                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=DataGrid}, Path=IsKeyboardFocusWithin}"
+                                    Value="False" />
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter
+                                    Property="Background"
+                                    Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                <Setter
+                                    Property="Foreground"
+                                    Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}" />
+                                <Setter
+                                    Property="BorderBrush"
+                                    Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <Style
+                    TargetType="Border">
+                    <Setter
+                        Property="Margin"
+                        Value="5,0,5,0" />
+                </Style>
+                <Style
+                    TargetType="{x:Type h:HelixViewport3D}">
+                    <Setter
+                        Property="Margin"
+                        Value="6,1,6,1" />
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition
+                    Width="50*" />
+                <ColumnDefinition
+                    Width="50*" />
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition
-                    Height="*" />
+                    Height="50*" />
+                <RowDefinition
+                    Height="50*" />
                 <RowDefinition
                     Height="Auto" />
             </Grid.RowDefinitions>
-            <DataGrid
-                Grid.Row="0"
-                x:Name="Carbodies_Grid"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                ItemsSource="{Binding Carbodies}"
-                AutoGenerateColumns="False"
-                SelectedItem="{Binding SelectedCarbody}"
-                SelectionMode="Single"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Header="Carbody"
-                        Width="Auto"
-                        Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
-                </DataGrid.Columns>
-            </DataGrid>
 
             <Grid
-                Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel
-                    Grid.Column="0"
-                    Orientation="Vertical">
-                    <Button
-                        x:Name="button_AddCarbody"
-                        Content="Add carbody"
-                        Width="100"
-                        Command="{Binding AddCarbody}" />
-                    <Button
-                        x:Name="button_DeleteCarbody"
-                        Content="Delete carbody"
-                        Width="100"
-                        Command="{Binding DeleteCarbody}" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Column="1"
-                    Orientation="Vertical">
-                    <CheckBox
-                        x:Name="checkBox_ShowHitPoints"
-                        Content="Show hit points"
-                        Command="{Binding HitPoints}"
-                        IsChecked="{Binding IsCheckedHitPoints}" />
-                    <CheckBox
-                        x:Name="checkBox_ShowRayOrigins"
-                        Content="Show ray origins"
-                        Command="{Binding RayOrigins}"
-                        IsChecked="{Binding IsCheckedRayOrigins}" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Column="2"
-                    Orientation="Vertical">
-                    <CheckBox
-                        x:Name="checkBox_ShowBoundingBox"
-                        Content="Show bounding box"
-                        Command="{Binding BoundingBox}"
-                        IsChecked="{Binding IsCheckedBoundingBox}" />
-                    <CheckBox
-                        x:Name="checkBox_ShowSymetryPlane"
-                        Content="Show symmetry plane"
-                        Command="{Binding SymmetryPlane}"
-                        IsChecked="{Binding IsCheckedSymmetryPlane}" />
-                </StackPanel>
+                Grid.Column="0"
+                Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="*" />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <DataGrid
+                    Grid.Row="0"
+                    x:Name="Carbodies_Grid"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    ItemsSource="{Binding Carbodies}"
+                    AutoGenerateColumns="False"
+                    SelectedItem="{Binding SelectedCarbody}"
+                    SelectionMode="Single"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="Carbody"
+                            Width="Auto"
+                            Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Grid
+                    Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Vertical">
+                        <Button
+                            x:Name="button_AddCarbody"
+                            Content="Add carbody"
+                            Width="100"
+                            Command="{Binding AddCarbody}" />
+                        <Button
+                            x:Name="button_DeleteCarbody"
+                            Content="Delete carbody"
+                            Width="100"
+                            Command="{Binding DeleteCarbody}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Vertical">
+                        <CheckBox
+                            x:Name="checkBox_ShowHitPoints"
+                            Content="Show hit points"
+                            Command="{Binding HitPoints}"
+                            IsChecked="{Binding IsCheckedHitPoints}" />
+                        <CheckBox
+                            x:Name="checkBox_ShowRayOrigins"
+                            Content="Show ray origins"
+                            Command="{Binding RayOrigins}"
+                            IsChecked="{Binding IsCheckedRayOrigins}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Vertical">
+                        <CheckBox
+                            x:Name="checkBox_ShowBoundingBox"
+                            Content="Show bounding box"
+                            Command="{Binding BoundingBox}"
+                            IsChecked="{Binding IsCheckedBoundingBox}" />
+                        <CheckBox
+                            x:Name="checkBox_ShowSymetryPlane"
+                            Content="Show symmetry plane"
+                            Command="{Binding SymmetryPlane}"
+                            IsChecked="{Binding IsCheckedSymmetryPlane}" />
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </Grid>
-
-        <Grid
-            Grid.Column="0"
-            Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition
-                    Height="*" />
-                <RowDefinition
-                    Height="Auto" />
-            </Grid.RowDefinitions>
-            <Border
-                Grid.Row="0"
-                BorderThickness="1"
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
-            <h:HelixViewport3D
-                Grid.Row="0"
-                VerticalAlignment="Stretch"
-                HorizontalAlignment="Stretch"
-                x:Name="view_Carbody"
-                CameraRotationMode="Trackball"
-                ModelUpDirection="0,1,0"
-                ZoomExtentsWhenLoaded="True"
-                ItemsSource="{Binding Path=CarbodyModels}" />
-            <Button
-                Grid.Row="1"
-                x:Name="button_FitToViewCarbody"
-                Content="Fit to view"
-                Width="100"
-                Command="{Binding FitToViewCarbody}" />
-        </Grid>
-
-        <Grid
-            Grid.Column="1"
-            Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition
-                    Height="*" />
-                <RowDefinition
-                    Height="Auto" />
-            </Grid.RowDefinitions>
-            <DataGrid
-                Grid.Row="0"
-                x:Name="Robots_Grid"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
-                ItemsSource="{Binding Robots}"
-                AutoGenerateColumns="False"
-                SelectedItem="{Binding SelectedRobot}"
-                SelectionMode="Single"
-                CanUserAddRows="False"
-                CanUserDeleteRows="False">
-                <DataGrid.Columns>
-                    <DataGridTextColumn
-                        Header="Robot"
-                        Width="Auto"
-                        Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
-                </DataGrid.Columns>
-            </DataGrid>
 
             <Grid
+                Grid.Column="0"
                 Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                    <ColumnDefinition
-                        Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel
-                    Grid.Column="0"
-                    Orientation="Vertical">
-                    <Button
-                        x:Name="button_CreateRobot"
-                        Content="Add robot"
-                        Width="100"
-                        Command="{Binding AddRobot}" />
-                    <Button
-                        x:Name="button_deleteRobot"
-                        Content="Delete robot"
-                        Width="100"
-                        Command="{Binding DeleteRobot}" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Column="1"
-                    Orientation="Vertical">
-                    <Button
-                        x:Name="button_CreateXML"
-                        Content="Save XML"
-                        Width="100"
-                        Command="{Binding CreateXml}" />
-                    <Button
-                        x:Name="button_EditRobot"
-                        Content="Edit robot"
-                        Width="100"
-                        Command="{Binding EditRobot}" />
-                </StackPanel>
-                <StackPanel
-                    Grid.Column="2"
-                    Orientation="Vertical">
-                    <CheckBox
-                        x:Name="checkBox_ShowManipulability"
-                        Content="Show manipulability"
-                        Command="{Binding Manipulability}"
-                        IsChecked="{Binding IsCheckedManipulability}" />
-                </StackPanel>
-            </Grid>
-        </Grid>
-
-        <Grid
-            Grid.Column="1"
-            Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition
-                    Height="*" />
-                <RowDefinition
-                    Height="Auto" />
-            </Grid.RowDefinitions>
-            <Border
-                Grid.Row="0"
-                BorderThickness="1"
-                BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
-            <h:HelixViewport3D
-                Grid.Row="0"
-                VerticalAlignment="Stretch"
-                HorizontalAlignment="Stretch"
-                x:Name="view_Robot"
-                CameraRotationMode="Trackball"
-                ModelUpDirection="0,1,0"
-                ZoomExtentsWhenLoaded="True"
-                ItemsSource="{Binding Path=RobotModels}" />
-            <Button
-                Grid.Row="1"
-                x:Name="button_FitToViewRobot"
-                Content="Fit to view"
-                Width="100"
-                Command="{Binding FitToViewRobot}" />
-        </Grid>
-
-        <StackPanel
-            Grid.Column="0"
-            Grid.ColumnSpan="2"
-            Grid.Row="2">
-            <StackPanel
-                HorizontalAlignment="Center"
-                Orientation="Horizontal">
-                <Slider
-                    x:Name="slider_Precision"
-                    HorizontalAlignment="Left"
-                    Width="220"
-                    TickFrequency="10"
-                    Maximum="500"
-                    IsSnapToTickEnabled="True"
-                    TickPlacement="BottomRight"
-                    Minimum="10"
-                    Value="{Binding Precision}" />
-                <TextBox x:Name="textBox_Precision"
-                    Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}"
-                    FontSize="15"
-                    Width="70" />
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="*" />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border
+                    Grid.Row="0"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
+                <h:HelixViewport3D
+                    Grid.Row="0"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    x:Name="view_Carbody"
+                    CameraRotationMode="Trackball"
+                    ModelUpDirection="0,1,0"
+                    ZoomExtentsWhenLoaded="True"
+                    ItemsSource="{Binding Path=CarbodyModels}" />
                 <Button
-                    x:Name="button_Update"
-                    Content="Update"
+                    Grid.Row="1"
+                    x:Name="button_FitToViewCarbody"
+                    Content="Fit to view"
+                    Width="100"
+                    Command="{Binding FitToViewCarbody}" />
+            </Grid>
+
+            <Grid
+                Grid.Column="1"
+                Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="*" />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <DataGrid
+                    Grid.Row="0"
+                    x:Name="Robots_Grid"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    ItemsSource="{Binding Robots}"
+                    AutoGenerateColumns="False"
+                    SelectedItem="{Binding SelectedRobot}"
+                    SelectionMode="Single"
+                    CanUserAddRows="False"
+                    CanUserDeleteRows="False">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn
+                            Header="Robot"
+                            Width="Auto"
+                            Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <Grid
+                    Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                        <ColumnDefinition
+                            Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Vertical">
+                        <Button
+                            x:Name="button_CreateRobot"
+                            Content="Add robot"
+                            Width="100"
+                            Command="{Binding AddRobot}" />
+                        <Button
+                            x:Name="button_deleteRobot"
+                            Content="Delete robot"
+                            Width="100"
+                            Command="{Binding DeleteRobot}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Vertical">
+                        <Button
+                            x:Name="button_CreateXML"
+                            Content="Save XML"
+                            Width="100"
+                            Command="{Binding CreateXml}" />
+                        <Button
+                            x:Name="button_EditRobot"
+                            Content="Edit robot"
+                            Width="100"
+                            Command="{Binding EditRobot}" />
+                    </StackPanel>
+                    <StackPanel
+                        Grid.Column="2"
+                        Orientation="Vertical">
+                        <CheckBox
+                            x:Name="checkBox_ShowManipulability"
+                            Content="Show manipulability"
+                            Command="{Binding Manipulability}"
+                            IsChecked="{Binding IsCheckedManipulability}" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <Grid
+                Grid.Column="1"
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="*" />
+                    <RowDefinition
+                        Height="Auto" />
+                </Grid.RowDefinitions>
+                <Border
+                    Grid.Row="0"
+                    BorderThickness="1"
+                    BorderBrush="{DynamicResource {x:Static SystemColors.ActiveBorderBrushKey}}" />
+                <h:HelixViewport3D
+                    Grid.Row="0"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    x:Name="view_Robot"
+                    CameraRotationMode="Trackball"
+                    ModelUpDirection="0,1,0"
+                    ZoomExtentsWhenLoaded="True"
+                    ItemsSource="{Binding Path=RobotModels}" />
+                <Button
+                    Grid.Row="1"
+                    x:Name="button_FitToViewRobot"
+                    Content="Fit to view"
+                    Width="100"
+                    Command="{Binding FitToViewRobot}" />
+            </Grid>
+
+            <StackPanel
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Grid.Row="2">
+                <StackPanel
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal">
+                    <Slider
+                        x:Name="slider_Precision"
+                        HorizontalAlignment="Left"
+                        Width="220"
+                        TickFrequency="10"
+                        Maximum="500"
+                        IsSnapToTickEnabled="True"
+                        TickPlacement="BottomRight"
+                        Minimum="10"
+                        Value="{Binding Precision}" />
+                    <TextBox
+                        Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                        FontSize="15"
+                        Width="70" />
+                    <Button
+                        x:Name="button_Update"
+                        Content="Update"
+                        Margin="5"
+                        Width="150" />
+                </StackPanel>
+                <Button
+                    x:Name="button_Compare"
+                    Content="Start comparison"
                     Margin="5"
                     Width="150" />
             </StackPanel>
-            <Button
-                x:Name="button_Compare"
-                Content="Start comparison"
-                Margin="5"
-                Width="150"
-                Command="{Binding Compare}" />
-        </StackPanel>
-    </Grid>
+        </Grid>
+    </AdornerDecorator>
 </Window>

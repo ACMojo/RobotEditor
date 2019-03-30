@@ -122,12 +122,20 @@
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Compile Include="ViewModel\ResultViewModel.cs" />
     <Compile Include="ViewModel\RobotViewModel.cs" />
+    <Compile Include="View\BusyIndicator.xaml.cs">
+      <DependentUpon>BusyIndicator.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ResultWindow.xaml.cs">
       <DependentUpon>ResultWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\RobotValues.xaml.cs">
       <DependentUpon>RobotValues.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\UiElementAdorner.cs" />
+    <Page Include="View\BusyIndicator.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ResultWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

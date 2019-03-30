@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -23,6 +26,7 @@ namespace RobotEditor.ViewModel
 
         private readonly IHelixViewport3D _viewportCarbody;
         private readonly IHelixViewport3D _viewportRobot;
+        private readonly CoordinateSystemVisual3D _carbodyCoordinateSystem;
         private IObbWrapper _obbCalculator;
         private IVirtualRobotManipulability _vrManip;
 
@@ -39,6 +43,7 @@ namespace RobotEditor.ViewModel
         private double _precision;
 
         private VoxelOctree _octreeTemp;
+        private bool _isBusy;
 
         #endregion
 
@@ -69,7 +74,8 @@ namespace RobotEditor.ViewModel
             _precision = 100.0;
             _vrManip = new RemoteVirtualRobotManipulability();
 
-            CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+            _carbodyCoordinateSystem = new CoordinateSystemVisual3D { ArrowLengths = 100.0 };
+            CarbodyModels.Add(_carbodyCoordinateSystem);
             CarbodyModels.Add(new DefaultLights());
 
             RobotModels.Add(new DefaultLights());
@@ -84,6 +90,19 @@ namespace RobotEditor.ViewModel
         #endregion
 
         #region Properties
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                if (value == _isBusy)
+                    return;
+
+                _isBusy = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
         public ObservableCollection<CarbodyViewModel> Carbodies { get; } = new ObservableCollection<CarbodyViewModel>();
@@ -220,13 +239,13 @@ namespace RobotEditor.ViewModel
 
                 if (_selectedCarbody != null)
                 {
-                    if (IsCheckedHitPoints)
+                    if (IsCheckedHitPoints && !IsBusy)
                         _selectedCarbody.Model.Show3DHitPointGeometries();
-                    if (IsCheckedRayOrigins)
+                    if (IsCheckedRayOrigins && !IsBusy)
                         _selectedCarbody.Model.Show3DRayOriginGeometries();
-                    if (IsCheckedBoundingBox)
+                    if (IsCheckedBoundingBox && !IsBusy)
                         _selectedCarbody.Model.Show3DBoundingBoxGeometry();
-                    if (IsCheckedSymmetryPlane)
+                    if (IsCheckedSymmetryPlane && !IsBusy)
                         _selectedCarbody.Model.Show3DSymmetryPlaneGeometry();
 
                     CarbodyModels.Add(_selectedCarbody.CarbodyModel);
@@ -377,124 +396,141 @@ namespace RobotEditor.ViewModel
 
         private void CompareExecute(object obj)
         {
-            foreach (var carbody in Carbodies)
+            HideAdditionGeometries();
+
+            IsBusy = true;
+
+            var backgroundWorker = new BackgroundWorker();
+            backgroundWorker.DoWork += (s, e) =>
             {
-                SelectedCarbody = carbody;
-
-                _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
-
-                _viewportCarbody.ZoomExtents(0);
-
-                // Perform hit test
-
-                for (int m = 0; m < 3; m++)
+                foreach (var carbody in Carbodies)
                 {
-                    int[,] directionSelector = new int[,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
-                    int[] factor = new int[3] { 1, 1, 1 };
-                    int[] factor2 = new int[3] { 0, 0, 0 };
-                    int[] factor3 = new int[3] { 0, 0, 0 };
-                    factor[m] = -1;
+                    Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
 
-                    var matrixStart = new Matrix3D(
-                        SelectedCarbody.Model.BoundingBoxAxis[0][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[0][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[0][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxAxis[1][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[1][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[1][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxAxis[2][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[2][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[2][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxPosition[0],
-                        SelectedCarbody.Model.BoundingBoxPosition[1],
-                        SelectedCarbody.Model.BoundingBoxPosition[2],
-                        1.0
-                    );
+                    _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
 
-                    var matrixEnd = new Matrix3D(
-                        SelectedCarbody.Model.BoundingBoxAxis[0][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[0][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[0][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxAxis[1][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[1][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[1][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxAxis[2][0],
-                        SelectedCarbody.Model.BoundingBoxAxis[2][1],
-                        SelectedCarbody.Model.BoundingBoxAxis[2][2],
-                        0.0,
-                        SelectedCarbody.Model.BoundingBoxPosition[0],
-                        SelectedCarbody.Model.BoundingBoxPosition[1],
-                        SelectedCarbody.Model.BoundingBoxPosition[2],
-                        1.0
-                    );
+                    Application.Current.Dispatcher.Invoke(() => _viewportCarbody.ZoomExtents(0));
 
-                    var matrixTranslationStart = new Vector3D(
-                        SelectedCarbody.Model.BoundingBoxHalfExtents[0],
-                        SelectedCarbody.Model.BoundingBoxHalfExtents[1],
-                        SelectedCarbody.Model.BoundingBoxHalfExtents[2]
-                    );
+                    // Perform hit test
 
-                    var matrixTranslationEnd = new Vector3D(
-                        factor[0] * SelectedCarbody.Model.BoundingBoxHalfExtents[0],
-                        factor[1] * SelectedCarbody.Model.BoundingBoxHalfExtents[1],
-                        factor[2] * SelectedCarbody.Model.BoundingBoxHalfExtents[2]
-                    );
-
-                    matrixStart.TranslatePrepend(matrixTranslationStart);
-                    matrixEnd.TranslatePrepend(matrixTranslationEnd);
-
-                    Vector3D vector;
-
-                    for (int j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / 100.0; j++)
+                    for (int m = 0; m < 3; m++)
                     {
-                        var total = 0;
-                        for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / 100.0; k++)
-                        {
-                            RayHi(matrixStart, matrixEnd);
+                        int[,] directionSelector = new int[,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
+                        int[] factor = new int[3] { 1, 1, 1 };
+                        int[] factor2 = new int[3] { 0, 0, 0 };
+                        int[] factor3 = new int[3] { 0, 0, 0 };
+                        factor[m] = -1;
 
-                            total += -100;
-                            factor2[directionSelector[m, 1]] = 1;
-                            vector = new Vector3D(factor2[0] * -100, factor2[1] * -100, factor2[2] * -100);
+                        var matrixStart = new Matrix3D(
+                            SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxPosition[0],
+                            SelectedCarbody.Model.BoundingBoxPosition[1],
+                            SelectedCarbody.Model.BoundingBoxPosition[2],
+                            1.0
+                        );
+
+                        var matrixEnd = new Matrix3D(
+                            SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                            SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                            SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                            0.0,
+                            SelectedCarbody.Model.BoundingBoxPosition[0],
+                            SelectedCarbody.Model.BoundingBoxPosition[1],
+                            SelectedCarbody.Model.BoundingBoxPosition[2],
+                            1.0
+                        );
+
+                        var matrixTranslationStart = new Vector3D(
+                            SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                            SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                            SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                        );
+
+                        var matrixTranslationEnd = new Vector3D(
+                            factor[0] * SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                            factor[1] * SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                            factor[2] * SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                        );
+
+                        matrixStart.TranslatePrepend(matrixTranslationStart);
+                        matrixEnd.TranslatePrepend(matrixTranslationEnd);
+
+                        Vector3D vector;
+
+                        for (int j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / 100.0; j++)
+                        {
+                            var total = 0;
+                            for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / 100.0; k++)
+                            {
+                                Application.Current.Dispatcher.Invoke(() => RayHi(matrixStart, matrixEnd));
+
+                                total += -100;
+                                factor2[directionSelector[m, 1]] = 1;
+                                vector = new Vector3D(factor2[0] * -100, factor2[1] * -100, factor2[2] * -100);
+
+                                matrixStart.TranslatePrepend(vector);
+                                matrixEnd.TranslatePrepend(vector);
+                            }
+
+                            vector = new Vector3D(factor2[0] * -total, factor2[1] * -total, factor2[2] * -total);
+
+                            matrixStart.TranslatePrepend(vector);
+                            matrixEnd.TranslatePrepend(vector);
+
+                            factor3[directionSelector[m, 0]] = 1;
+                            vector = new Vector3D(factor3[0] * -100, factor3[1] * -100, factor3[2] * -100);
 
                             matrixStart.TranslatePrepend(vector);
                             matrixEnd.TranslatePrepend(vector);
                         }
-
-                        vector = new Vector3D(factor2[0] * -total, factor2[1] * -total, factor2[2] * -total);
-
-                        matrixStart.TranslatePrepend(vector);
-                        matrixEnd.TranslatePrepend(vector);
-
-                        factor3[directionSelector[m, 0]] = 1;
-                        vector = new Vector3D(factor3[0] * -100, factor3[1] * -100, factor3[2] * -100);
-
-                        matrixStart.TranslatePrepend(vector);
-                        matrixEnd.TranslatePrepend(vector);
                     }
+
+                    _booth.Octree.Add(_octreeTemp);
                 }
+            };
 
-                _booth.Octree.Add(_octreeTemp);
-            }
+            backgroundWorker.RunWorkerCompleted += (s, e) =>
+            {
+                IsBusy = false;
 
-            //octree = VoxelOctree.Create(400, 100d);
-            //octree.Set(-790, -790, -790, 1);
-            //octree.Set(-1, -1, -1, 2);
-            //octree.Set(790, -790, -790, 1);
-            //octree.Set(1, -1, -1, 2);
+                ShowAdditionalGeometries();
 
-            var comparison = new ResultWindow(_booth.Octree);
-            var result = comparison.ShowDialog();
+                //octree = VoxelOctree.Create(400, 100d);
+                //octree.Set(-790, -790, -790, 1);
+                //octree.Set(-1, -1, -1, 2);
+                //octree.Set(790, -790, -790, 1);
+                //octree.Set(1, -1, -1, 2);
 
-            if (result == true)
-                ;
+                var comparison = new ResultWindow(_booth.Octree);
+                var result = comparison.ShowDialog();
 
-            if (result != true)
-                return;
+                if (result == true)
+                    ;
+
+                if (result != true)
+                    return;
+            };
+
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void UpdateExecute(object obj)
@@ -816,6 +852,8 @@ namespace RobotEditor.ViewModel
             }
             */
 
+            HideAdditionGeometries();
+
             // Find symmetry plane
             int directionOfTop = 0;
             int directionOfTopShift = 0;
@@ -1063,12 +1101,15 @@ namespace RobotEditor.ViewModel
             //viewportCarbody.Viewport.Children.Add(topCoordinate);
 
             //move carbody front to world     
-            Console.WriteLine("Positoon vorher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
+            Console.WriteLine("Position vorher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
             SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
             //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
             Console.WriteLine("Position nachher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
 
-            RaisePropertyChanged();
+            ShowAdditionalGeometries();
+
+            RayOrigins.RaisePropertyChanged();
+            HitPoints.RaisePropertyChanged();
         }
 
         public void CalcManipulability()
@@ -1204,6 +1245,39 @@ namespace RobotEditor.ViewModel
                     new Vector3D(startPoint.X - endPoint.X, startPoint.Y - endPoint.Y, startPoint.Z - endPoint.Z)
                 );
             VisualTreeHelper.HitTest(SelectedCarbody.CarbodyModel, null, HitTestResultCallback, hitParams);
+        }
+
+        private void ShowAdditionalGeometries()
+        {
+            if (IsCheckedRayOrigins)
+                SelectedCarbody.Model.Show3DRayOriginGeometries();
+
+            if (IsCheckedHitPoints)
+                SelectedCarbody.Model.Show3DHitPointGeometries();
+
+            if (IsCheckedBoundingBox)
+                SelectedCarbody.Model.Show3DBoundingBoxGeometry();
+
+            if (IsCheckedSymmetryPlane)
+                SelectedCarbody.Model.Show3DSymmetryPlaneGeometry();
+
+            CarbodyModels.Insert(0, _carbodyCoordinateSystem);
+        }
+
+        private void HideAdditionGeometries()
+        {
+            foreach (var carbody in Carbodies)
+            {
+                carbody.Model.Hide3DRayOriginGeometries();
+
+                carbody.Model.Hide3DHitPointGeometries();
+
+                carbody.Model.Hide3DBoundingBoxGeometry();
+
+                carbody.Model.Hide3DSymmetryPlaneGeometry();
+            }
+
+            CarbodyModels.Remove(_carbodyCoordinateSystem);
         }
 
         #endregion
