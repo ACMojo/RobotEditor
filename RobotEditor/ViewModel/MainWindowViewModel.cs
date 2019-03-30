@@ -3,18 +3,22 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+
 using HelixToolkit.Wpf;
-using VirtualRobotWrapper;
+
 using Microsoft.Win32;
-using System.Xml;
-using MathGeoLibWrapper;
+
 using RobotEditor.Model;
 using RobotEditor.View;
 
+using VirtualRobotWrapperLib.OBB;
+using VirtualRobotWrapperLib.VirtualRobotManipulability;
+
 namespace RobotEditor.ViewModel
 {
-    internal class MainWindowViewModel : BaseViewModel
+    internal class MainWindowViewModel : BaseViewModel, IDisposable
     {
+        private IOBBWrapper _obbCalculator;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
         private Booth booth;
@@ -47,10 +51,11 @@ namespace RobotEditor.ViewModel
             CarbodyModels.Add(new DefaultLights());
 
             RobotModels.Add(new DefaultLights());
-            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });         
+            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+
+            _obbCalculator = new RemoteOBBWrapper();
 
             RaisePropertyChanged();
-            
         }
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
@@ -60,7 +65,6 @@ namespace RobotEditor.ViewModel
         public bool IsCheckedBoundingBox { get; set; }
         public bool IsCheckedSymmetryPlane { get; set; }
         public bool IsCheckedManipulability { get; set; }
-
 
         #region Public delegates
 
@@ -157,7 +161,7 @@ namespace RobotEditor.ViewModel
 
         private void RayOriginsExecute(object obj)
         {
-            if(IsCheckedRayOrigins)
+            if (IsCheckedRayOrigins)
             {
                 SelectedCarbody.Model.show3DRayOriginGeometries();
             }
@@ -208,26 +212,19 @@ namespace RobotEditor.ViewModel
 
         #endregion
 
-
-
-
-
         private void CompareExecute(object obj)
         {
-            
-            foreach(var carbody in Carbodies)
+            foreach (var carbody in Carbodies)
             {
                 SelectedCarbody = carbody;
 
-               
-                octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max()) * 4, 100d);
+                octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
 
                 this.viewportCarbody.ZoomExtents(0);
-                
 
                 // Perform hit test
-                
-                for(int m = 0; m<3; m++)
+
+                for (int m = 0; m < 3; m++)
                 {
                     int[,] directionSelector = new int[,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
                     int[] factor = new int[3] { 1, 1, 1 };
@@ -236,64 +233,64 @@ namespace RobotEditor.ViewModel
                     factor[m] = -1;
 
                     var matrixStart = new Matrix3D(
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Position[0],
-                                         SelectedCarbody.Model.OBBCalculator.Position[1],
-                                         SelectedCarbody.Model.OBBCalculator.Position[2],
-                                         1.0
-                                         );
+                        SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxPosition[0],
+                        SelectedCarbody.Model.BoundingBoxPosition[1],
+                        SelectedCarbody.Model.BoundingBoxPosition[2],
+                        1.0
+                    );
 
                     var matrixEnd = new Matrix3D(
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[0][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[1][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][0],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][1],
-                                         SelectedCarbody.Model.OBBCalculator.Axis[2][2],
-                                         0.0,
-                                         SelectedCarbody.Model.OBBCalculator.Position[0],
-                                         SelectedCarbody.Model.OBBCalculator.Position[1],
-                                         SelectedCarbody.Model.OBBCalculator.Position[2],
-                                         1.0
-                                         );
+                        SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                        SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                        SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                        0.0,
+                        SelectedCarbody.Model.BoundingBoxPosition[0],
+                        SelectedCarbody.Model.BoundingBoxPosition[1],
+                        SelectedCarbody.Model.BoundingBoxPosition[2],
+                        1.0
+                    );
 
                     var matrixTranslationStart = new Vector3D(
-                                     SelectedCarbody.Model.OBBCalculator.HalfExtents[0],
-                                     SelectedCarbody.Model.OBBCalculator.HalfExtents[1],
-                                     SelectedCarbody.Model.OBBCalculator.HalfExtents[2]
-                                    );
+                        SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                        SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                        SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                    );
 
                     var matrixTranslationEnd = new Vector3D(
-                                 factor[0] * SelectedCarbody.Model.OBBCalculator.HalfExtents[0],
-                                 factor[1] * SelectedCarbody.Model.OBBCalculator.HalfExtents[1],
-                                 factor[2] * SelectedCarbody.Model.OBBCalculator.HalfExtents[2]
-                                 );
+                        factor[0] * SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                        factor[1] * SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                        factor[2] * SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                    );
 
                     matrixStart.TranslatePrepend(matrixTranslationStart);
                     matrixEnd.TranslatePrepend(matrixTranslationEnd);
 
                     Vector3D vector;
 
-                    for (int j = 0; j < (Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents[directionSelector[m,0]]) * 2) / 100.0; j++)
+                    for (int j = 0; j < (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2) / 100.0; j++)
                     {
                         var total = 0;
-                        for (int k = 0; k < (Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents[directionSelector[m,1]]) * 2) / 100.0; k++)
+                        for (int k = 0; k < (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2) / 100.0; k++)
                         {
                             RayHi(matrixStart, matrixEnd);
 
@@ -318,17 +315,15 @@ namespace RobotEditor.ViewModel
                     }
                 }
 
-
                 booth.Octree.Add(octreeTemp);
             }
-
 
             //octree = VoxelOctree.Create(400, 100d);
             //octree.Set(-790, -790, -790, 1);
             //octree.Set(-1, -1, -1, 2);
             //octree.Set(790, -790, -790, 1);
             //octree.Set(1, -1, -1, 2);
-            
+
             var comparison = new ResultWindow(booth.Octree);
             var result = comparison.ShowDialog();
 
@@ -337,11 +332,9 @@ namespace RobotEditor.ViewModel
                 ;
             }
 
-
             if (result != true)
                 return;
         }
-
 
         public RobotViewModel SelectedRobot
         {
@@ -366,7 +359,7 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
 
                 DeleteRobot.RaisePropertyChanged();
-                
+
                 CreateXML.RaisePropertyChanged();
                 EditRobot.RaisePropertyChanged();
                 Compare.RaisePropertyChanged();
@@ -425,6 +418,12 @@ namespace RobotEditor.ViewModel
 
         public ObservableCollection<Visual3D> CarbodyModels { get; } = new ObservableCollection<Visual3D>();
         public ObservableCollection<Visual3D> RobotModels { get; } = new ObservableCollection<Visual3D>();
+
+        public void Dispose()
+        {
+            _obbCalculator?.Dispose();
+            _obbCalculator = null;
+        }
 
         private void AddRobotExecute(object obj)
         {
@@ -491,23 +490,20 @@ namespace RobotEditor.ViewModel
 
         //private HitTestResultBehavior HitTestResultCallback( RayHitTestParameters parameters, HitTestResult result)
 
-        
         private HitTestResultBehavior HitTestResultCallback(ref double x, HitTestResult result)
         {
-            
             // Did we hit 3D?
-            var rayResult = result as RayHitTestResult;            
+            var rayResult = result as RayHitTestResult;
 
             // Did we hit a MeshGeometry3D?
             var rayMeshResult = rayResult as RayMeshGeometry3DHitTestResult;
-           
+
             if (rayMeshResult != null)
             {
                 // Yes we did!
 
                 // Used to show surface hits of ray
                 SelectedCarbody.Model.Add3DHitPoint(rayMeshResult.PointHit);
-
 
                 x = rayResult.DistanceToRayOrigin;
 
@@ -527,15 +523,13 @@ namespace RobotEditor.ViewModel
 
                 //Console.WriteLine(rayMeshResult.DistanceToRayOrigin);
                 return HitTestResultBehavior.Stop;
-
-             }
+            }
 
             return HitTestResultBehavior.Continue;
         }
 
         private HitTestResultBehavior HitTestResultCallback(HitTestResult result)
         {
-
             // Did we hit 3D?
             var rayResult = result as RayHitTestResult;
 
@@ -548,8 +542,6 @@ namespace RobotEditor.ViewModel
 
                 // Used to show surface hits of ray
                 SelectedCarbody.Model.Add3DHitPoint(rayMeshResult.PointHit);
-
-
 
                 //Console.WriteLine(coordinateSystem.GetTransform().OffsetX + " " + PointTest.X + " " + coordinateSystem.GetTransform().OffsetY + " " + PointTest.Y + " " + coordinateSystem.GetTransform().OffsetZ + " " + PointTest.Z);
 
@@ -573,7 +565,6 @@ namespace RobotEditor.ViewModel
 
                 //Console.WriteLine(rayMeshResult.DistanceToRayOrigin);
                 return HitTestResultBehavior.Stop;
-
             }
 
             return HitTestResultBehavior.Continue;
@@ -636,13 +627,12 @@ namespace RobotEditor.ViewModel
             float[] minB;
             float maxManip;
 
-            using (var VrManip = new VirtualRobotManipulability())
+            using (IVirtualRobotManipulability VrManip = new RemoteVirtualRobotManipulability())
             {
                 String path = AppDomain.CurrentDomain.BaseDirectory + "/" + SelectedRobot.Model.Name;
                 if (VrManip.Init(0, null, @path, "robotNodeSet", "root", "tcp"))
                 {
                     ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
-
 
                     minB = VrManip.MinBox;
                     maxB = VrManip.MaxBox;
@@ -661,7 +651,6 @@ namespace RobotEditor.ViewModel
                     SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
 
                     maxManip = VrManip.MaxManipulability;
-
 
                     ManipulabilityVoxel voxOld = vox[0];
                     double maxValue = vox[0].value;
@@ -709,14 +698,16 @@ namespace RobotEditor.ViewModel
             if (FileDialog.ShowDialog() == true)
             {
                 var mi = new ModelImporter();
+
                 var carbody = new Carbody(
+                    _obbCalculator,
                     FileDialog.FileName,
                     FileDialog.SafeFileName,
                     new ModelVisual3D { Content = mi.Load(FileDialog.FileName, null, true) });
 
                 SelectedCarbody = new CarbodyViewModel(carbody);
-                 Carbodies.Add(SelectedCarbody);
-                
+                Carbodies.Add(SelectedCarbody);
+
                 if (SelectedCarbody != null)
                 {
                     CalcRefPosition();
@@ -738,7 +729,6 @@ namespace RobotEditor.ViewModel
 
         private void CalcRefPosition()
         {
-
             // Perform hit test
             /*
             for(int m = 0; m<3; m++)
@@ -750,53 +740,53 @@ namespace RobotEditor.ViewModel
                 factor[m] = -1;
 
                 var matrixStart = new Matrix3D(
-                                     OBBCalculator.Axis[0][0],
-                                     OBBCalculator.Axis[0][1],
-                                     OBBCalculator.Axis[0][2],
+                                     BoundingBoxAxis[0][0],
+                                     BoundingBoxAxis[0][1],
+                                     BoundingBoxAxis[0][2],
                                      0.0,
-                                     OBBCalculator.Axis[1][0],
-                                     OBBCalculator.Axis[1][1],
-                                     OBBCalculator.Axis[1][2],
+                                     BoundingBoxAxis[1][0],
+                                     BoundingBoxAxis[1][1],
+                                     BoundingBoxAxis[1][2],
                                      0.0,
-                                     OBBCalculator.Axis[2][0],
-                                     OBBCalculator.Axis[2][1],
-                                     OBBCalculator.Axis[2][2],
+                                     BoundingBoxAxis[2][0],
+                                     BoundingBoxAxis[2][1],
+                                     BoundingBoxAxis[2][2],
                                      0.0,
-                                     OBBCalculator.Position[0],
-                                     OBBCalculator.Position[1],
-                                     OBBCalculator.Position[2],
+                                     BoundingBoxPosition[0],
+                                     BoundingBoxPosition[1],
+                                     BoundingBoxPosition[2],
                                      1.0
                                      );
 
                 var matrixEnd = new Matrix3D(
-                                     OBBCalculator.Axis[0][0],
-                                     OBBCalculator.Axis[0][1],
-                                     OBBCalculator.Axis[0][2],
+                                     BoundingBoxAxis[0][0],
+                                     BoundingBoxAxis[0][1],
+                                     BoundingBoxAxis[0][2],
                                      0.0,
-                                     OBBCalculator.Axis[1][0],
-                                     OBBCalculator.Axis[1][1],
-                                     OBBCalculator.Axis[1][2],
+                                     BoundingBoxAxis[1][0],
+                                     BoundingBoxAxis[1][1],
+                                     BoundingBoxAxis[1][2],
                                      0.0,
-                                     OBBCalculator.Axis[2][0],
-                                     OBBCalculator.Axis[2][1],
-                                     OBBCalculator.Axis[2][2],
+                                     BoundingBoxAxis[2][0],
+                                     BoundingBoxAxis[2][1],
+                                     BoundingBoxAxis[2][2],
                                      0.0,
-                                     OBBCalculator.Position[0],
-                                     OBBCalculator.Position[1],
-                                     OBBCalculator.Position[2],
+                                     BoundingBoxPosition[0],
+                                     BoundingBoxPosition[1],
+                                     BoundingBoxPosition[2],
                                      1.0
                                      );
 
                 var matrixTranslationStart = new Vector3D(
-                                 OBBCalculator.HalfExtents[0],
-                                 OBBCalculator.HalfExtents[1],
-                                 OBBCalculator.HalfExtents[2]
+                                 BoundingBoxHalfExtents[0],
+                                 BoundingBoxHalfExtents[1],
+                                 BoundingBoxHalfExtents[2]
                                 );
 
                 var matrixTranslationEnd = new Vector3D(
-                             factor[0] * OBBCalculator.HalfExtents[0],
-                             factor[1] * OBBCalculator.HalfExtents[1],
-                             factor[2] * OBBCalculator.HalfExtents[2]
+                             factor[0] * BoundingBoxHalfExtents[0],
+                             factor[1] * BoundingBoxHalfExtents[1],
+                             factor[2] * BoundingBoxHalfExtents[2]
                              );
 
                 matrixStart.TranslatePrepend(matrixTranslationStart);
@@ -804,10 +794,10 @@ namespace RobotEditor.ViewModel
 
                 Vector3D vector;
 
-                for (int j = 0; j < (Math.Abs(OBBCalculator.HalfExtents[directionSelector[m,0]]) * 2) / 100.0; j++)
+                for (int j = 0; j < (Math.Abs(BoundingBoxHalfExtents[directionSelector[m,0]]) * 2) / 100.0; j++)
                 {
                     var total = 0;
-                    for (int k = 0; k < (Math.Abs(OBBCalculator.HalfExtents[directionSelector[m,1]]) * 2) / 100.0; k++)
+                    for (int k = 0; k < (Math.Abs(BoundingBoxHalfExtents[directionSelector[m,1]]) * 2) / 100.0; k++)
                     {
                         RayHi(matrixStart, matrixEnd);
 
@@ -834,7 +824,6 @@ namespace RobotEditor.ViewModel
             }
             */
 
-
             // Find symmetry plane
             int directionOfTop = 0;
             int directionOfTopShift = 0;
@@ -849,85 +838,85 @@ namespace RobotEditor.ViewModel
                 int[] sideBSelector = new int[3] { 0, 0, 0 };
 
                 int z = m;
-                if (Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max()) == m)
+                if (Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) == m)
                 {
                     z = m + 1;
                 }
-                if (m == 1 && Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max()) == 0)
+
+                if (m == 1 && Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) == 0)
                 {
                     z = 2;
                 }
-                sideASelector[Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max())] = 1;
-                sideBSelector[Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max())] = 1;
+
+                sideASelector[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
+                sideBSelector[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
                 sideASelector[z] = 1;
                 sideBSelector[z] = -1;
 
                 var matrixStart = new Matrix3D(
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Position[0],
-                                     SelectedCarbody.Model.OBBCalculator.Position[1],
-                                     SelectedCarbody.Model.OBBCalculator.Position[2],
-                                     1.0
-                                     );
+                    SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxPosition[0],
+                    SelectedCarbody.Model.BoundingBoxPosition[1],
+                    SelectedCarbody.Model.BoundingBoxPosition[2],
+                    1.0
+                );
 
                 var matrixEnd = new Matrix3D(
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[0][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[1][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][0],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][1],
-                                     SelectedCarbody.Model.OBBCalculator.Axis[2][2],
-                                     0.0,
-                                     SelectedCarbody.Model.OBBCalculator.Position[0],
-                                     SelectedCarbody.Model.OBBCalculator.Position[1],
-                                     SelectedCarbody.Model.OBBCalculator.Position[2],
-                                     1.0
-                                     );
+                    SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[0][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[1][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                    SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                    SelectedCarbody.Model.BoundingBoxAxis[2][2],
+                    0.0,
+                    SelectedCarbody.Model.BoundingBoxPosition[0],
+                    SelectedCarbody.Model.BoundingBoxPosition[1],
+                    SelectedCarbody.Model.BoundingBoxPosition[2],
+                    1.0
+                );
 
                 var matrixTranslationStart = new Vector3D(
-                             sideASelector[0] * SelectedCarbody.Model.OBBCalculator.HalfExtents[0],
-                             sideASelector[1] * SelectedCarbody.Model.OBBCalculator.HalfExtents[1],
-                             sideASelector[2] * SelectedCarbody.Model.OBBCalculator.HalfExtents[2]
-                                );
+                    sideASelector[0] * SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                    sideASelector[1] * SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                    sideASelector[2] * SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                );
 
                 var matrixTranslationEnd = new Vector3D(
-                             sideBSelector[0] * SelectedCarbody.Model.OBBCalculator.HalfExtents[0],
-                             sideBSelector[1] * SelectedCarbody.Model.OBBCalculator.HalfExtents[1],
-                             sideBSelector[2] * SelectedCarbody.Model.OBBCalculator.HalfExtents[2]
-                             );
+                    sideBSelector[0] * SelectedCarbody.Model.BoundingBoxHalfExtents[0],
+                    sideBSelector[1] * SelectedCarbody.Model.BoundingBoxHalfExtents[1],
+                    sideBSelector[2] * SelectedCarbody.Model.BoundingBoxHalfExtents[2]
+                );
 
                 matrixStart.TranslatePrepend(matrixTranslationStart);
                 matrixEnd.TranslatePrepend(matrixTranslationEnd);
 
+                double[] savor = new double[(int)(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50.0) + 1)];
+                double[] savor2 = new double[(int)(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50.0) + 1)];
+                double[] savor3 = new double[(int)(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50.0) + 1)];
+                double[] savor4 = new double[(int)(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50.0) + 1)];
 
-                double[] savor = new double[(int)(Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max() * 2 / 50.0) + 1)];
-                double[] savor2 = new double[(int)(Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max() * 2 / 50.0) + 1)];
-                double[] savor3 = new double[(int)(Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max() * 2 / 50.0) + 1)];
-                double[] savor4 = new double[(int)(Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max() * 2 / 50.0) + 1)];
-
-
-                for (int k = 0; k < Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents.Max() * 2 / 50); k++)
+                for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max() * 2 / 50); k++)
                 {
                     savor[k] = double.NaN;
                     RayHi(matrixStart, matrixEnd, ref savor[k], ref savor2[k], ref savor3[k]);
 
-                    stepDirection[Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max())] = 1;
+                    stepDirection[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
                     vector = new Vector3D(stepDirection[0] * -50, stepDirection[1] * -50, stepDirection[2] * -50);
 
                     matrixStart.TranslatePrepend(vector);
@@ -947,20 +936,20 @@ namespace RobotEditor.ViewModel
                 }
                 // bottom top calculation
 
-
                 for (int q = 0; q < savor2.Length; q++)
                 {
                     if (savor2[q] > 0.1 && savor3[q] > 0.1)
                     {
-                        savor4[q] = (SelectedCarbody.Model.OBBCalculator.HalfExtents[z] * 2) - savor2[q] - savor3[q];
+                        savor4[q] = (SelectedCarbody.Model.BoundingBoxHalfExtents[z] * 2) - savor2[q] - savor3[q];
                     }
                 }
+
                 if (savor4.Average() < 100.0)
                 {
                     directionOfTop = z;
                     double totalFirst = 0.0;
                     double totalLast = 0.0;
-                    directionOfFront = Array.IndexOf(SelectedCarbody.Model.OBBCalculator.HalfExtents, SelectedCarbody.Model.OBBCalculator.HalfExtents.Max());
+                    directionOfFront = Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max());
                     if (savor2.Max() > savor3.Max())
                     {
                         directionOfTopShift = 1;
@@ -970,6 +959,7 @@ namespace RobotEditor.ViewModel
                             totalFirst += savor3[r];
                             totalLast += savor3[savor3.Length - 1 - r];
                         }
+
                         if (totalFirst > totalLast)
                         {
                             directionOfFrontShift = 1;
@@ -987,6 +977,7 @@ namespace RobotEditor.ViewModel
                             totalFirst += savor3[r];
                             totalLast += savor3[savor3.Length - 1 - r];
                         }
+
                         if (totalFirst > totalLast)
                         {
                             directionOfFrontShift = 1;
@@ -998,34 +989,31 @@ namespace RobotEditor.ViewModel
                     }
                 }
 
-
                 if ((sumOfSquares / count) < sumOfSquaresDivided)
                 {
                     sumOfSquaresDivided = (sumOfSquares / count);
-                    SelectedCarbody.Model.DirectionOfSymmetryPlane = Array.IndexOf(sideASelector, sideASelector.Min()); 
+                    SelectedCarbody.Model.DirectionOfSymmetryPlane = Array.IndexOf(sideASelector, sideASelector.Min());
                 }
-
             }
 
             var centerOfPlane = new Matrix3D(
-                SelectedCarbody.Model.OBBCalculator.Axis[0][0],
-                SelectedCarbody.Model.OBBCalculator.Axis[0][1],
-                SelectedCarbody.Model.OBBCalculator.Axis[0][2],
+                SelectedCarbody.Model.BoundingBoxAxis[0][0],
+                SelectedCarbody.Model.BoundingBoxAxis[0][1],
+                SelectedCarbody.Model.BoundingBoxAxis[0][2],
                 0.0,
-                SelectedCarbody.Model.OBBCalculator.Axis[1][0],
-                SelectedCarbody.Model.OBBCalculator.Axis[1][1],
-                SelectedCarbody.Model.OBBCalculator.Axis[1][2],
+                SelectedCarbody.Model.BoundingBoxAxis[1][0],
+                SelectedCarbody.Model.BoundingBoxAxis[1][1],
+                SelectedCarbody.Model.BoundingBoxAxis[1][2],
                 0.0,
-                SelectedCarbody.Model.OBBCalculator.Axis[2][0],
-                SelectedCarbody.Model.OBBCalculator.Axis[2][1],
-                SelectedCarbody.Model.OBBCalculator.Axis[2][2],
+                SelectedCarbody.Model.BoundingBoxAxis[2][0],
+                SelectedCarbody.Model.BoundingBoxAxis[2][1],
+                SelectedCarbody.Model.BoundingBoxAxis[2][2],
                 0.0,
-                SelectedCarbody.Model.OBBCalculator.Position[0],
-                SelectedCarbody.Model.OBBCalculator.Position[1],
-                SelectedCarbody.Model.OBBCalculator.Position[2],
+                SelectedCarbody.Model.BoundingBoxPosition[0],
+                SelectedCarbody.Model.BoundingBoxPosition[1],
+                SelectedCarbody.Model.BoundingBoxPosition[2],
                 1.0
-                );
-
+            );
 
             int[] topSelector = new int[3] { 0, 0, 0 };
             topSelector[directionOfTop] = directionOfTopShift;
@@ -1036,75 +1024,71 @@ namespace RobotEditor.ViewModel
             coordinateSelector[1] = directionOfFront;
             coordinateSelector[0] = Array.IndexOf(topSelector, 0);
 
-            
-                        var centerOfTop = new Matrix3D(
-                            -SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[0]][0],
-                            -SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[0]][1],
-                            -SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[0]][2],
-                            0.0,
-                            topSelector[directionOfFront] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[1]][0],
-                            topSelector[directionOfFront] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[1]][1],
-                            topSelector[directionOfFront] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[1]][2],
-                            0.0,
-                            -topSelector[directionOfTop] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[2]][0],
-                            -topSelector[directionOfTop] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[2]][1],
-                            -topSelector[directionOfTop] * SelectedCarbody.Model.OBBCalculator.Axis[coordinateSelector[2]][2],
-                            0.0,
-                            SelectedCarbody.Model.OBBCalculator.Position[0],
-                            SelectedCarbody.Model.OBBCalculator.Position[1],
-                            SelectedCarbody.Model.OBBCalculator.Position[2],
-                            1.0
-                            );
+            var centerOfTop = new Matrix3D(
+                -SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[0]][0],
+                -SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[0]][1],
+                -SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[0]][2],
+                0.0,
+                topSelector[directionOfFront] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[1]][0],
+                topSelector[directionOfFront] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[1]][1],
+                topSelector[directionOfFront] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[1]][2],
+                0.0,
+                -topSelector[directionOfTop] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[2]][0],
+                -topSelector[directionOfTop] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[2]][1],
+                -topSelector[directionOfTop] * SelectedCarbody.Model.BoundingBoxAxis[coordinateSelector[2]][2],
+                0.0,
+                SelectedCarbody.Model.BoundingBoxPosition[0],
+                SelectedCarbody.Model.BoundingBoxPosition[1],
+                SelectedCarbody.Model.BoundingBoxPosition[2],
+                1.0
+            );
             /*
             var centerOfTop = new Matrix3D(
-                OBBCalculator.Axis[0][0],
-                OBBCalculator.Axis[0][1],
-                OBBCalculator.Axis[0][2],
+                BoundingBoxAxis[0][0],
+                BoundingBoxAxis[0][1],
+                BoundingBoxAxis[0][2],
                 0.0,
-                OBBCalculator.Axis[1][0],
-                OBBCalculator.Axis[1][1],
-                OBBCalculator.Axis[1][2],
+                BoundingBoxAxis[1][0],
+                BoundingBoxAxis[1][1],
+                BoundingBoxAxis[1][2],
                 0.0,
-                OBBCalculator.Axis[2][0],
-                OBBCalculator.Axis[2][1],
-                OBBCalculator.Axis[2][2],
+                BoundingBoxAxis[2][0],
+                BoundingBoxAxis[2][1],
+                BoundingBoxAxis[2][2],
                 0.0,
-                OBBCalculator.Position[0],
-                OBBCalculator.Position[1],
-                OBBCalculator.Position[2],
+                BoundingBoxPosition[0],
+                BoundingBoxPosition[1],
+                BoundingBoxPosition[2],
                 1.0
                 );
 
                         var matrixTranslationTop = new Vector3D(
-             topSelector[0] * OBBCalculator.HalfExtents[0],
-             topSelector[1] * OBBCalculator.HalfExtents[1],
-             topSelector[2] * OBBCalculator.HalfExtents[2]
+             topSelector[0] * BoundingBoxHalfExtents[0],
+             topSelector[1] * BoundingBoxHalfExtents[1],
+             topSelector[2] * BoundingBoxHalfExtents[2]
                 );
 
 
 */
 
             var matrixTranslationTop = new Vector3D(
-             0,
-             Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents[directionOfFront]),
-             -Math.Abs(SelectedCarbody.Model.OBBCalculator.HalfExtents[directionOfTop])
-                );
-            
-            
+                0,
+                Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionOfFront]),
+                -Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionOfTop])
+            );
+
             centerOfTop.TranslatePrepend(matrixTranslationTop);
-            
+
             // draw top
-            var topCoordinate = new CoordinateSystemVisual3D() { ArrowLengths = 100.0 };        
+            var topCoordinate = new CoordinateSystemVisual3D() { ArrowLengths = 100.0 };
             topCoordinate.Transform = new MatrixTransform3D(centerOfTop);
             //viewportCarbody.Viewport.Children.Add(topCoordinate);
-
 
             //move carbody front to world     
             Console.WriteLine("Positoon vorher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
             SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
             //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
             Console.WriteLine("Position nachher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
-
 
             RaisePropertyChanged();
         }
@@ -1120,38 +1104,32 @@ namespace RobotEditor.ViewModel
             startPoint = transformToBoundingBoxStart.Transform(startPoint);
             EndPoint = transformToBoundingBoxEnd.Transform(EndPoint);
 
-
             // Only used to show start and end points of ray
             SelectedCarbody.Model.Add3DRayOrigin(startPoint);
             SelectedCarbody.Model.Add3DRayOrigin(EndPoint);
 
-
-
             // Ray from side A
             RayHitTestParameters hitParams =
                 new RayHitTestParameters(
-                startPoint,
-                new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
-            );
+                    startPoint,
+                    new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
+                );
             double distanceFromStart = 0.0;
             VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(ref distanceFromStart, h), hitParams);
-            
 
             // Ray from side B
             hitParams =
                 new RayHitTestParameters(
-                EndPoint,
-                new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
-            );
+                    EndPoint,
+                    new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
+                );
             double distanceFromEnd = 0.0;
             VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(ref distanceFromEnd, h), hitParams);
 
             k = Math.Abs(distanceFromStart - distanceFromEnd);
             o = distanceFromStart;
             p = distanceFromEnd;
-
         }
-
 
         private void RayHi(Matrix3D matrixStart, Matrix3D matrixEnd)
         {
@@ -1164,7 +1142,6 @@ namespace RobotEditor.ViewModel
             startPoint = transformToBoundingBoxStart.Transform(startPoint);
             EndPoint = transformToBoundingBoxEnd.Transform(EndPoint);
 
-
             // Only used to show start and end points of ray
             SelectedCarbody.Model.Add3DRayOrigin(startPoint);
             SelectedCarbody.Model.Add3DRayOrigin(EndPoint);
@@ -1172,20 +1149,18 @@ namespace RobotEditor.ViewModel
             // Ray from side A
             RayHitTestParameters hitParams =
                 new RayHitTestParameters(
-                startPoint,
-                new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
-            );
+                    startPoint,
+                    new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
+                );
             VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
-
 
             // Ray from side B
             hitParams =
                 new RayHitTestParameters(
-                EndPoint,
-                new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
-            );
+                    EndPoint,
+                    new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
+                );
             VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
-
         }
     }
 }

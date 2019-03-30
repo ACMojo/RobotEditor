@@ -4,17 +4,46 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RobotEditor", "RobotEditor\RobotEditor.csproj", "{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A} = {E9B417BD-56BA-4B6C-AF0F-84482C82611A}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRobotWrapperRunner", "VirtualRobotWrapperRunner\VirtualRobotWrapperRunner.csproj", "{E9B417BD-56BA-4B6C-AF0F-84482C82611A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualRobotWrapperLib", "VirtualRobotWrapperLib\VirtualRobotWrapperLib.csproj", "{7673CD8F-9B3A-421F-8BD5-739232C6EADE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Debug|x64.ActiveCfg = Debug|x64
+		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Debug|x64.Build.0 = Debug|x64
 		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Debug|x86.ActiveCfg = Debug|x86
 		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Debug|x86.Build.0 = Debug|x86
+		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Release|x64.ActiveCfg = Release|x64
+		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Release|x64.Build.0 = Release|x64
 		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Release|x86.ActiveCfg = Release|x86
 		{76CAC2FB-C02D-4BA7-B361-104254F4F1D0}.Release|x86.Build.0 = Release|x86
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Debug|x64.ActiveCfg = Debug|x64
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Debug|x64.Build.0 = Debug|x64
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Debug|x86.ActiveCfg = Debug|x86
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Debug|x86.Build.0 = Debug|x86
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Release|x64.ActiveCfg = Release|x64
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Release|x64.Build.0 = Release|x64
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Release|x86.ActiveCfg = Release|x86
+		{E9B417BD-56BA-4B6C-AF0F-84482C82611A}.Release|x86.Build.0 = Release|x86
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Debug|x64.Build.0 = Debug|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Debug|x86.Build.0 = Debug|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Release|x64.ActiveCfg = Release|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Release|x64.Build.0 = Release|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Release|x86.ActiveCfg = Release|Any CPU
+		{7673CD8F-9B3A-421F-8BD5-739232C6EADE}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
