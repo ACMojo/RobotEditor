@@ -388,7 +388,8 @@
                     x:Name="button_Compare"
                     Content="Start comparison"
                     Margin="5"
-                    Width="150" />
+                    Width="150"
+                    BindingGroup="{Binding Compare}" />
             </StackPanel>
         </Grid>
     </AdornerDecorator>
