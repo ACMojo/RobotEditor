@@ -13,6 +13,7 @@ using RobotEditor.View;
 
 using VirtualRobotWrapperLib.OBB;
 using VirtualRobotWrapperLib.VirtualRobotManipulability;
+using System.Windows;
 
 namespace RobotEditor.ViewModel
 {
@@ -24,9 +25,18 @@ namespace RobotEditor.ViewModel
         private readonly IHelixViewport3D _viewportRobot;
         private IObbWrapper _obbCalculator;
         private IVirtualRobotManipulability _vrManip;
+
+        private readonly Booth _booth;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
-        private readonly Booth _booth;
+
+
+        private bool _isCheckedHitPoints;
+        private bool _isCheckedRayOrigins;
+        private bool _isCheckedBoundingBox;
+        private bool _isCheckedSymmetryPlane;
+        private bool _isCheckedManipulability;
+
         private VoxelOctree _octreeTemp;
 
         #endregion
@@ -52,7 +62,9 @@ namespace RobotEditor.ViewModel
 
             this._viewportCarbody = viewportCarbody;
             this._viewportRobot = viewportRobot;
+
             _booth = new Booth(10000, 100d);
+            _vrManip = new RemoteVirtualRobotManipulability();
 
             CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             CarbodyModels.Add(new DefaultLights());
@@ -61,7 +73,7 @@ namespace RobotEditor.ViewModel
             RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
 
             _obbCalculator = new RemoteObbWrapper();
-            _vrManip = new RemoteVirtualRobotManipulability();
+            
 
             RaisePropertyChanged();
         }
@@ -72,11 +84,51 @@ namespace RobotEditor.ViewModel
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
         public ObservableCollection<CarbodyViewModel> Carbodies { get; } = new ObservableCollection<CarbodyViewModel>();
-        public bool IsCheckedHitPoints { get; set; }
-        public bool IsCheckedRayOrigins { get; set; }
-        public bool IsCheckedBoundingBox { get; set; }
-        public bool IsCheckedSymmetryPlane { get; set; }
-        public bool IsCheckedManipulability { get; set; }
+        public bool IsCheckedHitPoints
+        {
+            get { return _isCheckedHitPoints; }
+            set
+            {
+                _isCheckedHitPoints = value;
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsCheckedRayOrigins
+        {
+            get { return _isCheckedRayOrigins; }
+            set
+            {
+                _isCheckedRayOrigins = value;
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsCheckedBoundingBox
+        {
+            get { return _isCheckedBoundingBox; }
+            set
+            {
+                _isCheckedBoundingBox = value;
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsCheckedSymmetryPlane
+        {
+            get { return _isCheckedSymmetryPlane; }
+            set
+            {
+                _isCheckedSymmetryPlane = value;
+                RaisePropertyChanged();
+            }
+        }
+        public bool IsCheckedManipulability
+        {
+            get { return _isCheckedManipulability;  }
+            set
+            {
+                _isCheckedManipulability = value;
+                RaisePropertyChanged();
+            }      
+        }
 
         public DelegateCommand<object> CreateXml { get; }
         public DelegateCommand<object> HitPoints { get; }
@@ -102,12 +154,22 @@ namespace RobotEditor.ViewModel
                     return;
 
                 if (_selectedRobot != null)
+                {
+                   
+                    _selectedRobot.Model.Hide3DManipulabilityOctree();
                     RobotModels.Remove(_selectedRobot.RobotModel);
-
+                }
+                
                 _selectedRobot = value;
 
                 if (_selectedRobot != null)
+                {
+                    SelectedRobot.Model.Show3DRobot();
+
+                    if (IsCheckedManipulability)
+                        SelectedRobot.Model.Show3DManipulabilityOctree();
                     RobotModels.Add(_selectedRobot.RobotModel);
+                }
 
                 RaisePropertyChanged();
 
@@ -181,6 +243,7 @@ namespace RobotEditor.ViewModel
             _obbCalculator?.Dispose();
             _obbCalculator = null;
 
+            
             _vrManip?.Dispose();
             _vrManip = null;
         }
@@ -416,64 +479,36 @@ namespace RobotEditor.ViewModel
 
         private void AddRobotExecute(object obj)
         {
-            var robot = new Robot(Robot.RobotTypes.Puma560);
+            int i = Robots.Count;
+            foreach(var Robot in Robots)
+            {
+                if (Robot.Name == $"Robot_{i}")
+                    i++;
+            }
+            var robot = new Robot(Robot.RobotTypes.Empty, i);
             var newRobot = new RobotValues { DataContext = new RobotViewModel(robot) };
             var result = newRobot.ShowDialog();
 
             if (result == true)
             {
-                robot.RobotModel.Children.Clear();
-                //drawVoxelMap(robot);
-                SelectedRobot = new RobotViewModel(robot);
-                Robots.Add(SelectedRobot);
-
                 if (SelectedRobot != null)
-                {
-                    SelectedRobot.Model.Show3DRobot();
-                    CalcManipulability();
-                }
+                    SelectedRobot.Model.Hide3DRobot();
+
+                if (IsCheckedManipulability && SelectedRobot != null)
+                    SelectedRobot.Model.Hide3DManipulabilityOctree();
+
+                var robotViewModel = new RobotViewModel(robot);
+                Robots.Add(robotViewModel);
+                SelectedRobot = robotViewModel;
+
+                CalcManipulability();
+
             }
 
             _viewportRobot.ZoomExtents(0);
 
             if (result != true)
                 return;
-        }
-
-        private void DrawVoxelMap(Robot robot)
-        {
-            robot.RobotModel.Children.Clear();
-            for (int i = 0; i < 120; i++)
-            {
-                for (int j = 0; j < 120; j++)
-                {
-                    for (int k = 0; k < 120; k++)
-                    {
-                        /*var vm = new MeshGeometryVisual3D();
-                        var mb = new MeshBuilder();
-                        mb.AddBox(robot.VoxelMap[i, j, k].PositionFromRobotBase, 10.0, 10.0, 10.0);
-                        vm.MeshGeometry = mb.ToMesh();
-                        vm.Material = MaterialHelper.CreateMaterial(robot.VoxelMap[i, j, k].Colour);
-                        robot.RobotModel.Children.Add(vm);
-                         */
-
-                        PointsVisual3D line = new PointsVisual3D();
-                        line.Size = 5.0;
-                        TranslateTransform3D tr = new TranslateTransform3D();
-                        tr.OffsetX = i * 6;
-                        tr.OffsetY = j * 6;
-                        tr.OffsetZ = k * 6;
-
-                        line.Transform = tr;
-                        line.Color = Colors.Gray;
-                        robot.RobotModel.Children.Add(line);
-                    }
-                }
-            }
-            //robot.RobotModel.Children.Clear();
-            //robot.RobotModel.Children.Add(baseCoordinateSystem);
-
-            //return robot;
         }
 
         //private HitTestResultBehavior HitTestResultCallback( RayHitTestParameters parameters, HitTestResult result)
@@ -565,24 +600,40 @@ namespace RobotEditor.ViewModel
 
         private void EditRobotExecute(object obj)
         {
-            //var robot = new Robot(0, "Roboter " + Robots.Count);
+            SelectedRobot.Model.Hide3DRobot();
+            if (IsCheckedManipulability)
+                SelectedRobot.Model.Hide3DManipulabilityOctree();
+
             var newRobot = new RobotValues { DataContext = new RobotViewModel(_selectedRobot.Model) };
             var result = newRobot.ShowDialog();
 
             if (result == true)
             {
-                Robots.Remove(_selectedRobot);
-                //RobotModels.Remove(_selectedRobot.robotModel);
-                //_selectedRobot.robotModel = new ModelVisual3D();
-                _selectedRobot.Model.Show3DRobot();
-                RobotModels.Add(_selectedRobot.RobotModel);
-                _viewportRobot.ZoomExtents(0);
+                CalcManipulability();
             }
+            
+            SelectedRobot.Model.Show3DRobot();
+            if (IsCheckedManipulability)
+                SelectedRobot.Model.Show3DManipulabilityOctree();
+
+            _viewportRobot.ZoomExtents(0);
+
         }
 
         private void DeleteRobotExecute(object obj)
         {
-            Robots.Remove(_selectedRobot);
+            if (IsCheckedManipulability && SelectedRobot != null)
+                SelectedRobot.Model.Hide3DManipulabilityOctree();
+
+            var currentlySelected = SelectedRobot;
+            SelectedRobot = Robots.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
+            Robots.Remove(currentlySelected);
+
+            if (Robots.Count == 0)
+                IsCheckedManipulability = false;
+
+            if (IsCheckedManipulability && SelectedRobot != null)
+                SelectedRobot.Model.Show3DManipulabilityOctree();
 
             RaisePropertyChanged();
         }
@@ -603,75 +654,6 @@ namespace RobotEditor.ViewModel
         }
 
         private bool CreateXmlCanExecute(object arg)
-        {
-            return SelectedRobot != null;
-        }
-
-        private void CalcManipulability()
-        {
-            SelectedRobot.Model.SaveRobotStructur();
-
-            float[] maxB;
-            float[] minB;
-            float maxManip;
-
-            string path = AppDomain.CurrentDomain.BaseDirectory + SelectedRobot.Model.Name;
-            if (_vrManip.Init(0, null, path, "robotNodeSet", "root", "tcp"))
-            {
-                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
-
-                minB = _vrManip.MinBox;
-                maxB = _vrManip.MaxBox;
-
-                // Calc size of cube depending on reachability of robot
-                double octreeSize;
-                if (Math.Abs(_vrManip.MaxBox.Max()) > Math.Abs(_vrManip.MinBox.Max()))
-                    octreeSize = Math.Abs(_vrManip.MaxBox.Max()) * 2;
-                else
-                    octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
-
-                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
-
-                maxManip = _vrManip.MaxManipulability;
-
-                ManipulabilityVoxel voxOld = vox[0];
-                double maxValue = vox[0].Value;
-                for (int j = 1; j < vox.Length; j++)
-                {
-                    // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
-
-                    if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
-                    {
-                        if (vox[j].Value > maxValue)
-                            maxValue = vox[j].Value;
-                    }
-                    else
-                    {
-                        if (!SelectedRobot.Model.Octree.Set(
-                                (int)(minB[0] + voxOld.X * 100),
-                                (int)(minB[1] + voxOld.Y * 100),
-                                (int)(minB[2] + voxOld.Z * 100),
-                                maxValue))
-                        {
-                            var value = _booth.Octree.Get(
-                                (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
-                                (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
-                                (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
-                            if (double.IsNaN(value))
-                                Console.WriteLine(
-                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
-                        }
-
-                        voxOld = vox[j];
-                        maxValue = vox[j].Value;
-                    }
-                }
-            }
-
-            RaisePropertyChanged();
-        }
-
-        private bool CalcManipulabilityCanExecute(object arg)
         {
             return SelectedRobot != null;
         }
@@ -1062,6 +1044,68 @@ namespace RobotEditor.ViewModel
             Console.WriteLine("Position nachher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
 
             RaisePropertyChanged();
+        }
+
+        public void CalcManipulability()
+        {
+            SelectedRobot.Model.SaveRobotStructur();
+
+            float[] maxB;
+            float[] minB;
+            float maxManip;
+
+            string path = AppDomain.CurrentDomain.BaseDirectory + SelectedRobot.Model.Name;
+            if (_vrManip.Init(0, null, path, "robotNodeSet", "root", "tcp"))
+            {
+                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
+
+                minB = _vrManip.MinBox;
+                maxB = _vrManip.MaxBox;
+
+                // Calc size of cube depending on reachability of robot
+                double octreeSize;
+                if (Math.Abs(_vrManip.MaxBox.Max()) > Math.Abs(_vrManip.MinBox.Max()))
+                    octreeSize = Math.Abs(_vrManip.MaxBox.Max()) * 2;
+                else
+                    octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
+
+                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
+
+                maxManip = _vrManip.MaxManipulability;
+
+                ManipulabilityVoxel voxOld = vox[0];
+                double maxValue = vox[0].Value;
+                for (int j = 1; j < vox.Length; j++)
+                {
+                    // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
+
+                    if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
+                    {
+                        if (vox[j].Value > maxValue)
+                            maxValue = vox[j].Value;
+                    }
+                    else
+                    {
+                        if (!SelectedRobot.Model.Octree.Set(
+                                (int)(minB[0] + voxOld.X * 100),
+                                (int)(minB[1] + voxOld.Y * 100),
+                                (int)(minB[2] + voxOld.Z * 100),
+                                maxValue))
+                        {
+                            var value = _booth.Octree.Get(
+                                (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
+                                (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
+                                (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
+                            if (double.IsNaN(value))
+                                Console.WriteLine(
+                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
+                        }
+
+                        voxOld = vox[j];
+                        maxValue = vox[j].Value;
+                    }
+                }
+            }
         }
 
         private void RayHi(Matrix3D matrixStart, Matrix3D matrixEnd, ref double k, ref double o, ref double p)

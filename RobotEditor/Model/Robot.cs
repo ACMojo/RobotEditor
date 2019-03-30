@@ -9,6 +9,7 @@ using HelixToolkit.Wpf;
 
 using RobotEditor.ViewModel;
 
+
 namespace RobotEditor.Model
 {
     internal class Robot
@@ -22,7 +23,8 @@ namespace RobotEditor.Model
             EcoRp043,
             Abbirb5400,
             Abbirb5500,
-            FanucP250
+            FanucP250,
+            Empty
         };
 
         #endregion
@@ -32,6 +34,8 @@ namespace RobotEditor.Model
         private ModelVisual3D _robotModel;
         public List<MeshGeometryVisual3D> ManipulabilityVoxel3D;
         public CoordinateSystemVisual3D Robot3D;
+
+        private readonly Booth _booth;
 
         #endregion
 
@@ -43,12 +47,13 @@ namespace RobotEditor.Model
                 Joints.Add(new Joint(i + 1));
 
             Name = name;
+
             ManipulabilityVoxel3D = new List<MeshGeometryVisual3D>();
             Robot3D = new CoordinateSystemVisual3D();
             RobotModel = new ModelVisual3D();
         }
 
-        public Robot(RobotTypes type)
+        public Robot(RobotTypes type, int count)
         {
             switch (type)
             {
@@ -62,7 +67,7 @@ namespace RobotEditor.Model
                     Joints.Add(new Joint(6, 0.0, 0.0, 56.0, 0.0, 266, -266, JointTypes.Rotational, 0.0, 0.0));
                     break;
                 default:
-                    Name = "Puma 560";
+                    Name = $"Robot_{count}";
                     Joints.Add(new Joint(1, 0.0, -90.0, 0.0, 90.0, 160.0, -160.0, JointTypes.Rotational, 0.0, 0.0));
                     Joints.Add(new Joint(2, 431.0, 0.0, 149.0, 0.0, 45.0, -225, JointTypes.Rotational, 0.0, 0.0));
                     Joints.Add(new Joint(3, -20.0, 90.0, 0.0, 90.0, 225, -45, JointTypes.Rotational, 0.0, 0.0));
@@ -428,6 +433,8 @@ namespace RobotEditor.Model
             RobotModel.Children.Remove(Robot3D);
             Robot3D = null;
         }
+
+ 
 
         #endregion
 

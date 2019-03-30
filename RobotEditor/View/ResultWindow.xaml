@@ -148,7 +148,7 @@
             Margin="363,541,0,0"
             VerticalAlignment="Top"
             Width="123"
-            Command="{Binding Start}" />
+            IsCancel="True" />
         <GroupBox
             Header="Settings"
             HorizontalAlignment="Left"
