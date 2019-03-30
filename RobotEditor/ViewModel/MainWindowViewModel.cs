@@ -36,6 +36,7 @@ namespace RobotEditor.ViewModel
         private bool _isCheckedBoundingBox;
         private bool _isCheckedSymmetryPlane;
         private bool _isCheckedManipulability;
+        private double _precision;
 
         private VoxelOctree _octreeTemp;
 
@@ -65,6 +66,7 @@ namespace RobotEditor.ViewModel
             this._viewportRobot = viewportRobot;
 
             _booth = new Booth(10000, 100d);
+            _precision = 100.0;
             _vrManip = new RemoteVirtualRobotManipulability();
 
             CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
@@ -129,6 +131,15 @@ namespace RobotEditor.ViewModel
                 _isCheckedManipulability = value;
                 RaisePropertyChanged();
             }      
+        }
+        public double Precision
+        {
+            get { return _precision; }
+            set
+            {
+                _precision = value;
+                RaisePropertyChanged();
+            }
         }
 
         public DelegateCommand<object> CreateXml { get; }
@@ -1071,7 +1082,7 @@ namespace RobotEditor.ViewModel
             string path = AppDomain.CurrentDomain.BaseDirectory + SelectedRobot.Model.Name;
             if (_vrManip.Init(0, null, path, "robotNodeSet", "root", "tcp"))
             {
-                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
+                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)Precision, (float)(Math.PI / 2), 100000, false, false, true, 50f);
 
                 minB = _vrManip.MinBox;
                 maxB = _vrManip.MaxBox;
@@ -1083,7 +1094,10 @@ namespace RobotEditor.ViewModel
                 else
                     octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
 
-                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
+                
+                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, Precision);
+
+                
 
                 maxManip = _vrManip.MaxManipulability;
 
@@ -1101,18 +1115,18 @@ namespace RobotEditor.ViewModel
                     else
                     {
                         if (!SelectedRobot.Model.Octree.Set(
-                                (int)(minB[0] + voxOld.X * 100),
-                                (int)(minB[1] + voxOld.Y * 100),
-                                (int)(minB[2] + voxOld.Z * 100),
+                                (int)(minB[0] + voxOld.X * Precision),
+                                (int)(minB[1] + voxOld.Y * Precision),
+                                (int)(minB[2] + voxOld.Z * Precision),
                                 maxValue))
                         {
                             var value = _booth.Octree.Get(
-                                (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
-                                (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
-                                (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
+                                (int)Math.Floor(minB[0] / Precision + voxOld.X),
+                                (int)Math.Floor(minB[1] / Precision + voxOld.Y),
+                                (int)Math.Floor(minB[2] / Precision + voxOld.Z));
                             if (double.IsNaN(value))
                                 Console.WriteLine(
-                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
+                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / Precision + voxOld.X)} {Math.Floor(minB[1] / Precision + voxOld.Y)} {Math.Floor(minB[2] / Precision + voxOld.Z)}");
                         }
 
                         voxOld = vox[j];

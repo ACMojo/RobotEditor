@@ -370,8 +370,8 @@
                     IsSnapToTickEnabled="True"
                     TickPlacement="BottomRight"
                     Minimum="10"
-                    Value="100" />
-                <TextBox
+                    Value="{Binding Precision}" />
+                <TextBox x:Name="textBox_Precision"
                     Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}"
                     FontSize="15"
                     Width="70" />
@@ -379,8 +379,7 @@
                     x:Name="button_Update"
                     Content="Update"
                     Margin="5"
-                    Width="150"
-                    Command="{Binding Update}" />
+                    Width="150" />
             </StackPanel>
             <Button
                 x:Name="button_Compare"

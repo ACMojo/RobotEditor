@@ -35,8 +35,6 @@ namespace RobotEditor.Model
         public List<MeshGeometryVisual3D> ManipulabilityVoxel3D;
         public CoordinateSystemVisual3D Robot3D;
 
-        private readonly Booth _booth;
-
         #endregion
 
         #region Instance
@@ -434,75 +432,6 @@ namespace RobotEditor.Model
             Robot3D = null;
         }
 
- 
-
         #endregion
-
-        /*
-
-        private void drawRobotModel(Robot robot)
-        {
-            var coordinateSystem = new CoordinateSystemVisual3D();
-            var baseCoordinateSystem = coordinateSystem;
-
-            baseCoordinateSystem.XAxisColor = Colors.Yellow;
-            baseCoordinateSystem.YAxisColor = Colors.Yellow;
-            baseCoordinateSystem.ZAxisColor = Colors.Yellow;
-
-            baseCoordinateSystem.ArrowLengths = 100.0;
-
-            int i = 0;
-            foreach (Joint joint in robot.Joints)
-            {
-                i++;
-                var interimCS = new CoordinateSystemVisual3D();
-
-                if (i == robot.Joints.Count)
-                {
-                    interimCS.XAxisColor = Colors.Magenta;
-                    interimCS.YAxisColor = Colors.Magenta;
-                    interimCS.ZAxisColor = Colors.Magenta;
-                }
-                interimCS.ArrowLengths = 100.0;
-
-                var DH_Matrix = new Matrix3D(
-                    Math.Cos(degreeToRadian(joint.theta)),
-                    Math.Sin(degreeToRadian(joint.theta)),
-                    0.0,
-                    0.0,
-                    -Math.Sin(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                    Math.Cos(degreeToRadian(joint.theta)) * Math.Cos(degreeToRadian(joint.alpha)),
-                    Math.Sin(degreeToRadian(joint.alpha)),
-                    0.0,
-                    Math.Sin(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                    -Math.Cos(degreeToRadian(joint.theta)) * Math.Sin(degreeToRadian(joint.alpha)),
-                    Math.Cos(degreeToRadian(joint.alpha)),
-                    0.0,
-                    joint.a * Math.Cos(degreeToRadian(joint.theta)),
-                    joint.a * Math.Sin(degreeToRadian(joint.theta)),
-                    joint.d,
-                    1.0
-                );
-
-                interimCS.Transform = new MatrixTransform3D(DH_Matrix);
-
-                LinesVisual3D line = new LinesVisual3D();
-                line.Thickness = 5.0;
-                Point3DCollection PCollection = new Point3DCollection();
-                PCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                PCollection.Add(new Point3D(joint.a * Math.Cos(degreeToRadian(joint.theta)), joint.a * Math.Sin(degreeToRadian(joint.theta)), joint.d));
-                line.Color = Colors.Gray;
-                line.Points = PCollection;
-                coordinateSystem.Children.Add(line);
-
-                coordinateSystem.Children.Add(interimCS);
-
-                coordinateSystem = interimCS;
-            }
-
-            //robot.RobotModel.Children.Clear();
-            robot.RobotModel.Children.Add(baseCoordinateSystem);
-        }
-        */
     }
 }
