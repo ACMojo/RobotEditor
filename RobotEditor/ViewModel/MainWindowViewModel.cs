@@ -30,7 +30,8 @@ namespace RobotEditor.ViewModel
             DeleteCarbody = new DelegateCommand<object>(DeleteCarbodyExecute, DeleteCarbodyCanExecute);
             AddRobot = new DelegateCommand<object>(AddRobotExecute, AddRobotCanExecute);
             DeleteRobot = new DelegateCommand<object>(DeleteRobotExecute, DeleteRobotCanExecute);
-            FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
+            FitToViewCarbody = new DelegateCommand<object>(FitToViewCarbodyExecute, FitToViewCarbodyCanExecute);
+            FitToViewRobot = new DelegateCommand<object>(FitToViewRobotExecute, FitToViewRobotCanExecute);
             EditRobot = new DelegateCommand<object>(EditRobotExecute, EditRobotCanExecute);
             HitPoints = new DelegateCommand<object>(HitPointsExecute, HitPointsCanExecute);
             RayOrigins = new DelegateCommand<object>(RayOriginsExecute, RayOriginsCanExecute);
@@ -69,7 +70,8 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> Compare { get; }
         public DelegateCommand<object> AddCarbody { get; }
         public DelegateCommand<object> DeleteCarbody { get; }
-        public DelegateCommand<object> FitToView { get; }
+        public DelegateCommand<object> FitToViewCarbody { get; }
+        public DelegateCommand<object> FitToViewRobot { get; }
         public DelegateCommand<object> EditRobot { get; }
         public DelegateCommand<object> BoundingBox { get; }
         public DelegateCommand<object> SymmetryPlane { get; }
@@ -162,13 +164,24 @@ namespace RobotEditor.ViewModel
             }
         }
 
-        private void FitToViewExecute(object obj)
+        private void FitToViewCarbodyExecute(object obj)
         {
             viewportCarbody.ZoomExtents(0);
             RaisePropertyChanged();
         }
 
-        private bool FitToViewCanExecute(object arg)
+        private bool FitToViewCarbodyCanExecute(object arg)
+        {
+            return true;
+        }
+
+        private void FitToViewRobotExecute(object obj)
+        {
+            viewportRobot.ZoomExtents(0);
+            RaisePropertyChanged();
+        }
+
+        private bool FitToViewRobotCanExecute(object arg)
         {
             return true;
         }
