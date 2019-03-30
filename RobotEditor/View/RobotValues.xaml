@@ -1,43 +1,128 @@
-﻿<Window x:Class="RobotEditor.View.RobotValues"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModel="clr-namespace:RobotEditor.ViewModel"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        xmlns:local="clr-namespace:RobotEditor.Model"
-        mc:Ignorable="d"
-        d:DataContext="{d:DesignInstance Type=viewModel:ResultViewModel, IsDesignTimeCreatable=false}"
-        Title="RobotValues" Height="296" Width="1147.4">
+﻿<Window
+    x:Class="RobotEditor.View.RobotValues"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModel="clr-namespace:RobotEditor.ViewModel"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:local="clr-namespace:RobotEditor.Model"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=viewModel:ResultViewModel, IsDesignTimeCreatable=false}"
+    Title="RobotValues"
+    Height="296"
+    Width="1147.4">
     <Window.Resources>
-        <ObjectDataProvider x:Key="JTypes"
-                            MethodName="GetValues"
-                            ObjectType="{x:Type sys:Enum}" >
+        <ObjectDataProvider
+            x:Key="JTypes"
+            MethodName="GetValues"
+            ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="local:JointTypes"/>
+                <x:Type
+                    TypeName="local:JointTypes" />
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
     </Window.Resources>
     <Grid>
-        <Button x:Name="OK_Button" Content="OK" HorizontalAlignment="Left" Margin="586,223,0,0" VerticalAlignment="Top" Width="75" Click="OK_Button_Click"/>
-        <Button x:Name="Cancel_Button" Content="Cancel" HorizontalAlignment="Left" Margin="446,223,0,0" VerticalAlignment="Top" Width="75" IsCancel="True"/>
-        <DataGrid x:Name="DHParam_Grid" HorizontalAlignment="Left" Height="174" Margin="10,10,0,0" VerticalAlignment="Top" Width="946" ItemsSource="{Binding Path=Joints}" AutoGenerateColumns="False"
-                  SelectedItem="{Binding Path=SelectedJoint}" SelectionMode="Single" CanUserAddRows="False" CanUserDeleteRows="False">
+        <Button
+            x:Name="OK_Button"
+            Content="OK"
+            HorizontalAlignment="Left"
+            Margin="586,223,0,0"
+            VerticalAlignment="Top"
+            Width="75"
+            Click="OK_Button_Click" />
+        <Button
+            x:Name="Cancel_Button"
+            Content="Cancel"
+            HorizontalAlignment="Left"
+            Margin="446,223,0,0"
+            VerticalAlignment="Top"
+            Width="75"
+            IsCancel="True" />
+        <DataGrid
+            x:Name="DHParam_Grid"
+            HorizontalAlignment="Left"
+            Height="174"
+            Margin="10,10,0,0"
+            VerticalAlignment="Top"
+            Width="946"
+            ItemsSource="{Binding Path=Joints}"
+            AutoGenerateColumns="False"
+            SelectedItem="{Binding Path=SelectedJoint}"
+            SelectionMode="Single"
+            CanUserAddRows="False"
+            CanUserDeleteRows="False">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="#" Width="30" Binding="{Binding Path=Nr, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" IsReadOnly="true"/>
-                <DataGridTextColumn Header="a [mm]" Width="100" Binding="{Binding Path=A, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Alpha [°]" Width="100" Binding="{Binding Path=Alpha, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="d [mm]" Width="100" Binding="{Binding Path=D, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Theta [°]" Width="100" Binding="{Binding Path=Theta, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Max. Lim [° / mm]" Width="100" Binding="{Binding Path=MaxLim, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Min. Lim [° / mm]" Width="100" Binding="{Binding Path=MinLim, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridComboBoxColumn Header="Joint Type" Width="100" ItemsSource="{Binding Source={StaticResource JTypes}}" SelectedItemBinding="{Binding Path=JoinType, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Speed [mm/s]" Width="100" Binding="{Binding Path=Speed, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
-                <DataGridTextColumn Header="Accel. [mm/s²]" Width="100" Binding="{Binding Path=Acceleration, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" CanUserSort="False"/>
+                <DataGridTextColumn
+                    Header="#"
+                    Width="30"
+                    Binding="{Binding Path=Nr, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    IsReadOnly="true" />
+                <DataGridTextColumn
+                    Header="a [mm]"
+                    Width="100"
+                    Binding="{Binding Path=A, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Alpha [°]"
+                    Width="100"
+                    Binding="{Binding Path=Alpha, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="d [mm]"
+                    Width="100"
+                    Binding="{Binding Path=D, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Theta [°]"
+                    Width="100"
+                    Binding="{Binding Path=Theta, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Max. Lim [° / mm]"
+                    Width="100"
+                    Binding="{Binding Path=MaxLim, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Min. Lim [° / mm]"
+                    Width="100"
+                    Binding="{Binding Path=MinLim, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridComboBoxColumn
+                    Header="Joint Type"
+                    Width="100"
+                    ItemsSource="{Binding Source={StaticResource JTypes}}"
+                    SelectedItemBinding="{Binding Path=JoinType, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Speed [mm/s]"
+                    Width="100"
+                    Binding="{Binding Path=Speed, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
+                <DataGridTextColumn
+                    Header="Accel. [mm/s²]"
+                    Width="100"
+                    Binding="{Binding Path=Acceleration, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                    CanUserSort="False" />
             </DataGrid.Columns>
         </DataGrid>
-        <Button x:Name="AddJoint_Button" Content="Add Joint" HorizontalAlignment="Left" Margin="977,12,0,0" VerticalAlignment="Top" Width="139" Command="{Binding Path=AddJoint}"/>
-        <Button x:Name="DeletJoint_Button" Content="Delete Joint" HorizontalAlignment="Left" Margin="977,49,0,0" VerticalAlignment="Top" Width="139" Command="{Binding Path=DeleteJoint}"/>
+        <Button
+            x:Name="AddJoint_Button"
+            Content="Add Joint"
+            HorizontalAlignment="Left"
+            Margin="977,12,0,0"
+            VerticalAlignment="Top"
+            Width="139"
+            Command="{Binding Path=AddJoint}" />
+        <Button
+            x:Name="DeletJoint_Button"
+            Content="Delete Joint"
+            HorizontalAlignment="Left"
+            Margin="977,49,0,0"
+            VerticalAlignment="Top"
+            Width="139"
+            Command="{Binding Path=DeleteJoint}" />
 
     </Grid>
 </Window>

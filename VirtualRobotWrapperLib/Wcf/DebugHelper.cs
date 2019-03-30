@@ -17,7 +17,7 @@ namespace VirtualRobotWrapperLib.Wcf
         private static readonly List<uint> _retryCodes =
             new List<uint>(new uint[] { 0x00030202, 0x80010109, 0x8001010A, 0x8DEAD01E });
 
-        private static readonly int MAX_RETRIES = 500;
+        private static readonly int _maxRetries = 500;
         private static int _visualStudioVersion = -1;
         private static PropertyInfo _debuggerProperty;
         private static PropertyInfo _localProcessesProperty;
@@ -44,7 +44,7 @@ namespace VirtualRobotWrapperLib.Wcf
                 var localProcesses = _localProcessesProperty.GetValue(debugger, null);
 
                 var retryCount = 0;
-                while (retryCount < MAX_RETRIES)
+                while (retryCount < _maxRetries)
                 {
                     retryCount++;
 
@@ -109,7 +109,7 @@ namespace VirtualRobotWrapperLib.Wcf
                 var localProcesses = _localProcessesProperty.GetValue(debugger, null);
 
                 var retryCount = 0;
-                while (retryCount < MAX_RETRIES)
+                while (retryCount < _maxRetries)
                 {
                     retryCount++;
 
@@ -249,9 +249,7 @@ namespace VirtualRobotWrapperLib.Wcf
 
                 var vsVersionKey = vsKey.OpenSubKey(@"15.0\\Setup");
                 if (vsVersionKey != null)
-                {
                     _visualStudioVersion = 15;
-                }
 
                 for (var i = 14; i >= 7 && vsVersionKey == null; i--)
                 {

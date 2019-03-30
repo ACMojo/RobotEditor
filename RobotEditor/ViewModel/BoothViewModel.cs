@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
-
-using HelixToolkit.Wpf;
+﻿using System.Collections.Generic;
 
 using RobotEditor.Model;
 
@@ -13,12 +6,16 @@ namespace RobotEditor.ViewModel
 {
     internal class BoothViewModel : BaseViewModel
     {
+        #region Fields
 
         private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
 
+        #endregion
+
+        #region Instance
+
         public BoothViewModel(Booth booth)
         {
-
             Model = booth;
 
             _errors.Add(nameof(RobotName), string.Empty);
@@ -26,9 +23,11 @@ namespace RobotEditor.ViewModel
             _errors.Add(nameof(ComputationTime), string.Empty);
         }
 
+        #endregion
+
+        #region Properties
 
         public Booth Model { get; }
-
 
         public string RobotName
         {
@@ -52,7 +51,6 @@ namespace RobotEditor.ViewModel
             }
         }
 
-
         public double BestMatch
         {
             get { return Model.BestMatch; }
@@ -74,7 +72,6 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
-
 
         public double ComputationTime
         {
@@ -98,5 +95,6 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        #endregion
     }
 }

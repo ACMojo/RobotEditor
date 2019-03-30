@@ -1,42 +1,56 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Media.Media3D;
-using HelixToolkit.Wpf;
 using System.Linq;
-using System.Xml;
-using RobotEditor.ViewModel;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
+using System.Xml;
+
+using HelixToolkit.Wpf;
+
+using RobotEditor.ViewModel;
 
 namespace RobotEditor.Model
-{  
+{
     internal class Robot
     {
-        public enum RobotTypes { Puma560, EcoRP033, EcoRP043, ABBIRB5400, ABBIRB5500, FanucP250 };
+        #region Enums
 
-        public List<Joint> Joints { get; } = new List<Joint>();
-        public string Name { get; set; }
-        public ModelVisual3D robotModel;
-        public MeshGeometry3D RobotAsMesh { get; set; }
-        public VoxelOctree Octree { get; set; }
+        public enum RobotTypes
+        {
+            Puma560,
+            EcoRp033,
+            EcoRp043,
+            Abbirb5400,
+            Abbirb5500,
+            FanucP250
+        };
+
+        #endregion
+
+        #region Fields
+
+        private ModelVisual3D _robotModel;
         public List<MeshGeometryVisual3D> ManipulabilityVoxel3D;
         public CoordinateSystemVisual3D Robot3D;
+
+        #endregion
+
+        #region Instance
 
         public Robot(int nrOfJoints, string name)
         {
             for (int i = 0; i < nrOfJoints; i++)
-            {
-                Joints.Add(new Joint(i+1));
-            }
+                Joints.Add(new Joint(i + 1));
 
             Name = name;
             ManipulabilityVoxel3D = new List<MeshGeometryVisual3D>();
             Robot3D = new CoordinateSystemVisual3D();
-            robotModel = new ModelVisual3D();
+            RobotModel = new ModelVisual3D();
         }
 
         public Robot(RobotTypes type)
         {
-            switch(type)
+            switch (type)
             {
                 case RobotTypes.Puma560:
                     Name = "Puma 560";
@@ -60,187 +74,200 @@ namespace RobotEditor.Model
 
             ManipulabilityVoxel3D = new List<MeshGeometryVisual3D>();
             Robot3D = new CoordinateSystemVisual3D();
-            robotModel = new ModelVisual3D();
+            RobotModel = new ModelVisual3D();
         }
+
+        #endregion
+
+        #region Properties
+
+        public List<Joint> Joints { get; } = new List<Joint>();
+        public string Name { get; set; }
+        public MeshGeometry3D RobotAsMesh { get; set; }
+        public VoxelOctree Octree { get; set; }
 
         public ModelVisual3D RobotModel
         {
-            get { return robotModel; }
+            get { return _robotModel; }
             set
             {
-                robotModel = value;
+                _robotModel = value;
 
                 var mbs = ((Model3DGroup)value.Content).Children.Cast<GeometryModel3D>();
                 foreach (var mb in mbs)
-                {
                     RobotAsMesh = (MeshGeometry3D)mb.Geometry;
-                }               
             }
         }
+
+        #endregion
+
+        #region Public methods
 
         public void SaveRobotStructur()
         {
             XmlDocument doc = new XmlDocument();
-            XmlNode Robot = doc.CreateElement("Robot");
-            XmlAttribute RobotAttribute = doc.CreateAttribute("Type");
-            RobotAttribute.InnerText = Name;
-            Robot.Attributes.Append(RobotAttribute);
+            XmlNode robot = doc.CreateElement("Robot");
+            XmlAttribute robotAttribute = doc.CreateAttribute("Type");
+            robotAttribute.InnerText = Name;
+            robot.Attributes.Append(robotAttribute);
 
-            RobotAttribute = doc.CreateAttribute("RootNode");
-            RobotAttribute.InnerText = "root";
-            Robot.Attributes.Append(RobotAttribute);
+            robotAttribute = doc.CreateAttribute("RootNode");
+            robotAttribute.InnerText = "root";
+            robot.Attributes.Append(robotAttribute);
 
-            doc.AppendChild(Robot);
+            doc.AppendChild(robot);
 
-            XmlNode RootNode = doc.CreateElement("RobotNode");
-            XmlAttribute RootNodeAttribute = doc.CreateAttribute("name");
-            RootNodeAttribute.InnerText = "root";
-            RootNode.Attributes.Append(RootNodeAttribute);
+            XmlNode rootNode = doc.CreateElement("RobotNode");
+            XmlAttribute rootNodeAttribute = doc.CreateAttribute("name");
+            rootNodeAttribute.InnerText = "root";
+            rootNode.Attributes.Append(rootNodeAttribute);
 
-            Robot.AppendChild(RootNode);
+            robot.AppendChild(rootNode);
 
-            XmlNode Child = doc.CreateElement("Child");
-            XmlAttribute ChildAttribute = doc.CreateAttribute("name");
-            ChildAttribute.InnerText = "joint 1";
-            Child.Attributes.Append(ChildAttribute);
+            XmlNode child = doc.CreateElement("Child");
+            XmlAttribute childAttribute = doc.CreateAttribute("name");
+            childAttribute.InnerText = "joint 1";
+            child.Attributes.Append(childAttribute);
 
-            RootNode.AppendChild(Child);
+            rootNode.AppendChild(child);
 
             Joint oldJoint = null;
             int i = 0;
             foreach (var joint in Joints)
             {
                 i++;
-                XmlNode JointNode = doc.CreateElement("RobotNode");
-                XmlAttribute JointNodeAttribute = doc.CreateAttribute("name");
-                JointNodeAttribute.InnerText = "joint " + i;
-                JointNode.Attributes.Append(JointNodeAttribute);
+                XmlNode jointNode = doc.CreateElement("RobotNode");
+                XmlAttribute jointNodeAttribute = doc.CreateAttribute("name");
+                jointNodeAttribute.InnerText = "joint " + i;
+                jointNode.Attributes.Append(jointNodeAttribute);
 
                 if (i > 1)
                 {
-                    XmlNode TransformNode = doc.CreateElement("Transform");
-                    XmlNode DHNode = doc.CreateElement("DH");
-                    XmlAttribute DHNodeAttribute = doc.CreateAttribute("a");
-                    DHNodeAttribute.InnerText = oldJoint.a.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("d");
-                    DHNodeAttribute.InnerText = oldJoint.d.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("alpha");
-                    DHNodeAttribute.InnerText = oldJoint.alpha.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("theta");
-                    DHNodeAttribute.InnerText = oldJoint.theta.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("units");
-                    DHNodeAttribute.InnerText = "degree";
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    TransformNode.AppendChild(DHNode);
-                    JointNode.AppendChild(TransformNode);
+                    XmlNode transformNode = doc.CreateElement("Transform");
+                    XmlNode dhNode = doc.CreateElement("DH");
+                    XmlAttribute dhNodeAttribute = doc.CreateAttribute("a");
+                    dhNodeAttribute.InnerText = oldJoint.A.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("d");
+                    dhNodeAttribute.InnerText = oldJoint.D.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("alpha");
+                    dhNodeAttribute.InnerText = oldJoint.Alpha.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("theta");
+                    dhNodeAttribute.InnerText = oldJoint.Theta.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("units");
+                    dhNodeAttribute.InnerText = "degree";
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    transformNode.AppendChild(dhNode);
+                    jointNode.AppendChild(transformNode);
                 }
 
-                XmlNode JointTypeNode = doc.CreateElement("Joint");
-                XmlAttribute JointTypeNodeAttribute = doc.CreateAttribute("type");
-                XmlNode LimitsNode = doc.CreateElement("Limits");
-                XmlAttribute LimitsNodeAttribute = doc.CreateAttribute("lo");
-                LimitsNodeAttribute.InnerText = joint.minLim.ToString();
-                LimitsNode.Attributes.Append(LimitsNodeAttribute);
-                LimitsNodeAttribute = doc.CreateAttribute("hi");
-                LimitsNodeAttribute.InnerText = joint.maxLim.ToString();
-                LimitsNode.Attributes.Append(LimitsNodeAttribute);
-                LimitsNodeAttribute = doc.CreateAttribute("units");
+                XmlNode jointTypeNode = doc.CreateElement("Joint");
+                XmlAttribute jointTypeNodeAttribute = doc.CreateAttribute("type");
+                XmlNode limitsNode = doc.CreateElement("Limits");
+                XmlAttribute limitsNodeAttribute = doc.CreateAttribute("lo");
+                limitsNodeAttribute.InnerText = joint.MinLim.ToString();
+                limitsNode.Attributes.Append(limitsNodeAttribute);
+                limitsNodeAttribute = doc.CreateAttribute("hi");
+                limitsNodeAttribute.InnerText = joint.MaxLim.ToString();
+                limitsNode.Attributes.Append(limitsNodeAttribute);
+                limitsNodeAttribute = doc.CreateAttribute("units");
                 if (joint.JTypes == JointTypes.Linear)
                 {
-                    JointTypeNodeAttribute.InnerText = "prismatic";
-                    LimitsNodeAttribute.InnerText = "millimeter";
+                    jointTypeNodeAttribute.InnerText = "prismatic";
+                    limitsNodeAttribute.InnerText = "millimeter";
                 }
                 else
                 {
-                    JointTypeNodeAttribute.InnerText = "revolute";
-                    LimitsNodeAttribute.InnerText = "degree";
+                    jointTypeNodeAttribute.InnerText = "revolute";
+                    limitsNodeAttribute.InnerText = "degree";
                 }
-                LimitsNode.Attributes.Append(LimitsNodeAttribute);
 
-                JointTypeNode.Attributes.Append(JointTypeNodeAttribute);
-                JointTypeNode.AppendChild(LimitsNode);
-                JointNode.AppendChild(JointTypeNode);
+                limitsNode.Attributes.Append(limitsNodeAttribute);
+
+                jointTypeNode.Attributes.Append(jointTypeNodeAttribute);
+                jointTypeNode.AppendChild(limitsNode);
+                jointNode.AppendChild(jointTypeNode);
 
                 if (i < Joints.Count)
                 {
-                    Child = doc.CreateElement("Child");
-                    ChildAttribute = doc.CreateAttribute("name");
-                    ChildAttribute.InnerText = "joint " + (i + 1);
-                    Child.Attributes.Append(ChildAttribute);
-                    JointNode.AppendChild(Child);
+                    child = doc.CreateElement("Child");
+                    childAttribute = doc.CreateAttribute("name");
+                    childAttribute.InnerText = "joint " + (i + 1);
+                    child.Attributes.Append(childAttribute);
+                    jointNode.AppendChild(child);
                 }
 
-                Robot.AppendChild(JointNode);
+                robot.AppendChild(jointNode);
 
                 if (i == Joints.Count)
                 {
-                    Child = doc.CreateElement("Child");
-                    ChildAttribute = doc.CreateAttribute("name");
-                    ChildAttribute.InnerText = "tcp";
-                    Child.Attributes.Append(ChildAttribute);
-                    JointNode.AppendChild(Child);
+                    child = doc.CreateElement("Child");
+                    childAttribute = doc.CreateAttribute("name");
+                    childAttribute.InnerText = "tcp";
+                    child.Attributes.Append(childAttribute);
+                    jointNode.AppendChild(child);
 
-                    XmlNode TCPNode = doc.CreateElement("RobotNode");
-                    XmlAttribute TCPNodeAttribute = doc.CreateAttribute("name");
-                    TCPNodeAttribute.InnerText = "tcp";
-                    TCPNode.Attributes.Append(TCPNodeAttribute);
+                    XmlNode tcpNode = doc.CreateElement("RobotNode");
+                    XmlAttribute tcpNodeAttribute = doc.CreateAttribute("name");
+                    tcpNodeAttribute.InnerText = "tcp";
+                    tcpNode.Attributes.Append(tcpNodeAttribute);
 
-                    XmlNode TransformNode = doc.CreateElement("Transform");
-                    XmlNode DHNode = doc.CreateElement("DH");
-                    XmlAttribute DHNodeAttribute = doc.CreateAttribute("a");
-                    DHNodeAttribute.InnerText = joint.a.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("d");
-                    DHNodeAttribute.InnerText = joint.d.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("alpha");
-                    DHNodeAttribute.InnerText = joint.alpha.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("theta");
-                    DHNodeAttribute.InnerText = joint.theta.ToString();
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    DHNodeAttribute = doc.CreateAttribute("units");
-                    DHNodeAttribute.InnerText = "degree";
-                    DHNode.Attributes.Append(DHNodeAttribute);
-                    TransformNode.AppendChild(DHNode);
-                    TCPNode.AppendChild(TransformNode);
+                    XmlNode transformNode = doc.CreateElement("Transform");
+                    XmlNode dhNode = doc.CreateElement("DH");
+                    XmlAttribute dhNodeAttribute = doc.CreateAttribute("a");
+                    dhNodeAttribute.InnerText = joint.A.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("d");
+                    dhNodeAttribute.InnerText = joint.D.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("alpha");
+                    dhNodeAttribute.InnerText = joint.Alpha.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("theta");
+                    dhNodeAttribute.InnerText = joint.Theta.ToString();
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    dhNodeAttribute = doc.CreateAttribute("units");
+                    dhNodeAttribute.InnerText = "degree";
+                    dhNode.Attributes.Append(dhNodeAttribute);
+                    transformNode.AppendChild(dhNode);
+                    tcpNode.AppendChild(transformNode);
 
-                    Robot.AppendChild(TCPNode);
+                    robot.AppendChild(tcpNode);
                 }
+
                 oldJoint = joint;
             }
 
-            XmlNode RobotNodeSet = doc.CreateElement("RobotNodeSet");
-            XmlAttribute RobotNodeSetAttribute = doc.CreateAttribute("name");
-            RobotNodeSetAttribute.InnerText = "robotNodeSet";
-            RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
-            RobotNodeSetAttribute = doc.CreateAttribute("kinematicRoot");
-            RobotNodeSetAttribute.InnerText = "root";
-            RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
-            RobotNodeSetAttribute = doc.CreateAttribute("tcp");
-            RobotNodeSetAttribute.InnerText = "tcp";
-            RobotNodeSet.Attributes.Append(RobotNodeSetAttribute);
+            XmlNode robotNodeSet = doc.CreateElement("RobotNodeSet");
+            XmlAttribute robotNodeSetAttribute = doc.CreateAttribute("name");
+            robotNodeSetAttribute.InnerText = "robotNodeSet";
+            robotNodeSet.Attributes.Append(robotNodeSetAttribute);
+            robotNodeSetAttribute = doc.CreateAttribute("kinematicRoot");
+            robotNodeSetAttribute.InnerText = "root";
+            robotNodeSet.Attributes.Append(robotNodeSetAttribute);
+            robotNodeSetAttribute = doc.CreateAttribute("tcp");
+            robotNodeSetAttribute.InnerText = "tcp";
+            robotNodeSet.Attributes.Append(robotNodeSetAttribute);
 
             for (int j = 0; j < Joints.Count; j++)
             {
-                Child = doc.CreateElement("Node");
-                ChildAttribute = doc.CreateAttribute("name");
-                ChildAttribute.InnerText = "joint " + (j + 1);
-                Child.Attributes.Append(ChildAttribute);
-                RobotNodeSet.AppendChild(Child);
+                child = doc.CreateElement("Node");
+                childAttribute = doc.CreateAttribute("name");
+                childAttribute.InnerText = "joint " + (j + 1);
+                child.Attributes.Append(childAttribute);
+                robotNodeSet.AppendChild(child);
             }
 
-            Robot.AppendChild(RobotNodeSet);
+            robot.AppendChild(robotNodeSet);
 
-            String path = AppDomain.CurrentDomain.BaseDirectory + "/" + Name;
+            string path = AppDomain.CurrentDomain.BaseDirectory + "/" + Name;
             doc.Save(@path);
         }
 
-        public void show3DManipulabilityOctree()
+        public void Show3DManipulabilityOctree()
         {
             int i = Octree.StartIndexLeafNodes - 1;
             int maxValu = 0;
@@ -251,9 +278,7 @@ namespace RobotEditor.Model
                     continue;
 
                 if (((VoxelNodeInner)Octree.Nodes[h]).Max > maxValu)
-                {
                     maxValu = (int)((VoxelNodeInner)Octree.Nodes[h]).Max;
-                }
             }
 
             foreach (var node in Octree.GetLeafNodes())
@@ -261,8 +286,8 @@ namespace RobotEditor.Model
                 i++;
                 if (node == null)
                     continue;
-               
-                var StartOffset = new Point3D(0, 0, 0);
+
+                var startOffset = new Point3D(0, 0, 0);
 
                 int n = 0;
                 int k = i;
@@ -273,44 +298,44 @@ namespace RobotEditor.Model
                     switch (n)
                     {
                         case 0:
-                            StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
                             break;
                         case 1:
-                            StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
                             break;
                         case 2:
-                            StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
                             break;
                         case 3:
-                            StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z - (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
                             break;
                         case 4:
-                            StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
                             break;
                         case 5:
-                            StartOffset.X = StartOffset.X + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
                             break;
                         case 6:
-                            StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
                             break;
                         case 7:
-                            StartOffset.X = StartOffset.X - (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Y = StartOffset.Y + (Math.Pow(2, w) * (100 / 2));
-                            StartOffset.Z = StartOffset.Z + (Math.Pow(2, w) * (100 / 2));
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
                             break;
                         default:
                             Console.WriteLine("Fehler");
@@ -318,16 +343,14 @@ namespace RobotEditor.Model
                     }
 
                     if (w < Octree.Level - 1)
-                    {
-                        k = Octree.StartIndexPerLevel[Octree.Level - 2 - w] + ((k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) / 8);
-                    }
+                        k = Octree.StartIndexPerLevel[Octree.Level - 2 - w] + (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) / 8;
                 }
 
                 if (node != null)
                 {
                     var mgv = new MeshGeometryVisual3D();
                     var mb = new MeshBuilder();
-                    mb.AddBox(new Point3D(StartOffset.X, StartOffset.Y, StartOffset.Z), 25.0, 25.0, 25.0);
+                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 25.0, 25.0, 25.0);
                     mgv.MeshGeometry = mb.ToMesh();
                     mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
                     ManipulabilityVoxel3D.Add(mgv);
@@ -335,7 +358,8 @@ namespace RobotEditor.Model
                 }
             }
         }
-        public void show3DRobot()
+
+        public void Show3DRobot()
         {
             var coordinateSystem = new CoordinateSystemVisual3D();
             Robot3D = coordinateSystem;
@@ -350,69 +374,70 @@ namespace RobotEditor.Model
             foreach (Joint joint in Joints)
             {
                 i++;
-                var interimCS = new CoordinateSystemVisual3D();
+                var interimCs = new CoordinateSystemVisual3D();
 
                 if (i == Joints.Count)
                 {
-                    interimCS.XAxisColor = Colors.Magenta;
-                    interimCS.YAxisColor = Colors.Magenta;
-                    interimCS.ZAxisColor = Colors.Magenta;
+                    interimCs.XAxisColor = Colors.Magenta;
+                    interimCs.YAxisColor = Colors.Magenta;
+                    interimCs.ZAxisColor = Colors.Magenta;
                 }
-                interimCS.ArrowLengths = 100.0;
 
-                var DH_Matrix = new Matrix3D(
-                    Math.Cos(DegreeToRadian.getValue(joint.theta)),
-                    Math.Sin(DegreeToRadian.getValue(joint.theta)),
+                interimCs.ArrowLengths = 100.0;
+
+                var dhMatrix = new Matrix3D(
+                    Math.Cos(DegreeToRadian.GetValue(joint.Theta)),
+                    Math.Sin(DegreeToRadian.GetValue(joint.Theta)),
                     0.0,
                     0.0,
-                    -Math.Sin(DegreeToRadian.getValue(joint.theta)) * Math.Cos(DegreeToRadian.getValue(joint.alpha)),
-                    Math.Cos(DegreeToRadian.getValue(joint.theta)) * Math.Cos(DegreeToRadian.getValue(joint.alpha)),
-                    Math.Sin(DegreeToRadian.getValue(joint.alpha)),
+                    -Math.Sin(DegreeToRadian.GetValue(joint.Theta)) * Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
+                    Math.Cos(DegreeToRadian.GetValue(joint.Theta)) * Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
+                    Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
                     0.0,
-                    Math.Sin(DegreeToRadian.getValue(joint.theta)) * Math.Sin(DegreeToRadian.getValue(joint.alpha)),
-                    -Math.Cos(DegreeToRadian.getValue(joint.theta)) * Math.Sin(DegreeToRadian.getValue(joint.alpha)),
-                    Math.Cos(DegreeToRadian.getValue(joint.alpha)),
+                    Math.Sin(DegreeToRadian.GetValue(joint.Theta)) * Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
+                    -Math.Cos(DegreeToRadian.GetValue(joint.Theta)) * Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
+                    Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
                     0.0,
-                    joint.a * Math.Cos(DegreeToRadian.getValue(joint.theta)),
-                    joint.a * Math.Sin(DegreeToRadian.getValue(joint.theta)),
-                    joint.d,
+                    joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)),
+                    joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)),
+                    joint.D,
                     1.0
                 );
 
-                interimCS.Transform = new MatrixTransform3D(DH_Matrix);
+                interimCs.Transform = new MatrixTransform3D(dhMatrix);
 
                 LinesVisual3D line = new LinesVisual3D();
                 line.Thickness = 5.0;
-                Point3DCollection PCollection = new Point3DCollection();
-                PCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                PCollection.Add(new Point3D(joint.a * Math.Cos(DegreeToRadian.getValue(joint.theta)), joint.a * Math.Sin(DegreeToRadian.getValue(joint.theta)), joint.d));
+                Point3DCollection pCollection = new Point3DCollection();
+                pCollection.Add(new Point3D(0.0, 0.0, 0.0));
+                pCollection.Add(
+                    new Point3D(joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)), joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)), joint.D));
                 line.Color = Colors.Gray;
-                line.Points = PCollection;
+                line.Points = pCollection;
                 coordinateSystem.Children.Add(line);
 
-                coordinateSystem.Children.Add(interimCS);
+                coordinateSystem.Children.Add(interimCs);
 
-                coordinateSystem = interimCS;
+                coordinateSystem = interimCs;
             }
 
             RobotModel.Children.Add(Robot3D);
         }
 
-        public void hide3DManipulabilityOctree()
+        public void Hide3DManipulabilityOctree()
         {
             foreach (var manipulabilityVoxel in ManipulabilityVoxel3D)
-            {
                 RobotModel.Children.Remove(manipulabilityVoxel);
-            }
             ManipulabilityVoxel3D.Clear();
         }
-        public void hide3DRobot()
+
+        public void Hide3DRobot()
         {
             RobotModel.Children.Remove(Robot3D);
             Robot3D = null;
         }
 
-
+        #endregion
 
         /*
 

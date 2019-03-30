@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using VirtualRobotWrapperLib.Wcf;
 
 namespace VirtualRobotWrapperRunner
 {
@@ -26,7 +21,7 @@ namespace VirtualRobotWrapperRunner
                 var service = new VirtualRobotWrapperRunnerService();
 
                 if (args.Any(a => string.Equals("OBB", a)))
-                    service.RunOBBWrapper(args);
+                    service.RunObbWrapper(args);
                 else
                     service.RunVirtualRobotManipulability(args);
             }

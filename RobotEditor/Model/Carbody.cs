@@ -1,11 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
-
-using System.Windows.Media;
-using System.Collections.Generic;
-using System;
 
 using VirtualRobotWrapperLib.OBB;
 
@@ -13,9 +12,23 @@ namespace RobotEditor.Model
 {
     class Carbody
     {
+        #region Fields
+
+        public BoxVisual3D SymmetryPlane;
+        public Matrix3D Center;
+        public BoundingBoxVisual3D BoundingBox;
+        public CoordinateSystemVisual3D RootFrame;
+        public List<Point3D> HitPoints;
+        public List<Point3D> RayOrigins;
+        public List<CoordinateSystemVisual3D> HitPoints3D;
+        public List<MeshGeometryVisual3D> RayOrigins3D;
+        public int DirectionOfSymmetryPlane;
+
+        #endregion
+
         #region Instance
 
-        public Carbody(IOBBWrapper obbCalculator, string path, string name, ModelVisual3D model)
+        public Carbody(IObbWrapper obbCalculator, string path, string name, ModelVisual3D model)
         {
             Path = path;
             Name = name;
@@ -40,17 +53,6 @@ namespace RobotEditor.Model
         public string Path { get; set; }
         public string Name { get; set; }
         public ModelVisual3D CarbodyModel { get; set; }
-        public BoxVisual3D SymmetryPlane;
-        public Matrix3D Center;
-        public BoundingBoxVisual3D BoundingBox;
-        public CoordinateSystemVisual3D RootFrame;
-        public List<Point3D> HitPoints;
-        public List<Point3D> RayOrigins;
-        public List<CoordinateSystemVisual3D> HitPoints3D;
-        public List<MeshGeometryVisual3D> RayOrigins3D;
-        public int DirectionOfSymmetryPlane;
-
-        public VoxelOctree Octree;
 
         public double[][] BoundingBoxAxis { get; private set; }
         public double[] BoundingBoxHalfExtents { get; private set; }
@@ -58,15 +60,123 @@ namespace RobotEditor.Model
 
         #endregion
 
+        #region Public methods
+
+        public void Add3DHitPoint(Point3D value)
+        {
+            HitPoints.Add(value);
+        }
+
+        public void Add3DRayOrigin(Point3D value)
+        {
+            RayOrigins.Add(value);
+        }
+
+        public void Show3DHitPointGeometries()
+        {
+            foreach (var hitPoint in HitPoints)
+            {
+                var coordinateSystem = new CoordinateSystemVisual3D()
+                    { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
+                HitPoints3D.Add(coordinateSystem);
+                CarbodyModel.Children.Add(HitPoints3D.Last());
+            }
+        }
+
+        public void Show3DRayOriginGeometries()
+        {
+            foreach (var rayOrigin in RayOrigins)
+            {
+                var mgv = new MeshGeometryVisual3D();
+                var mb = new MeshBuilder();
+                mb.AddBox(rayOrigin, 10.0, 10.0, 10.0);
+                mgv.MeshGeometry = mb.ToMesh();
+                mgv.Material = MaterialHelper.CreateMaterial(Colors.Red);
+                RayOrigins3D.Add(mgv);
+                CarbodyModel.Children.Add(RayOrigins3D.Last());
+            }
+        }
+
+        public void Show3DBoundingBoxGeometry()
+        {
+            var boxPosVector = new Vector3D(-BoundingBoxHalfExtents[0], -BoundingBoxHalfExtents[1], -BoundingBoxHalfExtents[2]);
+            var centerTemp = Center;
+
+            RootFrame = new CoordinateSystemVisual3D() { ArrowLengths = 100.0 };
+            RootFrame.Transform = new MatrixTransform3D(Center);
+            CarbodyModel.Children.Add(RootFrame);
+
+            centerTemp.TranslatePrepend(boxPosVector);
+            BoundingBox = new BoundingBoxVisual3D
+            {
+                BoundingBox = new Rect3D(
+                    new Point3D(),
+                    new Size3D(
+                        Math.Abs(BoundingBoxHalfExtents[0]) * 2,
+                        Math.Abs(BoundingBoxHalfExtents[1]) * 2,
+                        Math.Abs(BoundingBoxHalfExtents[2] * 2))),
+                Diameter = 20.0
+            };
+            BoundingBox.Transform = new MatrixTransform3D(centerTemp);
+            CarbodyModel.Children.Add(BoundingBox);
+        }
+
+        public void Show3DSymmetryPlaneGeometry()
+        {
+            var sizeOfSymmetryPlane = new double[3] { 10.0, 10.0, 10.0 };
+
+            sizeOfSymmetryPlane[Array.IndexOf(BoundingBoxHalfExtents, BoundingBoxHalfExtents.Max())] = BoundingBoxHalfExtents.Max() * 2;
+            sizeOfSymmetryPlane[DirectionOfSymmetryPlane] = BoundingBoxHalfExtents[DirectionOfSymmetryPlane] * 2;
+
+            SymmetryPlane = new BoxVisual3D()
+            {
+                Length = sizeOfSymmetryPlane[0], Width = sizeOfSymmetryPlane[1], Height = sizeOfSymmetryPlane[2],
+                Material = MaterialHelper.CreateMaterial(Colors.HotPink)
+            };
+            SymmetryPlane.Transform = new MatrixTransform3D(Center);
+            CarbodyModel.Children.Add(SymmetryPlane);
+        }
+
+        public void Hide3DHitPointGeometries()
+        {
+            foreach (var hitPoint in HitPoints3D)
+                CarbodyModel.Children.Remove(hitPoint);
+
+            HitPoints3D.Clear();
+        }
+
+        public void Hide3DRayOriginGeometries()
+        {
+            foreach (var rayOrigin in RayOrigins3D)
+                CarbodyModel.Children.Remove(rayOrigin);
+
+            RayOrigins3D.Clear();
+        }
+
+        public void Hide3DBoundingBoxGeometry()
+        {
+            CarbodyModel.Children.Remove(BoundingBox);
+            CarbodyModel.Children.Remove(RootFrame);
+            BoundingBox = null;
+        }
+
+        public void Hide3DSymmetryPlaneGeometry()
+        {
+            CarbodyModel.Children.Remove(SymmetryPlane);
+            SymmetryPlane = null;
+        }
+
+        #endregion
+
         #region Private methods
 
-        private void FindBoundingBox(IOBBWrapper obbCalculator)
+        private void FindBoundingBox(IObbWrapper obbCalculator)
         {
-            var CarbodyAsMesh = (MeshGeometry3D)(((Model3DGroup)CarbodyModel.Content).Children.Cast<GeometryModel3D>()).First().Geometry;
+            var carbodyAsMesh = (MeshGeometry3D)((Model3DGroup)CarbodyModel.Content).Children.Cast<GeometryModel3D>().First().Geometry;
 
-            double[][] pointCloud = new double[CarbodyAsMesh.Positions.Count][];
+            double[][] pointCloud = new double[carbodyAsMesh.Positions.Count][];
             int i = 0;
-            foreach (Point3D pointOnCarbody in CarbodyAsMesh.Positions)
+            foreach (Point3D pointOnCarbody in carbodyAsMesh.Positions)
             {
                 pointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z };
                 i++;
@@ -95,118 +205,6 @@ namespace RobotEditor.Model
                 BoundingBoxPosition[1],
                 BoundingBoxPosition[2],
                 1.0);
-        }
-
-        #endregion
-
-        #region Public methods
-
-        public void Add3DHitPoint(Point3D value)
-        {
-            HitPoints.Add(value);
-        }
-
-        public void Add3DRayOrigin(Point3D value)
-        {
-            RayOrigins.Add(value);
-        }
-
-        public void show3DHitPointGeometries()
-        {
-            foreach (var hitPoint in HitPoints)
-            {
-                var coordinateSystem = new CoordinateSystemVisual3D()
-                    { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
-                HitPoints3D.Add(coordinateSystem);
-                CarbodyModel.Children.Add(HitPoints3D.Last());
-            }
-        }
-
-        public void show3DRayOriginGeometries()
-        {
-            foreach (var rayOrigin in RayOrigins)
-            {
-                var mgv = new MeshGeometryVisual3D();
-                var mb = new MeshBuilder();
-                mb.AddBox(rayOrigin, 10.0, 10.0, 10.0);
-                mgv.MeshGeometry = mb.ToMesh();
-                mgv.Material = MaterialHelper.CreateMaterial(Colors.Red);
-                RayOrigins3D.Add(mgv);
-                CarbodyModel.Children.Add(RayOrigins3D.Last());
-            }
-        }
-
-        public void show3DBoundingBoxGeometry()
-        {
-            var boxPosVector = new Vector3D(-BoundingBoxHalfExtents[0], -BoundingBoxHalfExtents[1], -BoundingBoxHalfExtents[2]);
-            var centerTemp = Center;
-
-            RootFrame = new CoordinateSystemVisual3D() { ArrowLengths = 100.0 };
-            RootFrame.Transform = new MatrixTransform3D(Center);
-            CarbodyModel.Children.Add(RootFrame);
-
-            centerTemp.TranslatePrepend(boxPosVector);
-            BoundingBox = new BoundingBoxVisual3D
-            {
-                BoundingBox = new Rect3D(
-                    new Point3D(),
-                    new Size3D(
-                        Math.Abs(BoundingBoxHalfExtents[0]) * 2,
-                        Math.Abs(BoundingBoxHalfExtents[1]) * 2,
-                        Math.Abs(BoundingBoxHalfExtents[2] * 2))),
-                Diameter = 20.0
-            };
-            BoundingBox.Transform = new MatrixTransform3D(centerTemp);
-            CarbodyModel.Children.Add(BoundingBox);
-        }
-
-        public void show3DSymmetryPlaneGeometry()
-        {
-            var sizeOfSymmetryPlane = new double[3] { 10.0, 10.0, 10.0 };
-
-            sizeOfSymmetryPlane[Array.IndexOf(BoundingBoxHalfExtents, BoundingBoxHalfExtents.Max())] = BoundingBoxHalfExtents.Max() * 2;
-            sizeOfSymmetryPlane[DirectionOfSymmetryPlane] = BoundingBoxHalfExtents[DirectionOfSymmetryPlane] * 2;
-
-            SymmetryPlane = new BoxVisual3D()
-            {
-                Length = sizeOfSymmetryPlane[0], Width = sizeOfSymmetryPlane[1], Height = sizeOfSymmetryPlane[2],
-                Material = MaterialHelper.CreateMaterial(Colors.HotPink)
-            };
-            SymmetryPlane.Transform = new MatrixTransform3D(Center);
-            CarbodyModel.Children.Add(SymmetryPlane);
-        }
-
-        public void hide3DHitPointGeometries()
-        {
-            foreach (var hitPoint in HitPoints3D)
-            {
-                CarbodyModel.Children.Remove(hitPoint);
-            }
-
-            HitPoints3D.Clear();
-        }
-
-        public void hide3DRayOriginGeometries()
-        {
-            foreach (var rayOrigin in RayOrigins3D)
-            {
-                CarbodyModel.Children.Remove(rayOrigin);
-            }
-
-            RayOrigins3D.Clear();
-        }
-
-        public void hide3DBoundingBoxGeometry()
-        {
-            CarbodyModel.Children.Remove(BoundingBox);
-            CarbodyModel.Children.Remove(RootFrame);
-            BoundingBox = null;
-        }
-
-        public void hide3DSymmetryPlaneGeometry()
-        {
-            CarbodyModel.Children.Remove(SymmetryPlane);
-            SymmetryPlane = null;
         }
 
         #endregion

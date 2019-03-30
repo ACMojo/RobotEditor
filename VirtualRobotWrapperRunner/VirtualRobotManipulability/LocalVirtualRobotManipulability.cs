@@ -59,14 +59,14 @@ namespace VirtualRobotWrapperRunner.VirtualRobotManipulability
                 penalizeJointLimits,
                 jointLimitPenalizationFactor);
 
-            return result.Select(r => new ManipulabilityVoxel { a = r.a, b = r.b, c = r.c, x = r.x, y = r.y, z = r.z, value = r.value }).ToArray();
+            return result.Select(r => new ManipulabilityVoxel { A = r.a, B = r.b, C = r.c, X = r.x, Y = r.y, Z = r.z, Value = r.value }).ToArray();
         }
 
         public ManipulabilityVoxel[] GetManipulability(float discrTr, float discrRot, int loops, bool fillHoles, bool manipulabilityAsMinMaxRatio)
         {
             var result = _instance.GetManipulability(discrTr, discrRot, loops, fillHoles, manipulabilityAsMinMaxRatio);
 
-            return result.Select(r => new ManipulabilityVoxel { a = r.a, b = r.b, c = r.c, x = r.x, y = r.y, z = r.z, value = r.value }).ToArray();
+            return result.Select(r => new ManipulabilityVoxel { A = r.a, B = r.b, C = r.c, X = r.x, Y = r.y, Z = r.z, Value = r.value }).ToArray();
         }
 
         public bool Running()

@@ -7,7 +7,7 @@ using VirtualRobotWrapperLib.OBB;
 namespace VirtualRobotWrapperRunner.OBB
 {
     [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single, ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    public class LocalOBBWrapper : IOBBWrapper
+    public class LocalObbWrapper : IObbWrapper
     {
         #region Fields
 

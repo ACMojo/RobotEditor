@@ -9,7 +9,7 @@ using VirtualRobotWrapperLib.Wcf;
 namespace VirtualRobotWrapperLib.OBB
 {
     [ServiceContract, ProtoContract(IsGroup = true)]
-    public interface IOBBWrapper : IRemoteService, IDisposable
+    public interface IObbWrapper : IRemoteService, IDisposable
     {
         #region Properties
 

@@ -6,17 +6,9 @@ using VirtualRobotWrapperLib.Wcf;
 namespace VirtualRobotWrapperLib.OBB
 {
     [CallbackBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false)]
-    public class RemoteOBBWrapper : WcfServiceProcessRunner<IOBBWrapper>, IOBBWrapper
+    public class RemoteObbWrapper : WcfServiceProcessRunner<IObbWrapper>, IObbWrapper
     {
         #region Properties
-
-        protected override string ProcessName => "VirtualRobotWrapperRunner.exe";
-
-        protected override string ServerName => "RemoteOBBWrapper";
-
-        protected override string ProcessArguments => "OBB";
-
-        #endregion
 
         public double[] Position
         {
@@ -84,6 +76,16 @@ namespace VirtualRobotWrapperLib.OBB
             }
         }
 
+        protected override string ProcessName => "VirtualRobotWrapperRunner.exe";
+
+        protected override string ServerName => "RemoteOBBWrapper";
+
+        protected override string ProcessArguments => "OBB";
+
+        #endregion
+
+        #region Public methods
+
         public void Calculate(double[][] points)
         {
             try
@@ -102,5 +104,7 @@ namespace VirtualRobotWrapperLib.OBB
                 Pipe.Calculate(points);
             }
         }
+
+        #endregion
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
@@ -13,22 +9,28 @@ namespace RobotEditor.ViewModel
 {
     internal class CarbodyViewModel : BaseViewModel
     {
+        #region Fields
 
         private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
 
+        #endregion
+
+        #region Instance
+
         public CarbodyViewModel(Carbody carbody)
         {
-
             Model = carbody;
 
             _errors.Add(nameof(Path), string.Empty);
             _errors.Add(nameof(Name), string.Empty);
-            _errors.Add(nameof(carbodyModel), string.Empty);
+            _errors.Add(nameof(CarbodyModel), string.Empty);
         }
 
+        #endregion
+
+        #region Properties
 
         public Carbody Model { get; }
-
 
         public string Path
         {
@@ -52,7 +54,7 @@ namespace RobotEditor.ViewModel
             }
         }
 
-        public ModelVisual3D carbodyModel
+        public ModelVisual3D CarbodyModel
         {
             get { return Model.CarbodyModel; }
             set
@@ -66,8 +68,7 @@ namespace RobotEditor.ViewModel
             }
         }
 
-
-        public BoundingBoxVisual3D boundingBox
+        public BoundingBoxVisual3D BoundingBox
         {
             get { return Model.BoundingBox; }
             set
@@ -80,8 +81,6 @@ namespace RobotEditor.ViewModel
                 RaisePropertyChanged();
             }
         }
-
-
 
         public string Name
         {
@@ -105,5 +104,6 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        #endregion
     }
 }

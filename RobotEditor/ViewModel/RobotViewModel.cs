@@ -6,7 +6,6 @@ using System.Linq;
 using System.Windows.Media.Media3D;
 
 using RobotEditor.Model;
-using RobotEditor.View;
 
 namespace RobotEditor.ViewModel
 {
@@ -14,10 +13,10 @@ namespace RobotEditor.ViewModel
     {
         #region Fields
 
+        private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
+
         //private readonly Robot _robot;
         private JointViewModel _selectedJoint;
-
-        private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
 
         #endregion
 
@@ -25,11 +24,10 @@ namespace RobotEditor.ViewModel
 
         public RobotViewModel(Robot robot)
         {
-
             Model = robot;
 
             _errors.Add(nameof(Name), string.Empty);
-            _errors.Add(nameof(robotModel), string.Empty);
+            _errors.Add(nameof(RobotModel), string.Empty);
 
             foreach (var joint in Model.Joints)
                 Joints.Add(new JointViewModel(joint));
@@ -39,7 +37,6 @@ namespace RobotEditor.ViewModel
 
             Joints.CollectionChanged += Joints_CollectionChanged;
         }
-
 
         #endregion
 
@@ -67,11 +64,7 @@ namespace RobotEditor.ViewModel
             }
         }
 
-        #endregion
-
-        #region Private methods
-
-        public ModelVisual3D robotModel
+        public ModelVisual3D RobotModel
         {
             get { return Model.RobotModel; }
             set
@@ -107,10 +100,13 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        #endregion
+
+        #region Private methods
 
         private void AddJointExecute(object obj)
         {
-            var joint = new Joint(Model.Joints.Count+1);
+            var joint = new Joint(Model.Joints.Count + 1);
 
             Joints.Add(new JointViewModel(joint));
 
@@ -121,7 +117,6 @@ namespace RobotEditor.ViewModel
         {
             return true;
         }
-
 
         private void DeleteJointExecute(object obj)
         {

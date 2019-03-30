@@ -162,25 +162,6 @@ namespace RobotEditor.Model
                 yield return Nodes[i];
         }
 
-        private void SetChildNodes(VoxelNodeInner node, IEnumerable<VoxelNode> children)
-        {
-            var level = CalculateNodeLevel(node) + 1;
-
-            var startIndex = StartIndexPerLevel[level];
-
-            var nodeIndex = Array.IndexOf(Nodes, node);
-            var previousLeafNodeCount = nodeIndex - StartIndexPerLevel[level - 1];
-            startIndex += previousLeafNodeCount * 8;
-
-            var count = 0;
-            foreach (var child in children)
-            {
-                Nodes[startIndex + count] = child;
-
-                count++;
-            }
-        }
-
         public void RotateX()
         {
             //var tempTree = new VoxelOctree(Level)
@@ -313,6 +294,25 @@ namespace RobotEditor.Model
 
         #region Private methods
 
+        private void SetChildNodes(VoxelNodeInner node, IEnumerable<VoxelNode> children)
+        {
+            var level = CalculateNodeLevel(node) + 1;
+
+            var startIndex = StartIndexPerLevel[level];
+
+            var nodeIndex = Array.IndexOf(Nodes, node);
+            var previousLeafNodeCount = nodeIndex - StartIndexPerLevel[level - 1];
+            startIndex += previousLeafNodeCount * 8;
+
+            var count = 0;
+            foreach (var child in children)
+            {
+                Nodes[startIndex + count] = child;
+
+                count++;
+            }
+        }
+
         private int CalculateNodeLevel(VoxelNode node)
         {
             var index = Array.IndexOf(Nodes, node);
@@ -355,7 +355,7 @@ namespace RobotEditor.Model
                 */
 
             var path = new int[Level];
-            
+
             int centerBoundX = 0;
             int centerBoundY = 0;
             int centerBoundZ = 0;
@@ -364,13 +364,13 @@ namespace RobotEditor.Model
             for (var i = 0; i < Level; i++)
             {
                 j = Level - 2 - i;
-                if(x>=centerBoundX)
+                if (x >= centerBoundX)
                 {
                     centerBoundX += (int)Math.Pow(2, j) * 100;
-                    if (y>=centerBoundY)
+                    if (y >= centerBoundY)
                     {
                         centerBoundY += (int)Math.Pow(2, j) * 100;
-                        if (z>=centerBoundZ)
+                        if (z >= centerBoundZ)
                         {
                             path[i] = 5;
                             centerBoundZ += (int)Math.Pow(2, j) * 100;
@@ -393,7 +393,7 @@ namespace RobotEditor.Model
                         {
                             path[i] = 0;
                             centerBoundZ += -(int)Math.Pow(2, j) * 100;
-                        }                                                   
+                        }
                     }
                 }
                 else
@@ -428,10 +428,11 @@ namespace RobotEditor.Model
                         }
                     }
                 }
+
                 //Console.WriteLine("path" + path[i]);
             }
-            
-                var nodeIndex = CalculateNodeIndex(path);
+
+            var nodeIndex = CalculateNodeIndex(path);
 
             return nodeIndex;
         }
@@ -440,8 +441,7 @@ namespace RobotEditor.Model
         {
             var index = 0;
             for (var i = 0; i < path.Length; i++)
-                index += (path[i]+1) * NodePathFactorPerLevel[path.Length - 1 - i];
-               
+                index += (path[i] + 1) * NodePathFactorPerLevel[path.Length - 1 - i];
 
             //index += path[path.Length - 1];
 

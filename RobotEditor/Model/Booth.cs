@@ -1,18 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Media.Media3D;
-
-using RobotEditor.ViewModel;
-
-namespace RobotEditor.Model
+﻿namespace RobotEditor.Model
 {
     internal class Booth
     {
-        public string RobotName { get; set; }
-        public double BestMatch { get; set; }
-        public double ComputationTime { get; set; }
-
-
         #region Instance
 
         public Booth(double diameter, double stepSize)
@@ -30,6 +19,10 @@ namespace RobotEditor.Model
         #endregion
 
         #region Properties
+
+        public string RobotName { get; set; }
+        public double BestMatch { get; set; }
+        public double ComputationTime { get; set; }
 
         public VoxelOctree Octree { get; }
 

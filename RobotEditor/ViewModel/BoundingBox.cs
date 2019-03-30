@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using MathNet.Numerics.LinearAlgebra;
 
 namespace RobotEditor.ViewModel
 {
     class BoundingBox
     {
-
         #region Fields
 
         private static readonly int[] _defaultFaceList =
@@ -53,7 +49,6 @@ namespace RobotEditor.ViewModel
         private double _jj = double.NaN;
         private double _kk = double.NaN;
         private double _volume = double.NaN;
-        private readonly Vector<float>[] _points;
 
         #endregion
 
@@ -62,13 +57,13 @@ namespace RobotEditor.ViewModel
         public BoundingBox(BoundingBox box)
             : this()
         {
-            _points = new Vector<float>[8];
+            Points = new Vector<float>[8];
 
             var length = box.Points.Length;
             for (var i = 0; i < length; i++)
             {
                 var point = box.Points[i];
-                _points[i] = Vector<float>.Build.Dense(new[] { point[0], point[1], point[2], 1 });
+                Points[i] = Vector<float>.Build.Dense(new[] { point[0], point[1], point[2], 1 });
             }
 
             Min = box.Min.Clone();
@@ -80,7 +75,7 @@ namespace RobotEditor.ViewModel
         public BoundingBox(Vector<float>[] pointsCuboid, Vector<float> min, Vector<float> max)
             : this()
         {
-            _points = pointsCuboid;
+            Points = pointsCuboid;
             Min = min;
             Max = max;
         }
@@ -91,7 +86,7 @@ namespace RobotEditor.ViewModel
             Min = min;
             Max = max;
 
-            _points = new[]
+            Points = new[]
             {
                 Vector<float>.Build.Dense(new[] { Min[0], Min[1], Min[2], 1 }),
                 Vector<float>.Build.Dense(new[] { Min[0], Min[1], Max[2], 1 }),
@@ -107,7 +102,7 @@ namespace RobotEditor.ViewModel
         public BoundingBox(Vector<float>[] axisVectors, Vector<float> centerPoint, float[] extents)
             : this()
         {
-            _points = new Vector<float>[8];
+            Points = new Vector<float>[8];
 
             var center = Vector<float>.Build.Dense(new[] { centerPoint[0], centerPoint[1], centerPoint[2] });
 
@@ -130,7 +125,7 @@ namespace RobotEditor.ViewModel
             {
                 var point = points[i];
                 point = Vector<float>.Build.Dense(new[] { point[0], point[1], point[2], 1 });
-                _points[i] = point;
+                Points[i] = point;
 
                 if (Min == null || Max == null)
                 {
@@ -176,7 +171,7 @@ namespace RobotEditor.ViewModel
 
         public Vector<float> Max { get; }
 
-        public Vector<float>[] Points => _points;
+        public Vector<float>[] Points { get; }
 
         public double[] Extents { get; private set; }
 
@@ -205,11 +200,11 @@ namespace RobotEditor.ViewModel
                 if (_initialized)
                     return;
 
-                var p1 = _points[0];
-                var p2 = _points[1];
-                var p3 = _points[2];
-                var p4 = _points[3];
-                var p5 = _points[4];
+                var p1 = Points[0];
+                var p2 = Points[1];
+                var p3 = Points[2];
+                var p4 = Points[3];
+                var p5 = Points[4];
 
                 Origin = p1;
 
@@ -303,14 +298,14 @@ namespace RobotEditor.ViewModel
 
         public BoundingBox Transform(Matrix<float> matrix)
         {
-            var length = _points.Length;
+            var length = Points.Length;
 
             Vector<float> min = null;
             Vector<float> max = null;
             var transformedPoints = new Vector<float>[length];
             for (var i = 0; i < length; i++)
             {
-                var result = matrix.Multiply(_points[i]);
+                var result = matrix.Multiply(Points[i]);
                 result = result.Multiply(1 / result[3]);
                 transformedPoints[i] = result;
 

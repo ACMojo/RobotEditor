@@ -39,7 +39,7 @@ namespace RobotEditor.ViewModel
 
         public JointTypes JoinType
         {
-            get { return Model.JTypes;  }
+            get { return Model.JTypes; }
 
             set
             {
@@ -56,10 +56,10 @@ namespace RobotEditor.ViewModel
 
         public int Nr
         {
-            get { return Model.nr; }
+            get { return Model.Nr; }
             set
             {
-                if (value.Equals(Model.nr))
+                if (value.Equals(Model.Nr))
                     return;
 
                 /*if (value < 0)
@@ -70,19 +70,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(Nr)] = string.Empty;
 
-                Model.nr = value;
+                Model.Nr = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double A
         {
-            get { return Model.a; }
+            get { return Model.A; }
             set
             {
-                if (value.Equals(Model.a))
+                if (value.Equals(Model.A))
                     return;
 
                 /*if (value < 0)
@@ -93,19 +92,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(A)] = string.Empty;
 
-                Model.a = value;
+                Model.A = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double Alpha
         {
-            get { return Model.alpha; }
+            get { return Model.Alpha; }
             set
             {
-                if (value.Equals(Model.alpha))
+                if (value.Equals(Model.Alpha))
                     return;
 
                 /*if (value < 0)
@@ -116,19 +114,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(Alpha)] = string.Empty;
 
-                Model.alpha = value;
+                Model.Alpha = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double D
         {
-            get { return Model.d; }
+            get { return Model.D; }
             set
             {
-                if (value.Equals(Model.d))
+                if (value.Equals(Model.D))
                     return;
 
                 /*if (value < 0)
@@ -139,19 +136,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(D)] = string.Empty;
 
-                Model.d = value;
+                Model.D = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double Theta
         {
-            get { return Model.theta; }
+            get { return Model.Theta; }
             set
             {
-                if (value.Equals(Model.theta))
+                if (value.Equals(Model.Theta))
                     return;
 
                 /*if (value < 0)
@@ -162,19 +158,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(Theta)] = string.Empty;
 
-                Model.theta = value;
+                Model.Theta = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double MaxLim
         {
-            get { return Model.maxLim; }
+            get { return Model.MaxLim; }
             set
             {
-                if (value.Equals(Model.maxLim))
+                if (value.Equals(Model.MaxLim))
                     return;
 
                 /*if (value < 0)
@@ -185,20 +180,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(MaxLim)] = string.Empty;
 
-                Model.maxLim = value;
+                Model.MaxLim = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double MinLim
         {
-            get { return Model.minLim; }
+            get { return Model.MinLim; }
             set
             {
-                
-                if (value.Equals(Model.minLim))
+                if (value.Equals(Model.MinLim))
                     return;
 
                 /*if (value < 0)
@@ -209,19 +202,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(MinLim)] = string.Empty;
 
-                Model.minLim = value;
+                Model.MinLim = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double Speed
         {
-            get { return Model.speed; }
+            get { return Model.Speed; }
             set
             {
-                if (value.Equals(Model.speed))
+                if (value.Equals(Model.Speed))
                     return;
 
                 /*if (value < 0)
@@ -232,19 +224,18 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(Speed)] = string.Empty;
 
-                Model.speed = value;
+                Model.Speed = value;
 
                 RaisePropertyChanged();
             }
         }
 
-
         public double Acceleration
         {
-            get { return Model.acceleration; }
+            get { return Model.Acceleration; }
             set
             {
-                if (value.Equals(Model.acceleration))
+                if (value.Equals(Model.Acceleration))
                     return;
 
                 /*if (value < 0)
@@ -255,13 +246,13 @@ namespace RobotEditor.ViewModel
 
                 _errors[nameof(Acceleration)] = string.Empty;
 
-                Model.acceleration = value;
+                Model.Acceleration = value;
 
                 RaisePropertyChanged();
             }
         }
 
-    public string this[string columnName]
+        public string this[string columnName]
         {
             get
             {

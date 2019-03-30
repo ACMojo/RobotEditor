@@ -18,17 +18,23 @@ namespace RobotEditor.ViewModel
 {
     internal class MainWindowViewModel : BaseViewModel, IDisposable
     {
-        private IOBBWrapper _obbCalculator;
+        #region Fields
+
+        private readonly IHelixViewport3D _viewportCarbody;
+        private readonly IHelixViewport3D _viewportRobot;
+        private IObbWrapper _obbCalculator;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
-        private Booth booth;
-        private VoxelOctree octreeTemp;
-        private readonly IHelixViewport3D viewportCarbody;
-        private readonly IHelixViewport3D viewportRobot;
+        private readonly Booth _booth;
+        private VoxelOctree _octreeTemp;
+
+        #endregion
+
+        #region Instance
 
         public MainWindowViewModel(HelixViewport3D viewportCarbody, HelixViewport3D viewportRobot)
         {
-            CreateXML = new DelegateCommand<object>(CreateXMLExecute, CreateXMLCanExecute);
+            CreateXml = new DelegateCommand<object>(CreateXmlExecute, CreateXmlCanExecute);
             AddCarbody = new DelegateCommand<object>(AddCarbodyExecute, AddCarbodyCanExecute);
             Compare = new DelegateCommand<object>(CompareExecute, CompareCanExecute);
             DeleteCarbody = new DelegateCommand<object>(DeleteCarbodyExecute, DeleteCarbodyCanExecute);
@@ -43,9 +49,9 @@ namespace RobotEditor.ViewModel
             Manipulability = new DelegateCommand<object>(ManipulabilityExecute, ManipulabilityCanExecute);
             SymmetryPlane = new DelegateCommand<object>(SymmetryPlaneExecute, SymmetryPlaneCanExecute);
 
-            this.viewportCarbody = viewportCarbody;
-            this.viewportRobot = viewportRobot;
-            booth = new Booth(10000, 100d);
+            this._viewportCarbody = viewportCarbody;
+            this._viewportRobot = viewportRobot;
+            _booth = new Booth(10000, 100d);
 
             CarbodyModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
             CarbodyModels.Add(new DefaultLights());
@@ -53,10 +59,14 @@ namespace RobotEditor.ViewModel
             RobotModels.Add(new DefaultLights());
             RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
 
-            _obbCalculator = new RemoteOBBWrapper();
+            _obbCalculator = new RemoteObbWrapper();
 
             RaisePropertyChanged();
         }
+
+        #endregion
+
+        #region Properties
 
         public ObservableCollection<RobotViewModel> Robots { get; } = new ObservableCollection<RobotViewModel>();
         public ObservableCollection<CarbodyViewModel> Carbodies { get; } = new ObservableCollection<CarbodyViewModel>();
@@ -66,9 +76,7 @@ namespace RobotEditor.ViewModel
         public bool IsCheckedSymmetryPlane { get; set; }
         public bool IsCheckedManipulability { get; set; }
 
-        #region Public delegates
-
-        public DelegateCommand<object> CreateXML { get; }
+        public DelegateCommand<object> CreateXml { get; }
         public DelegateCommand<object> HitPoints { get; }
         public DelegateCommand<object> RayOrigins { get; }
         public DelegateCommand<object> AddRobot { get; }
@@ -82,6 +90,95 @@ namespace RobotEditor.ViewModel
         public DelegateCommand<object> BoundingBox { get; }
         public DelegateCommand<object> SymmetryPlane { get; }
         public DelegateCommand<object> Manipulability { get; }
+
+        public RobotViewModel SelectedRobot
+        {
+            get { return _selectedRobot; }
+            set
+            {
+                if (Equals(value, _selectedRobot))
+                    return;
+
+                if (_selectedRobot != null)
+                    RobotModels.Remove(_selectedRobot.RobotModel);
+
+                _selectedRobot = value;
+
+                if (_selectedRobot != null)
+                    RobotModels.Add(_selectedRobot.RobotModel);
+
+                RaisePropertyChanged();
+
+                DeleteRobot.RaisePropertyChanged();
+
+                CreateXml.RaisePropertyChanged();
+                EditRobot.RaisePropertyChanged();
+                Compare.RaisePropertyChanged();
+                Manipulability.RaisePropertyChanged();
+
+                _viewportRobot.ZoomExtents(0);
+            }
+        }
+
+        public CarbodyViewModel SelectedCarbody
+        {
+            get { return _selectedCarbody; }
+            set
+            {
+                if (Equals(value, _selectedCarbody))
+                    return;
+
+                if (_selectedCarbody != null)
+                {
+                    _selectedCarbody.Model.Hide3DHitPointGeometries();
+                    _selectedCarbody.Model.Hide3DRayOriginGeometries();
+                    _selectedCarbody.Model.Hide3DBoundingBoxGeometry();
+                    _selectedCarbody.Model.Hide3DSymmetryPlaneGeometry();
+                    CarbodyModels.Remove(_selectedCarbody.CarbodyModel);
+                    CarbodyModels.Remove(_selectedCarbody.BoundingBox);
+                }
+
+                _selectedCarbody = value;
+
+                if (_selectedCarbody != null)
+                {
+                    if (IsCheckedHitPoints)
+                        _selectedCarbody.Model.Show3DHitPointGeometries();
+                    if (IsCheckedRayOrigins)
+                        _selectedCarbody.Model.Show3DRayOriginGeometries();
+                    if (IsCheckedBoundingBox)
+                        _selectedCarbody.Model.Show3DBoundingBoxGeometry();
+                    if (IsCheckedSymmetryPlane)
+                        _selectedCarbody.Model.Show3DSymmetryPlaneGeometry();
+
+                    CarbodyModels.Add(_selectedCarbody.CarbodyModel);
+                }
+
+                RaisePropertyChanged();
+
+                DeleteCarbody.RaisePropertyChanged();
+                HitPoints.RaisePropertyChanged();
+                RayOrigins.RaisePropertyChanged();
+                BoundingBox.RaisePropertyChanged();
+                SymmetryPlane.RaisePropertyChanged();
+                Compare.RaisePropertyChanged();
+
+                _viewportCarbody.ZoomExtents(0);
+            }
+        }
+
+        public ObservableCollection<Visual3D> CarbodyModels { get; } = new ObservableCollection<Visual3D>();
+        public ObservableCollection<Visual3D> RobotModels { get; } = new ObservableCollection<Visual3D>();
+
+        #endregion
+
+        #region Public methods
+
+        public void Dispose()
+        {
+            _obbCalculator?.Dispose();
+            _obbCalculator = null;
+        }
 
         #endregion
 
@@ -100,18 +197,14 @@ namespace RobotEditor.ViewModel
         private void BoundingBoxExecute(object obj)
         {
             if (IsCheckedBoundingBox)
-            {
-                SelectedCarbody.Model.show3DBoundingBoxGeometry();
-            }
+                SelectedCarbody.Model.Show3DBoundingBoxGeometry();
             else
-            {
-                SelectedCarbody.Model.hide3DBoundingBoxGeometry();
-            }
+                SelectedCarbody.Model.Hide3DBoundingBoxGeometry();
         }
 
         private bool CompareCanExecute(object arg)
         {
-            return (Robots.Count > 0 && Carbodies.Count > 0);
+            return Robots.Count > 0 && Carbodies.Count > 0;
         }
 
         private bool SymmetryPlaneCanExecute(object arg)
@@ -122,13 +215,9 @@ namespace RobotEditor.ViewModel
         private void SymmetryPlaneExecute(object obj)
         {
             if (IsCheckedSymmetryPlane)
-            {
-                SelectedCarbody.Model.show3DSymmetryPlaneGeometry();
-            }
+                SelectedCarbody.Model.Show3DSymmetryPlaneGeometry();
             else
-            {
-                SelectedCarbody.Model.hide3DSymmetryPlaneGeometry();
-            }
+                SelectedCarbody.Model.Hide3DSymmetryPlaneGeometry();
         }
 
         private bool HitPointsCanExecute(object arg)
@@ -142,13 +231,9 @@ namespace RobotEditor.ViewModel
         private void HitPointsExecute(object obj)
         {
             if (IsCheckedHitPoints)
-            {
-                SelectedCarbody.Model.show3DHitPointGeometries();
-            }
+                SelectedCarbody.Model.Show3DHitPointGeometries();
             else
-            {
-                SelectedCarbody.Model.hide3DHitPointGeometries();
-            }
+                SelectedCarbody.Model.Hide3DHitPointGeometries();
         }
 
         private bool RayOriginsCanExecute(object arg)
@@ -162,18 +247,14 @@ namespace RobotEditor.ViewModel
         private void RayOriginsExecute(object obj)
         {
             if (IsCheckedRayOrigins)
-            {
-                SelectedCarbody.Model.show3DRayOriginGeometries();
-            }
+                SelectedCarbody.Model.Show3DRayOriginGeometries();
             else
-            {
-                SelectedCarbody.Model.hide3DRayOriginGeometries();
-            }
+                SelectedCarbody.Model.Hide3DRayOriginGeometries();
         }
 
         private void FitToViewCarbodyExecute(object obj)
         {
-            viewportCarbody.ZoomExtents(0);
+            _viewportCarbody.ZoomExtents(0);
             RaisePropertyChanged();
         }
 
@@ -184,7 +265,7 @@ namespace RobotEditor.ViewModel
 
         private void FitToViewRobotExecute(object obj)
         {
-            viewportRobot.ZoomExtents(0);
+            _viewportRobot.ZoomExtents(0);
             RaisePropertyChanged();
         }
 
@@ -201,16 +282,10 @@ namespace RobotEditor.ViewModel
         private void ManipulabilityExecute(object obj)
         {
             if (IsCheckedManipulability)
-            {
-                SelectedRobot.Model.show3DManipulabilityOctree();
-            }
+                SelectedRobot.Model.Show3DManipulabilityOctree();
             else
-            {
-                SelectedRobot.Model.hide3DManipulabilityOctree();
-            }
+                SelectedRobot.Model.Hide3DManipulabilityOctree();
         }
-
-        #endregion
 
         private void CompareExecute(object obj)
         {
@@ -218,9 +293,9 @@ namespace RobotEditor.ViewModel
             {
                 SelectedCarbody = carbody;
 
-                octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
+                _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
 
-                this.viewportCarbody.ZoomExtents(0);
+                _viewportCarbody.ZoomExtents(0);
 
                 // Perform hit test
 
@@ -287,10 +362,10 @@ namespace RobotEditor.ViewModel
 
                     Vector3D vector;
 
-                    for (int j = 0; j < (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2) / 100.0; j++)
+                    for (int j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / 100.0; j++)
                     {
                         var total = 0;
-                        for (int k = 0; k < (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2) / 100.0; k++)
+                        for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / 100.0; k++)
                         {
                             RayHi(matrixStart, matrixEnd);
 
@@ -315,7 +390,7 @@ namespace RobotEditor.ViewModel
                     }
                 }
 
-                booth.Octree.Add(octreeTemp);
+                _booth.Octree.Add(_octreeTemp);
             }
 
             //octree = VoxelOctree.Create(400, 100d);
@@ -324,105 +399,14 @@ namespace RobotEditor.ViewModel
             //octree.Set(790, -790, -790, 1);
             //octree.Set(1, -1, -1, 2);
 
-            var comparison = new ResultWindow(booth.Octree);
+            var comparison = new ResultWindow(_booth.Octree);
             var result = comparison.ShowDialog();
 
             if (result == true)
-            {
                 ;
-            }
 
             if (result != true)
                 return;
-        }
-
-        public RobotViewModel SelectedRobot
-        {
-            get { return _selectedRobot; }
-            set
-            {
-                if (Equals(value, _selectedRobot))
-                    return;
-
-                if (_selectedRobot != null)
-                {
-                    RobotModels.Remove(_selectedRobot.robotModel);
-                }
-
-                _selectedRobot = value;
-
-                if (_selectedRobot != null)
-                {
-                    RobotModels.Add(_selectedRobot.robotModel);
-                }
-
-                RaisePropertyChanged();
-
-                DeleteRobot.RaisePropertyChanged();
-
-                CreateXML.RaisePropertyChanged();
-                EditRobot.RaisePropertyChanged();
-                Compare.RaisePropertyChanged();
-                Manipulability.RaisePropertyChanged();
-
-                this.viewportRobot.ZoomExtents(0);
-            }
-        }
-
-        public CarbodyViewModel SelectedCarbody
-        {
-            get { return _selectedCarbody; }
-            set
-            {
-                if (Equals(value, _selectedCarbody))
-                    return;
-
-                if (_selectedCarbody != null)
-                {
-                    _selectedCarbody.Model.hide3DHitPointGeometries();
-                    _selectedCarbody.Model.hide3DRayOriginGeometries();
-                    _selectedCarbody.Model.hide3DBoundingBoxGeometry();
-                    _selectedCarbody.Model.hide3DSymmetryPlaneGeometry();
-                    CarbodyModels.Remove(_selectedCarbody.carbodyModel);
-                    CarbodyModels.Remove(_selectedCarbody.boundingBox);
-                }
-
-                _selectedCarbody = value;
-
-                if (_selectedCarbody != null)
-                {
-                    if (IsCheckedHitPoints)
-                        _selectedCarbody.Model.show3DHitPointGeometries();
-                    if (IsCheckedRayOrigins)
-                        _selectedCarbody.Model.show3DRayOriginGeometries();
-                    if (IsCheckedBoundingBox)
-                        _selectedCarbody.Model.show3DBoundingBoxGeometry();
-                    if (IsCheckedSymmetryPlane)
-                        _selectedCarbody.Model.show3DSymmetryPlaneGeometry();
-
-                    CarbodyModels.Add(_selectedCarbody.carbodyModel);
-                }
-
-                RaisePropertyChanged();
-
-                DeleteCarbody.RaisePropertyChanged();
-                HitPoints.RaisePropertyChanged();
-                RayOrigins.RaisePropertyChanged();
-                BoundingBox.RaisePropertyChanged();
-                SymmetryPlane.RaisePropertyChanged();
-                Compare.RaisePropertyChanged();
-
-                this.viewportCarbody.ZoomExtents(0);
-            }
-        }
-
-        public ObservableCollection<Visual3D> CarbodyModels { get; } = new ObservableCollection<Visual3D>();
-        public ObservableCollection<Visual3D> RobotModels { get; } = new ObservableCollection<Visual3D>();
-
-        public void Dispose()
-        {
-            _obbCalculator?.Dispose();
-            _obbCalculator = null;
         }
 
         private void AddRobotExecute(object obj)
@@ -440,20 +424,19 @@ namespace RobotEditor.ViewModel
 
                 if (SelectedRobot != null)
                 {
-                    SelectedRobot.Model.show3DRobot();
+                    SelectedRobot.Model.Show3DRobot();
                     CalcManipulability();
                 }
             }
 
-            this.viewportRobot.ZoomExtents(0);
+            _viewportRobot.ZoomExtents(0);
 
             if (result != true)
                 return;
         }
 
-        private void drawVoxelMap(Robot robot)
+        private void DrawVoxelMap(Robot robot)
         {
-            
             robot.RobotModel.Children.Clear();
             for (int i = 0; i < 120; i++)
             {
@@ -545,9 +528,9 @@ namespace RobotEditor.ViewModel
 
                 //Console.WriteLine(coordinateSystem.GetTransform().OffsetX + " " + PointTest.X + " " + coordinateSystem.GetTransform().OffsetY + " " + PointTest.Y + " " + coordinateSystem.GetTransform().OffsetZ + " " + PointTest.Z);
 
-                var PointTest = rayMeshResult.PointHit;
-                PointTest = Point3D.Multiply(PointTest, SelectedCarbody.Model.CarbodyModel.GetTransform());
-                octreeTemp.Set((int)PointTest.X, (int)PointTest.Y, (int)PointTest.Z, 1.0);
+                var pointTest = rayMeshResult.PointHit;
+                pointTest = Point3D.Multiply(pointTest, SelectedCarbody.Model.CarbodyModel.GetTransform());
+                _octreeTemp.Set((int)pointTest.X, (int)pointTest.Y, (int)pointTest.Z, 1.0);
 
                 /*
                 if (octree.Set((int)Math.Floor(rayMeshResult.PointHit.X / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Y / 100.0), (int)Math.Floor(rayMeshResult.PointHit.Z / 100.0), 1))
@@ -586,9 +569,9 @@ namespace RobotEditor.ViewModel
                 Robots.Remove(_selectedRobot);
                 //RobotModels.Remove(_selectedRobot.robotModel);
                 //_selectedRobot.robotModel = new ModelVisual3D();
-                _selectedRobot.Model.show3DRobot();
-                RobotModels.Add(_selectedRobot.robotModel);
-                this.viewportRobot.ZoomExtents(0);
+                _selectedRobot.Model.Show3DRobot();
+                RobotModels.Add(_selectedRobot.RobotModel);
+                _viewportRobot.ZoomExtents(0);
             }
         }
 
@@ -609,12 +592,12 @@ namespace RobotEditor.ViewModel
             return true;
         }
 
-        private void CreateXMLExecute(object obj)
+        private void CreateXmlExecute(object obj)
         {
             SelectedRobot.Model.SaveRobotStructur();
         }
 
-        private bool CreateXMLCanExecute(object arg)
+        private bool CreateXmlCanExecute(object arg)
         {
             return SelectedRobot != null;
         }
@@ -627,60 +610,59 @@ namespace RobotEditor.ViewModel
             float[] minB;
             float maxManip;
 
-            using (IVirtualRobotManipulability VrManip = new RemoteVirtualRobotManipulability())
+            using (IVirtualRobotManipulability vrManip = new RemoteVirtualRobotManipulability())
             {
-                String path = AppDomain.CurrentDomain.BaseDirectory + "/" + SelectedRobot.Model.Name;
-                if (VrManip.Init(0, null, @path, "robotNodeSet", "root", "tcp"))
+                string path = AppDomain.CurrentDomain.BaseDirectory + "/" + SelectedRobot.Model.Name;
+                if (vrManip.Init(0, null, @path, "robotNodeSet", "root", "tcp"))
                 {
-                    ManipulabilityVoxel[] vox = VrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
+                    ManipulabilityVoxel[] vox = vrManip.GetManipulability((float)100.0, (float)(Math.PI / 2), 100000, false, false, true, 50f);
 
-                    minB = VrManip.MinBox;
-                    maxB = VrManip.MaxBox;
+                    minB = vrManip.MinBox;
+                    maxB = vrManip.MaxBox;
 
                     // Calc size of cube depending on reachability of robot
                     double octreeSize;
-                    if (Math.Abs(VrManip.MaxBox.Max()) > Math.Abs(VrManip.MinBox.Max()))
-                    {
-                        octreeSize = Math.Abs(VrManip.MaxBox.Max()) * 2;
-                    }
+                    if (Math.Abs(vrManip.MaxBox.Max()) > Math.Abs(vrManip.MinBox.Max()))
+                        octreeSize = Math.Abs(vrManip.MaxBox.Max()) * 2;
                     else
-                    {
-                        octreeSize = Math.Abs(VrManip.MinBox.Max()) * 2;
-                    }
+                        octreeSize = Math.Abs(vrManip.MinBox.Max()) * 2;
 
                     SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, 100.0);
 
-                    maxManip = VrManip.MaxManipulability;
+                    maxManip = vrManip.MaxManipulability;
 
                     ManipulabilityVoxel voxOld = vox[0];
-                    double maxValue = vox[0].value;
+                    double maxValue = vox[0].Value;
                     for (int j = 1; j < vox.Length; j++)
                     {
                         // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
 
-                        if (vox[j].x == voxOld.x && vox[j].y == voxOld.y && vox[j].z == voxOld.z)
+                        if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
                         {
-                            if (vox[j].value > maxValue)
-                            {
-                                maxValue = vox[j].value;
-                            }
+                            if (vox[j].Value > maxValue)
+                                maxValue = vox[j].Value;
                         }
                         else
                         {
-                            if (!SelectedRobot.Model.Octree.Set((int)(minB[0] + voxOld.x * 100), (int)(minB[1] + voxOld.y * 100), (int)(minB[2] + voxOld.z * 100), maxValue))
+                            if (!SelectedRobot.Model.Octree.Set(
+                                    (int)(minB[0] + voxOld.X * 100),
+                                    (int)(minB[1] + voxOld.Y * 100),
+                                    (int)(minB[2] + voxOld.Z * 100),
+                                    maxValue))
                             {
-
-                                var value = booth.Octree.Get((int)Math.Floor((minB[0] / 100.0) + voxOld.x), (int)Math.Floor((minB[1] / 100.0) + voxOld.y), (int)Math.Floor((minB[2] / 100.0) + voxOld.z));
+                                var value = _booth.Octree.Get(
+                                    (int)Math.Floor(minB[0] / 100.0 + voxOld.X),
+                                    (int)Math.Floor(minB[1] / 100.0 + voxOld.Y),
+                                    (int)Math.Floor(minB[2] / 100.0 + voxOld.Z));
                                 if (double.IsNaN(value))
-                                    Console.WriteLine($"Nicht erfolgreich bei: { Math.Floor((minB[0] / 100.0) + voxOld.x) } { Math.Floor((minB[1] / 100.0) + voxOld.y) } { Math.Floor((minB[2] / 100.0) + voxOld.z) }");
-                                else
-                                    ;
+                                    Console.WriteLine(
+                                        $"Nicht erfolgreich bei: {Math.Floor(minB[0] / 100.0 + voxOld.X)} {Math.Floor(minB[1] / 100.0 + voxOld.Y)} {Math.Floor(minB[2] / 100.0 + voxOld.Z)}");
                             }
 
                             voxOld = vox[j];
-                            maxValue = vox[j].value;
+                            maxValue = vox[j].Value;
                         }
-                    }                 
+                    }
                 }
             }
 
@@ -694,24 +676,22 @@ namespace RobotEditor.ViewModel
 
         private void AddCarbodyExecute(object obj)
         {
-            var FileDialog = new OpenFileDialog();
-            if (FileDialog.ShowDialog() == true)
+            var fileDialog = new OpenFileDialog();
+            if (fileDialog.ShowDialog() == true)
             {
                 var mi = new ModelImporter();
 
                 var carbody = new Carbody(
                     _obbCalculator,
-                    FileDialog.FileName,
-                    FileDialog.SafeFileName,
-                    new ModelVisual3D { Content = mi.Load(FileDialog.FileName, null, true) });
+                    fileDialog.FileName,
+                    fileDialog.SafeFileName,
+                    new ModelVisual3D { Content = mi.Load(fileDialog.FileName, null, true) });
 
                 SelectedCarbody = new CarbodyViewModel(carbody);
                 Carbodies.Add(SelectedCarbody);
 
                 if (SelectedCarbody != null)
-                {
                     CalcRefPosition();
-                }
             }
         }
 
@@ -839,14 +819,10 @@ namespace RobotEditor.ViewModel
 
                 int z = m;
                 if (Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) == m)
-                {
                     z = m + 1;
-                }
 
                 if (m == 1 && Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) == 0)
-                {
                     z = 2;
-                }
 
                 sideASelector[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
                 sideBSelector[Array.IndexOf(SelectedCarbody.Model.BoundingBoxHalfExtents, SelectedCarbody.Model.BoundingBoxHalfExtents.Max())] = 1;
@@ -939,9 +915,7 @@ namespace RobotEditor.ViewModel
                 for (int q = 0; q < savor2.Length; q++)
                 {
                     if (savor2[q] > 0.1 && savor3[q] > 0.1)
-                    {
-                        savor4[q] = (SelectedCarbody.Model.BoundingBoxHalfExtents[z] * 2) - savor2[q] - savor3[q];
-                    }
+                        savor4[q] = SelectedCarbody.Model.BoundingBoxHalfExtents[z] * 2 - savor2[q] - savor3[q];
                 }
 
                 if (savor4.Average() < 100.0)
@@ -961,13 +935,9 @@ namespace RobotEditor.ViewModel
                         }
 
                         if (totalFirst > totalLast)
-                        {
                             directionOfFrontShift = 1;
-                        }
                         else
-                        {
                             directionOfFrontShift = -1;
-                        }
                     }
                     else
                     {
@@ -979,19 +949,15 @@ namespace RobotEditor.ViewModel
                         }
 
                         if (totalFirst > totalLast)
-                        {
                             directionOfFrontShift = 1;
-                        }
                         else
-                        {
                             directionOfFrontShift = -1;
-                        }
                     }
                 }
 
-                if ((sumOfSquares / count) < sumOfSquaresDivided)
+                if (sumOfSquares / count < sumOfSquaresDivided)
                 {
-                    sumOfSquaresDivided = (sumOfSquares / count);
+                    sumOfSquaresDivided = sumOfSquares / count;
                     SelectedCarbody.Model.DirectionOfSymmetryPlane = Array.IndexOf(sideASelector, sideASelector.Min());
                 }
             }
@@ -1085,10 +1051,10 @@ namespace RobotEditor.ViewModel
             //viewportCarbody.Viewport.Children.Add(topCoordinate);
 
             //move carbody front to world     
-            Console.WriteLine("Positoon vorher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
+            Console.WriteLine("Positoon vorher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
             SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
             //SelectedCarbody.Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfPlane.Inverse());
-            Console.WriteLine("Position nachher: " + SelectedCarbody.carbodyModel.GetTransform().ToString());
+            Console.WriteLine("Position nachher: " + SelectedCarbody.CarbodyModel.GetTransform().ToString());
 
             RaisePropertyChanged();
         }
@@ -1096,35 +1062,35 @@ namespace RobotEditor.ViewModel
         private void RayHi(Matrix3D matrixStart, Matrix3D matrixEnd, ref double k, ref double o, ref double p)
         {
             Point3D startPoint = new Point3D();
-            Point3D EndPoint = new Point3D();
+            Point3D endPoint = new Point3D();
 
             MatrixTransform3D transformToBoundingBoxStart = new MatrixTransform3D(matrixStart);
             MatrixTransform3D transformToBoundingBoxEnd = new MatrixTransform3D(matrixEnd);
 
             startPoint = transformToBoundingBoxStart.Transform(startPoint);
-            EndPoint = transformToBoundingBoxEnd.Transform(EndPoint);
+            endPoint = transformToBoundingBoxEnd.Transform(endPoint);
 
             // Only used to show start and end points of ray
             SelectedCarbody.Model.Add3DRayOrigin(startPoint);
-            SelectedCarbody.Model.Add3DRayOrigin(EndPoint);
+            SelectedCarbody.Model.Add3DRayOrigin(endPoint);
 
             // Ray from side A
             RayHitTestParameters hitParams =
                 new RayHitTestParameters(
                     startPoint,
-                    new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
+                    new Vector3D(endPoint.X - startPoint.X, endPoint.Y - startPoint.Y, endPoint.Z - startPoint.Z)
                 );
             double distanceFromStart = 0.0;
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(ref distanceFromStart, h), hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.CarbodyModel, null, h => HitTestResultCallback(ref distanceFromStart, h), hitParams);
 
             // Ray from side B
             hitParams =
                 new RayHitTestParameters(
-                    EndPoint,
-                    new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
+                    endPoint,
+                    new Vector3D(startPoint.X - endPoint.X, startPoint.Y - endPoint.Y, startPoint.Z - endPoint.Z)
                 );
             double distanceFromEnd = 0.0;
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, h => HitTestResultCallback(ref distanceFromEnd, h), hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.CarbodyModel, null, h => HitTestResultCallback(ref distanceFromEnd, h), hitParams);
 
             k = Math.Abs(distanceFromStart - distanceFromEnd);
             o = distanceFromStart;
@@ -1134,33 +1100,35 @@ namespace RobotEditor.ViewModel
         private void RayHi(Matrix3D matrixStart, Matrix3D matrixEnd)
         {
             Point3D startPoint = new Point3D();
-            Point3D EndPoint = new Point3D();
+            Point3D endPoint = new Point3D();
 
             MatrixTransform3D transformToBoundingBoxStart = new MatrixTransform3D(matrixStart);
             MatrixTransform3D transformToBoundingBoxEnd = new MatrixTransform3D(matrixEnd);
 
             startPoint = transformToBoundingBoxStart.Transform(startPoint);
-            EndPoint = transformToBoundingBoxEnd.Transform(EndPoint);
+            endPoint = transformToBoundingBoxEnd.Transform(endPoint);
 
             // Only used to show start and end points of ray
             SelectedCarbody.Model.Add3DRayOrigin(startPoint);
-            SelectedCarbody.Model.Add3DRayOrigin(EndPoint);
+            SelectedCarbody.Model.Add3DRayOrigin(endPoint);
 
             // Ray from side A
             RayHitTestParameters hitParams =
                 new RayHitTestParameters(
                     startPoint,
-                    new Vector3D(EndPoint.X - startPoint.X, EndPoint.Y - startPoint.Y, EndPoint.Z - startPoint.Z)
+                    new Vector3D(endPoint.X - startPoint.X, endPoint.Y - startPoint.Y, endPoint.Z - startPoint.Z)
                 );
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.CarbodyModel, null, HitTestResultCallback, hitParams);
 
             // Ray from side B
             hitParams =
                 new RayHitTestParameters(
-                    EndPoint,
-                    new Vector3D(startPoint.X - EndPoint.X, startPoint.Y - EndPoint.Y, startPoint.Z - EndPoint.Z)
+                    endPoint,
+                    new Vector3D(startPoint.X - endPoint.X, startPoint.Y - endPoint.Y, startPoint.Z - endPoint.Z)
                 );
-            VisualTreeHelper.HitTest(SelectedCarbody.carbodyModel, null, HitTestResultCallback, hitParams);
+            VisualTreeHelper.HitTest(SelectedCarbody.CarbodyModel, null, HitTestResultCallback, hitParams);
         }
+
+        #endregion
     }
 }

@@ -10,14 +10,6 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
     {
         #region Properties
 
-        protected override string ProcessName => "VirtualRobotWrapperRunner.exe";
-
-        protected override string ServerName => "RemoteVirtualRobotManipulability";
-
-        protected override string ProcessArguments => "Manipulability";
-
-        #endregion
-
         public float[] MinBox
         {
             get
@@ -83,6 +75,16 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
                 }
             }
         }
+
+        protected override string ProcessName => "VirtualRobotWrapperRunner.exe";
+
+        protected override string ServerName => "RemoteVirtualRobotManipulability";
+
+        protected override string ProcessArguments => "Manipulability";
+
+        #endregion
+
+        #region Public methods
 
         public ManipulabilityVoxel[] GetManipulability(
             float discrTr,
@@ -161,5 +163,7 @@ namespace VirtualRobotWrapperLib.VirtualRobotManipulability
                 return Pipe.Init(argc, argv, file, robotNodeSetName, baseName, tcpName);
             }
         }
+
+        #endregion
     }
 }

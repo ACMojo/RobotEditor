@@ -13,7 +13,9 @@
     Width="959.599"
     MinWidth="940"
     MinHeight="800">
-    <Grid HorizontalAlignment="Left" Width="950">
+    <Grid
+        HorizontalAlignment="Left"
+        Width="950">
         <Grid
             HorizontalAlignment="Left"
             Height="649"
@@ -32,7 +34,8 @@
                 ModelUpDirection="0,1,0"
                 Margin="10,274,24,35"
                 ZoomExtentsWhenLoaded="True"
-                ItemsSource="{Binding Path=CarbodyModels}" Grid.ColumnSpan="2" />
+                ItemsSource="{Binding Path=CarbodyModels}"
+                Grid.ColumnSpan="2" />
             <Button
                 x:Name="button_AddCarbody"
                 Content="Add carbody"
@@ -79,11 +82,44 @@
                 Margin="10,235,0,0"
                 VerticalAlignment="Top"
                 Width="90"
-                Command="{Binding DeleteCarbody}" Grid.ColumnSpan="2" />
-            <CheckBox x:Name="checkBox_ShowHitPoints" Content="Show hit points" Grid.Column="1" HorizontalAlignment="Right" Margin="0,200,228,0" VerticalAlignment="Top" Command="{Binding HitPoints}" IsChecked="{Binding IsCheckedHitPoints}"/>
-            <CheckBox x:Name="checkBox_ShowRayOrigins" Content="Show ray origins" Grid.Column="1" HorizontalAlignment="Left" Margin="74,235,0,0" VerticalAlignment="Top" Command="{Binding RayOrigins}" IsChecked="{Binding IsCheckedRayOrigins}" />
-            <CheckBox x:Name="checkBox_ShowBoundingBox" Content="Show bounding box" Grid.Column="1" HorizontalAlignment="Right" Margin="0,200,79,0" VerticalAlignment="Top" Command="{Binding BoundingBox}" IsChecked="{Binding IsCheckedBoundingBox}"/>
-            <CheckBox x:Name="checkBox_ShowSymetryPlane" Content="Show symmetry plane" Grid.Column="1" HorizontalAlignment="Left" Margin="198,235,0,0" VerticalAlignment="Top" Command="{Binding SymmetryPlane}" IsChecked="{Binding IsCheckedSymmetryPlane}" />
+                Command="{Binding DeleteCarbody}"
+                Grid.ColumnSpan="2" />
+            <CheckBox
+                x:Name="checkBox_ShowHitPoints"
+                Content="Show hit points"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Margin="0,200,228,0"
+                VerticalAlignment="Top"
+                Command="{Binding HitPoints}"
+                IsChecked="{Binding IsCheckedHitPoints}" />
+            <CheckBox
+                x:Name="checkBox_ShowRayOrigins"
+                Content="Show ray origins"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                Margin="74,235,0,0"
+                VerticalAlignment="Top"
+                Command="{Binding RayOrigins}"
+                IsChecked="{Binding IsCheckedRayOrigins}" />
+            <CheckBox
+                x:Name="checkBox_ShowBoundingBox"
+                Content="Show bounding box"
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Margin="0,200,79,0"
+                VerticalAlignment="Top"
+                Command="{Binding BoundingBox}"
+                IsChecked="{Binding IsCheckedBoundingBox}" />
+            <CheckBox
+                x:Name="checkBox_ShowSymetryPlane"
+                Content="Show symmetry plane"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                Margin="198,235,0,0"
+                VerticalAlignment="Top"
+                Command="{Binding SymmetryPlane}"
+                IsChecked="{Binding IsCheckedSymmetryPlane}" />
         </Grid>
         <Grid
             HorizontalAlignment="Left"
@@ -134,14 +170,16 @@
                 Margin="148,200,0,0"
                 VerticalAlignment="Top"
                 Width="100"
-                Command="{Binding CreateXML}" />
+                Command="{Binding CreateXml}" />
             <h:HelixViewport3D
                 x:Name="view_Robot"
                 CameraRotationMode="Trackball"
                 ModelUpDirection="0,1,0"
                 Margin="10,284,0,35"
                 ZoomExtentsWhenLoaded="True"
-                ItemsSource="{Binding Path=RobotModels}" HorizontalAlignment="Left" Width="413" />
+                ItemsSource="{Binding Path=RobotModels}"
+                HorizontalAlignment="Left"
+                Width="413" />
             <Button
                 x:Name="button_EditRobot"
                 Content="Edit robot"
@@ -157,14 +195,54 @@
                 Margin="330,619,0,0"
                 VerticalAlignment="Top"
                 Width="93"
-                Command="{Binding FitToViewRobot}"
-    />
-            <CheckBox x:Name="checkBox_ShowManipulability" Content="Show manipulability" HorizontalAlignment="Left" Margin="296,200,0,0" VerticalAlignment="Top" Command="{Binding Manipulability}" IsChecked="{Binding IsCheckedManipulability}" />
+                Command="{Binding FitToViewRobot}" />
+            <CheckBox
+                x:Name="checkBox_ShowManipulability"
+                Content="Show manipulability"
+                HorizontalAlignment="Left"
+                Margin="296,200,0,0"
+                VerticalAlignment="Top"
+                Command="{Binding Manipulability}"
+                IsChecked="{Binding IsCheckedManipulability}" />
         </Grid>
-        <Button x:Name="button_Compare" Content="Start comparison" HorizontalAlignment="Left" Margin="465,724,0,0" Width="128" Height="23" VerticalAlignment="Top" Command="{Binding Compare}"/>
-        <Slider x:Name="slider_Precision" HorizontalAlignment="Left" Margin="334,680,0,0" Width="220" TickFrequency="10" Maximum="500" IsSnapToTickEnabled="True" TickPlacement="BottomRight" Minimum="10" Height="22" VerticalAlignment="Top" Value="100"/>
-        <TextBox Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="559,679,0,0" Width="68" Height="23" VerticalAlignment="Top"/>
-        <Button x:Name="button_Update" Content="Update" HorizontalAlignment="Left" Margin="642,680,0,0" Width="128" Height="23" VerticalAlignment="Top" Command="{Binding Compare}"/>
+        <Button
+            x:Name="button_Compare"
+            Content="Start comparison"
+            HorizontalAlignment="Left"
+            Margin="465,724,0,0"
+            Width="128"
+            Height="23"
+            VerticalAlignment="Top"
+            Command="{Binding Compare}" />
+        <Slider
+            x:Name="slider_Precision"
+            HorizontalAlignment="Left"
+            Margin="334,680,0,0"
+            Width="220"
+            TickFrequency="10"
+            Maximum="500"
+            IsSnapToTickEnabled="True"
+            TickPlacement="BottomRight"
+            Minimum="10"
+            Height="22"
+            VerticalAlignment="Top"
+            Value="100" />
+        <TextBox
+            Text="{Binding ElementName=slider_Precision, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+            HorizontalAlignment="Left"
+            Margin="559,679,0,0"
+            Width="68"
+            Height="23"
+            VerticalAlignment="Top" />
+        <Button
+            x:Name="button_Update"
+            Content="Update"
+            HorizontalAlignment="Left"
+            Margin="642,680,0,0"
+            Width="128"
+            Height="23"
+            VerticalAlignment="Top"
+            Command="{Binding Compare}" />
 
     </Grid>
 </Window>

@@ -274,7 +274,7 @@ namespace VirtualRobotWrapperLib.Wcf
 
                             Started?.Invoke(this, EventArgs.Empty);
                         }
-                        catch (Exception ex)
+                        catch
                         {
                             // ignored
                         }

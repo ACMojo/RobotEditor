@@ -1,54 +1,59 @@
-﻿using System;
-using System.Dynamic;
-
-namespace RobotEditor.Model
+﻿namespace RobotEditor.Model
 {
-    public enum JointTypes { Linear, Rotational };
+    public enum JointTypes
+    {
+        Linear,
+        Rotational
+    };
 
     class Joint
     {
+        #region Instance
 
-        public int nr { get; set; }
-        public double a { get; set;  }
-        public double alpha { get; set;  }
-        public double d { get; set;  }
-        public double theta { get; set;  }
-
-
-        public double maxLim { get; set; }
-        public double minLim { get; set; }
-        public JointTypes JTypes { get; set; }
-        public double speed { get; set; }
-        public double acceleration { get; set; }
-
-        public Joint(int Nr, double a, double alpha, double d, double theta, double maxLim, double minLim, JointTypes jTypes, double speed, double acceleration)
+        public Joint(int nr, double a, double alpha, double d, double theta, double maxLim, double minLim, JointTypes jTypes, double speed, double acceleration)
         {
-            this.nr = Nr;
-            this.a = a;
-            this.alpha = alpha;
-            this.d = d;
-            this.theta = theta;
-            this.maxLim = maxLim;
-            this.minLim = minLim;
-            this.JTypes = jTypes;
-            this.speed = speed;
-            this.acceleration = acceleration;
+            Nr = nr;
+            this.A = a;
+            this.Alpha = alpha;
+            this.D = d;
+            this.Theta = theta;
+            this.MaxLim = maxLim;
+            this.MinLim = minLim;
+            JTypes = jTypes;
+            this.Speed = speed;
+            this.Acceleration = acceleration;
         }
 
-        public Joint(int Nr)
+        public Joint(int nr)
         {
-            nr = Nr;
-            a = 0.0;
-            alpha = 0.0;
-            d = 0.0;
-            theta = 0.0;
-            maxLim = 0.0;
-            minLim = 0.0;
+            Nr = nr;
+            A = 0.0;
+            Alpha = 0.0;
+            D = 0.0;
+            Theta = 0.0;
+            MaxLim = 0.0;
+            MinLim = 0.0;
             JTypes = JointTypes.Linear;
-            speed = 0.0;
-            acceleration = 0.0;
+            Speed = 0.0;
+            Acceleration = 0.0;
         }
 
+        #endregion
 
+        #region Properties
+
+        public int Nr { get; set; }
+        public double A { get; set; }
+        public double Alpha { get; set; }
+        public double D { get; set; }
+        public double Theta { get; set; }
+
+        public double MaxLim { get; set; }
+        public double MinLim { get; set; }
+        public JointTypes JTypes { get; set; }
+        public double Speed { get; set; }
+        public double Acceleration { get; set; }
+
+        #endregion
     }
 }

@@ -1,21 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Windows.Media;
 using System.Windows.Media.Media3D;
-
-using HelixToolkit.Wpf;
 
 namespace RobotEditor.Model
 {
     internal class Voxel
     {
-        public Point3D PositionFromRobotBase { get; set; }
-
-        public Color Colour { get; set; }
-        public int Rating { get; set; }
+        #region Instance
 
         public Voxel()
         {
@@ -30,5 +20,16 @@ namespace RobotEditor.Model
             Colour = colour;
             Rating = rating;
         }
+
+        #endregion
+
+        #region Properties
+
+        public Point3D PositionFromRobotBase { get; set; }
+
+        public Color Colour { get; set; }
+        public int Rating { get; set; }
+
+        #endregion
     }
 }
