@@ -563,7 +563,7 @@ namespace RobotEditor.ViewModel
                         foreach (var robot in Robots)
                         {
                             SelectedRobot = robot;
-                            robot.CalcManipulability(_vrManip, _booth);
+                            robot.CalcManipulability(_vrManip, _booth, Precision);
                         }
 
                         SelectedRobot = null;
@@ -611,7 +611,7 @@ namespace RobotEditor.ViewModel
                             SelectedRobot = robotViewModel;
                         });
 
-                    robotViewModel?.CalcManipulability(_vrManip, _booth);
+                    robotViewModel?.CalcManipulability(_vrManip, _booth, Precision);
 
                     Application.Current.Dispatcher.Invoke(
                         () =>
@@ -646,7 +646,7 @@ namespace RobotEditor.ViewModel
             var result = newRobot.ShowDialog();
 
             if (result == true)
-                robotViewModel.CalcManipulability(_vrManip, _booth);
+                robotViewModel.CalcManipulability(_vrManip, _booth, Precision);
 
             SelectedRobot.Model.Show3DRobot();
             if (IsCheckedManipulability)
