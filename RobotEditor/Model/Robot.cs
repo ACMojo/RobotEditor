@@ -293,44 +293,44 @@ namespace RobotEditor.Model
                     switch (n)
                     {
                         case 0:
-                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision/ 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 1:
-                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 2:
-                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 3:
-                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 4:
-                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 5:
-                            startOffset.X = startOffset.X + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 6:
-                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         case 7:
-                            startOffset.X = startOffset.X - Math.Pow(2, w) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, w) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         default:
                             Console.WriteLine("Fehler");
@@ -345,7 +345,7 @@ namespace RobotEditor.Model
                 {
                     var mgv = new MeshGeometryVisual3D();
                     var mb = new MeshBuilder();
-                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 25.0, 25.0, 25.0);
+                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), (Octree.Precision/4), (Octree.Precision / 4), (Octree.Precision / 4));
                     mgv.MeshGeometry = mb.ToMesh();
                     mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
                     ManipulabilityVoxel3D.Add(mgv);

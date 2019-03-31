@@ -8,9 +8,10 @@ namespace RobotEditor.Model
     {
         #region Instance
 
-        public VoxelOctree(int level)
+        public VoxelOctree(int level, double precision)
         {
             Level = level;
+            Precision = precision;
 
             var size = (int)Math.Ceiling((Math.Pow(8, level + 1) - 1) / 7);
 
@@ -39,6 +40,8 @@ namespace RobotEditor.Model
 
         public int Level { get; }
 
+        public double Precision { get; }
+
         public VoxelNodeInner Root => (VoxelNodeInner)Nodes[0];
 
         public VoxelNode[] Nodes { get; private set; }
@@ -57,16 +60,11 @@ namespace RobotEditor.Model
         {
             var leafNodeCount = dimension / stepSize;
 
-            return Create(leafNodeCount * leafNodeCount * leafNodeCount);
-        }
-
-        public static VoxelOctree Create(double leafNodeCount)
-        {
-            var level = (int)Math.Ceiling(Math.Log(leafNodeCount, 8));
+            var level = (int)Math.Ceiling(Math.Log((leafNodeCount * leafNodeCount * leafNodeCount), 8));
             if (level < 1)
                 return null;
 
-            return new VoxelOctree(level);
+            return new VoxelOctree(level, stepSize);
         }
 
         public VoxelNodeInner GetParent(VoxelNode node)
@@ -179,7 +177,7 @@ namespace RobotEditor.Model
             //    }
             //};
 
-            var tempTree = new VoxelOctree(Level)
+            var tempTree = new VoxelOctree(Level, Precision)
             {
                 Nodes =
                 {
@@ -366,70 +364,68 @@ namespace RobotEditor.Model
                 j = Level - 2 - i;
                 if (x >= centerBoundX)
                 {
-                    centerBoundX += (int)Math.Pow(2, j) * 100;
+                    centerBoundX += (int)(Math.Pow(2, j) * Precision);
                     if (y >= centerBoundY)
                     {
-                        centerBoundY += (int)Math.Pow(2, j) * 100;
+                        centerBoundY += (int)(Math.Pow(2, j) * Precision);
                         if (z >= centerBoundZ)
                         {
                             path[i] = 5;
-                            centerBoundZ += (int)Math.Pow(2, j) * 100;
+                            centerBoundZ += (int)(Math.Pow(2, j) * Precision);
                         }
                         else
                         {
                             path[i] = 1;
-                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
+                            centerBoundZ += -(int)(Math.Pow(2, j) * Precision);
                         }
                     }
                     else
                     {
-                        centerBoundY += -(int)Math.Pow(2, j) * 100;
+                        centerBoundY += -(int)(Math.Pow(2, j) * Precision);
                         if (z >= centerBoundZ)
                         {
                             path[i] = 4;
-                            centerBoundZ += (int)Math.Pow(2, j) * 100;
+                            centerBoundZ += (int)(Math.Pow(2, j) * Precision);
                         }
                         else
                         {
                             path[i] = 0;
-                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
+                            centerBoundZ += -(int)(Math.Pow(2, j) * Precision);
                         }
                     }
                 }
                 else
                 {
-                    centerBoundX += -(int)Math.Pow(2, j) * 100;
+                    centerBoundX += -(int)(Math.Pow(2, j) * Precision);
                     if (y >= centerBoundY)
                     {
-                        centerBoundY += (int)Math.Pow(2, j) * 100;
+                        centerBoundY += (int)(Math.Pow(2, j) * Precision);
                         if (z >= centerBoundZ)
                         {
                             path[i] = 7;
-                            centerBoundZ += (int)Math.Pow(2, j) * 100;
+                            centerBoundZ += (int)(Math.Pow(2, j) * Precision);
                         }
                         else
                         {
                             path[i] = 3;
-                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
+                            centerBoundZ += -(int)(Math.Pow(2, j) * Precision);
                         }
                     }
                     else
                     {
-                        centerBoundY += -(int)Math.Pow(2, j) * 100;
+                        centerBoundY += -(int)(Math.Pow(2, j) * Precision);
                         if (z >= centerBoundZ)
                         {
                             path[i] = 6;
-                            centerBoundZ += (int)Math.Pow(2, j) * 100;
+                            centerBoundZ += (int)(Math.Pow(2, j) * Precision);
                         }
                         else
                         {
                             path[i] = 2;
-                            centerBoundZ += -(int)Math.Pow(2, j) * 100;
+                            centerBoundZ += -(int)(Math.Pow(2, j) * Precision);
                         }
                     }
                 }
-
-                //Console.WriteLine("path" + path[i]);
             }
 
             var nodeIndex = CalculateNodeIndex(path);

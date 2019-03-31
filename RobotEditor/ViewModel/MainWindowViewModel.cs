@@ -198,8 +198,8 @@ namespace RobotEditor.ViewModel
                 if (_selectedRobot != null)
                 {
                     SelectedRobot.Model.Show3DRobot();
-
-                    if (IsCheckedManipulability)
+                    
+                    if (IsCheckedManipulability && SelectedRobot.Model.Octree!= null)
                         SelectedRobot.Model.Show3DManipulabilityOctree();
                     RobotModels.Add(_selectedRobot.RobotModel);
                 }
@@ -553,17 +553,40 @@ namespace RobotEditor.ViewModel
 
             if (result == true)
             {
-                if (SelectedRobot != null)
-                    SelectedRobot.Model.Hide3DRobot();
+                var backgroundWorker = new BackgroundWorker();
 
-                if (IsCheckedManipulability && SelectedRobot != null)
-                    SelectedRobot.Model.Hide3DManipulabilityOctree();
+                backgroundWorker.DoWork += (s, e) =>
+                {
+                    Application.Current.Dispatcher.Invoke(
+                    () =>
+                    {
 
-                var robotViewModel = new RobotViewModel(robot);
-                Robots.Add(robotViewModel);
-                SelectedRobot = robotViewModel;
+                        if (SelectedRobot != null)
+                            SelectedRobot.Model.Hide3DRobot();
 
-                CalcManipulability();
+                        if (IsCheckedManipulability && SelectedRobot != null)
+                            SelectedRobot.Model.Hide3DManipulabilityOctree();
+
+                        var robotViewModel = new RobotViewModel(robot);
+                        Robots.Add(robotViewModel);
+                        SelectedRobot = robotViewModel;                  
+                    });
+
+                    CalcManipulability();
+
+                    Application.Current.Dispatcher.Invoke(
+                    () =>
+                    {
+                        if (IsCheckedManipulability)
+                            SelectedRobot.Model.Show3DManipulabilityOctree();
+                    });
+
+                };
+
+                backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+                IsBusy = true;
+                backgroundWorker.RunWorkerAsync();
             }
 
             _viewportRobot.ZoomExtents(0);
@@ -682,18 +705,34 @@ namespace RobotEditor.ViewModel
 
         private void DeleteRobotExecute(object obj)
         {
-            if (IsCheckedManipulability && SelectedRobot != null)
-                SelectedRobot.Model.Hide3DManipulabilityOctree();
+            var backgroundWorker = new BackgroundWorker();
 
-            var currentlySelected = SelectedRobot;
-            SelectedRobot = Robots.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
-            Robots.Remove(currentlySelected);
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                Application.Current.Dispatcher.Invoke(
+                () =>
+                {
 
-            if (Robots.Count == 0)
-                IsCheckedManipulability = false;
+                    if (IsCheckedManipulability && SelectedRobot != null)
+                        SelectedRobot.Model.Hide3DManipulabilityOctree();
 
-            if (IsCheckedManipulability && SelectedRobot != null)
-                SelectedRobot.Model.Show3DManipulabilityOctree();
+                    var currentlySelected = SelectedRobot;
+                    SelectedRobot = Robots.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
+                    Robots.Remove(currentlySelected);
+
+                    if (Robots.Count == 0)
+                        IsCheckedManipulability = false;
+
+                    if (IsCheckedManipulability && SelectedRobot != null)
+                        SelectedRobot.Model.Show3DManipulabilityOctree();
+                },System.Windows.Threading.DispatcherPriority.ContextIdle);
+                
+            };
+
+            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+            IsBusy = true;
+            backgroundWorker.RunWorkerAsync();
 
             RaisePropertyChanged();
         }
@@ -755,9 +794,24 @@ namespace RobotEditor.ViewModel
 
         private void DeleteCarbodyExecute(object obj)
         {
-            var currentlySelected = SelectedCarbody;
-            SelectedCarbody = Carbodies.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
-            Carbodies.Remove(currentlySelected);
+            var backgroundWorker = new BackgroundWorker();
+
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                Application.Current.Dispatcher.Invoke(
+                () =>
+                {
+                    var currentlySelected = SelectedCarbody;
+                    SelectedCarbody = Carbodies.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
+                    Carbodies.Remove(currentlySelected);
+                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+
+            };
+
+            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+            IsBusy = true;
+            backgroundWorker.RunWorkerAsync();
 
             RaisePropertyChanged();
         }
