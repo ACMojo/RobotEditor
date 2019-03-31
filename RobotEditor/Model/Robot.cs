@@ -355,7 +355,7 @@ namespace RobotEditor.Model
                 var mb = new MeshBuilder();
                 mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), Octree.Precision / 4, Octree.Precision / 4, Octree.Precision / 4);
                 mgv.MeshGeometry = mb.ToMesh();
-                mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
+                mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 0.0));
                 ManipulabilityVoxel3D.Add(mgv);
                 RobotModel.Children.Add(ManipulabilityVoxel3D.Last());
             }

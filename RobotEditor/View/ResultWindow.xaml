@@ -307,7 +307,7 @@
                 x:Name="Robots_Grid"
                 ItemsSource="{Binding Booths}"
                 AutoGenerateColumns="False"
-                SelectedItem="{Binding SelectedRobot}"
+                SelectedItem="{Binding SelectedBooth}"
                 SelectionMode="Single"
                 CanUserAddRows="False"
                 CanUserDeleteRows="False">

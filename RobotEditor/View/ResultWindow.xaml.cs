@@ -4,6 +4,7 @@ using System.Windows.Documents;
 
 using RobotEditor.Model;
 using RobotEditor.ViewModel;
+using System.Collections.Generic;
 
 namespace RobotEditor.View
 {
@@ -21,11 +22,11 @@ namespace RobotEditor.View
 
         #region Instance
 
-        public ResultWindow(VoxelOctree value)
+        public ResultWindow(VoxelOctree mixedCars, List<VoxelOctree> robots)
         {
             InitializeComponent();
 
-            _resultViewModel = new ResultViewModel(view_Result, value);
+            _resultViewModel = new ResultViewModel(view_Result, mixedCars, robots);
 
             DataContext = _resultViewModel;
 

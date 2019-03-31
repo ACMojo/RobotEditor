@@ -1,4 +1,5 @@
 ﻿using RobotEditor.Model;
+using System.Windows.Media.Media3D;
 
 namespace RobotEditor.ViewModel
 {
@@ -16,6 +17,20 @@ namespace RobotEditor.ViewModel
         #region Properties
 
         public Booth Model { get; }
+
+        public ModelVisual3D BoothModel
+        {
+            get { return Model.BoothModel; }
+            set
+            {
+                if (value.Equals(Model.BoothModel))
+                    return;
+
+                Model.BoothModel = value;
+
+                RaisePropertyChanged();
+            }
+        }
 
         public string RobotName
         {

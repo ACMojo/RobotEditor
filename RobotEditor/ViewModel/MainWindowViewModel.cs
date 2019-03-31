@@ -406,9 +406,9 @@ namespace RobotEditor.ViewModel
 
         private void CompareExecute(object obj)
         {
-            var booth = new Booth(10000, Precision);
-
             HideAdditionGeometries();
+
+            VoxelOctree octreeTemp = null;
 
             IsBusy = true;
 
@@ -426,9 +426,7 @@ namespace RobotEditor.ViewModel
                 foreach (var carbody in Carbodies)
                 {
                     Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
-
-                    var octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
-
+                    octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
                     Application.Current.Dispatcher.Invoke(() => _viewportCarbody.ZoomExtents(0));
 
                     // Perform hit test
@@ -526,7 +524,7 @@ namespace RobotEditor.ViewModel
                         }
                     }
 
-                    booth.Octree.Add(octreeTemp);
+                    //booth.ResultOctree.Add(_octreeTemp);
                 }
             };
 
@@ -542,7 +540,9 @@ namespace RobotEditor.ViewModel
                 //octree.Set(790, -790, -790, 1);
                 //octree.Set(1, -1, -1, 2);
 
-                var comparison = new ResultWindow(booth.Octree);
+                var robots = Robots.Select(r => r.Model.Octree).ToList();
+
+                var comparison = new ResultWindow(octreeTemp, robots);
                 var result = comparison.ShowDialog();
 
                 if (result == true)
