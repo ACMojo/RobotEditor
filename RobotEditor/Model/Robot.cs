@@ -276,15 +276,15 @@ namespace RobotEditor.Model
         public void Show3DManipulabilityOctree()
         {
             var i = Octree.StartIndexLeafNodes - 1;
-            var maxValu = 0;
+            var maxValue = 0.0;
 
             for (var h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
             {
                 if (Octree.Nodes[h] == null)
                     continue;
 
-                if (((VoxelNodeInner)Octree.Nodes[h]).Max > maxValu)
-                    maxValu = (int)((VoxelNodeInner)Octree.Nodes[h]).Max;
+                if (((VoxelNodeInner)Octree.Nodes[h]).Max > maxValue)
+                    maxValue = ((VoxelNodeInner)Octree.Nodes[h]).Max;
             }
 
             foreach (var node in Octree.GetLeafNodes())
@@ -355,7 +355,7 @@ namespace RobotEditor.Model
                 var mb = new MeshBuilder();
                 mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), Octree.Precision / 4, Octree.Precision / 4, Octree.Precision / 4);
                 mgv.MeshGeometry = mb.ToMesh();
-                mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 0.0));
+                mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
                 ManipulabilityVoxel3D.Add(mgv);
                 RobotModel.Children.Add(ManipulabilityVoxel3D.Last());
             }

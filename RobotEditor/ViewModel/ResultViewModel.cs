@@ -29,8 +29,9 @@ namespace RobotEditor.ViewModel
 
             _viewportResult = viewportResult;
             BoothModels.Add(new DefaultLights());
+            BoothModels.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
 
-            foreach(var robot in robots)
+            foreach (var robot in robots)
                 Booths.Add(new BoothViewModel(new Booth("Puma 560", 0.0, 0.0, mixedCars, robot)));
         }
 
