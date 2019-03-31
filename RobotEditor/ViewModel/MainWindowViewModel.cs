@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
@@ -204,7 +203,6 @@ namespace RobotEditor.ViewModel
                     RobotModels.Add(_selectedRobot.RobotModel);
                 }
 
-
                 RaisePropertyChanged();
 
                 DeleteRobot.RaisePropertyChanged();
@@ -394,16 +392,14 @@ namespace RobotEditor.ViewModel
             backgroundWorker.DoWork += (s, e) =>
             {
                 Application.Current.Dispatcher.Invoke(
-                () =>
-                {
-
-                    if (IsCheckedManipulability)
-                        SelectedRobot.Model.Show3DManipulabilityOctree();
-                    else
-                        SelectedRobot.Model.Hide3DManipulabilityOctree();
-
-                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
-
+                    () =>
+                    {
+                        if (IsCheckedManipulability)
+                            SelectedRobot.Model.Show3DManipulabilityOctree();
+                        else
+                            SelectedRobot.Model.Hide3DManipulabilityOctree();
+                    },
+                    System.Windows.Threading.DispatcherPriority.ContextIdle);
             };
 
             backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
@@ -425,18 +421,18 @@ namespace RobotEditor.ViewModel
                 {
                     Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
 
-                    _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, 100d);
+                    _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
 
                     Application.Current.Dispatcher.Invoke(() => _viewportCarbody.ZoomExtents(0));
 
                     // Perform hit test
 
-                    for (int m = 0; m < 3; m++)
+                    for (var m = 0; m < 3; m++)
                     {
-                        int[,] directionSelector = new int[,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
-                        int[] factor = new int[3] { 1, 1, 1 };
-                        int[] factor2 = new int[3] { 0, 0, 0 };
-                        int[] factor3 = new int[3] { 0, 0, 0 };
+                        var directionSelector = new [,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
+                        var factor = new [] { 1, 1, 1 };
+                        var factor2 = new [] { 0, 0, 0 };
+                        var factor3 = new [] { 0, 0, 0 };
                         factor[m] = -1;
 
                         var matrixStart = new Matrix3D(
@@ -492,12 +488,11 @@ namespace RobotEditor.ViewModel
                         matrixStart.TranslatePrepend(matrixTranslationStart);
                         matrixEnd.TranslatePrepend(matrixTranslationEnd);
 
-                        Vector3D vector;
-
-                        for (int j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / 100.0; j++)
+                        for (var j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / Precision; j++)
                         {
                             var total = 0;
-                            for (int k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / 100.0; k++)
+                            Vector3D vector;
+                            for (var k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / Precision; k++)
                             {
                                 Application.Current.Dispatcher.Invoke(() => SelectedCarbody.RayHi(matrixStart, matrixEnd, _octreeTemp));
 
@@ -555,26 +550,23 @@ namespace RobotEditor.ViewModel
         {
             var currentlySelectedRobot = SelectedRobot;
 
-
             var backgroundWorker = new BackgroundWorker();
 
             backgroundWorker.DoWork += (s, e) =>
             {
                 Application.Current.Dispatcher.Invoke(
-                () =>
-                {
-                    foreach (var robot in Robots)
+                    () =>
                     {
-                        SelectedRobot = robot;
-                        CalcManipulability();
-                    }
+                        foreach (var robot in Robots)
+                        {
+                            SelectedRobot = robot;
+                            robot.CalcManipulability(_vrManip, _booth);
+                        }
 
-                    SelectedRobot = null;
-                    SelectedRobot = currentlySelectedRobot;
-
-                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
-                
-
+                        SelectedRobot = null;
+                        SelectedRobot = currentlySelectedRobot;
+                    },
+                    System.Windows.Threading.DispatcherPriority.ContextIdle);
             };
 
             backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
@@ -585,10 +577,10 @@ namespace RobotEditor.ViewModel
 
         private void AddRobotExecute(object obj)
         {
-            int i = Robots.Count;
-            foreach (var Robot in Robots)
+            var i = Robots.Count;
+            foreach (var r in Robots)
             {
-                if (Robot.Name == $"Robot_{i}")
+                if (r.Name == $"Robot_{i}")
                     i++;
             }
 
@@ -602,21 +594,21 @@ namespace RobotEditor.ViewModel
 
                 backgroundWorker.DoWork += (s, e) =>
                 {
+                    RobotViewModel robotViewModel = null;
                     Application.Current.Dispatcher.Invoke(
                         () =>
                         {
-                            if (SelectedRobot != null)
-                                SelectedRobot.Model.Hide3DRobot();
+                            SelectedRobot?.Model.Hide3DRobot();
 
-                            if (IsCheckedManipulability && SelectedRobot != null)
-                                SelectedRobot.Model.Hide3DManipulabilityOctree();
+                            if (IsCheckedManipulability)
+                                SelectedRobot?.Model.Hide3DManipulabilityOctree();
 
-                            var robotViewModel = new RobotViewModel(robot);
+                            robotViewModel = new RobotViewModel(robot);
                             Robots.Add(robotViewModel);
                             SelectedRobot = robotViewModel;
                         });
 
-                    CalcManipulability();
+                    robotViewModel?.CalcManipulability(_vrManip, _booth);
 
                     Application.Current.Dispatcher.Invoke(
                         () =>
@@ -633,9 +625,6 @@ namespace RobotEditor.ViewModel
             }
 
             _viewportRobot.ZoomExtents(0);
-
-            if (result != true)
-                return;
         }
 
         private bool EditRobotCanExecute(object arg)
@@ -649,13 +638,12 @@ namespace RobotEditor.ViewModel
             if (IsCheckedManipulability)
                 SelectedRobot.Model.Hide3DManipulabilityOctree();
 
-            var newRobot = new RobotValues { DataContext = new RobotViewModel(_selectedRobot.Model) };
+            var robotViewModel = new RobotViewModel(_selectedRobot.Model);
+            var newRobot = new RobotValues { DataContext = robotViewModel };
             var result = newRobot.ShowDialog();
 
             if (result == true)
-            {
-                CalcManipulability();
-            }
+                robotViewModel.CalcManipulability(_vrManip, _booth);
 
             SelectedRobot.Model.Show3DRobot();
             if (IsCheckedManipulability)
@@ -673,8 +661,8 @@ namespace RobotEditor.ViewModel
                 Application.Current.Dispatcher.Invoke(
                     () =>
                     {
-                        if (IsCheckedManipulability && SelectedRobot != null)
-                            SelectedRobot.Model.Hide3DManipulabilityOctree();
+                        if (IsCheckedManipulability)
+                            SelectedRobot?.Model.Hide3DManipulabilityOctree();
 
                         var currentlySelected = SelectedRobot;
                         SelectedRobot = Robots.FirstOrDefault(c => !ReferenceEquals(c, currentlySelected));
@@ -683,8 +671,8 @@ namespace RobotEditor.ViewModel
                         if (Robots.Count == 0)
                             IsCheckedManipulability = false;
 
-                        if (IsCheckedManipulability && SelectedRobot != null)
-                            SelectedRobot.Model.Show3DManipulabilityOctree();
+                        if (IsCheckedManipulability)
+                            SelectedRobot?.Model.Show3DManipulabilityOctree();
                     },
                     System.Windows.Threading.DispatcherPriority.ContextIdle);
             };
@@ -810,69 +798,6 @@ namespace RobotEditor.ViewModel
         private bool DeleteCarbodyCanExecute(object arg)
         {
             return SelectedCarbody != null;
-        }
-
-        public void CalcManipulability()
-        {
-            SelectedRobot.Model.SaveRobotStructur();
-
-            float[] maxB;
-            float[] minB;
-            float maxManip;
-
-            string path = AppDomain.CurrentDomain.BaseDirectory + SelectedRobot.Model.Name;
-            if (_vrManip.Init(0, null, path, "robotNodeSet", "root", "tcp"))
-            {
-                ManipulabilityVoxel[] vox = _vrManip.GetManipulabilityWithPenalty((float)Precision, (float)(Math.PI / 2), 100000, false, false, true, 50f);
-
-                minB = _vrManip.MinBox;
-                maxB = _vrManip.MaxBox;
-
-                // Calc size of cube depending on reachability of robot
-                double octreeSize;
-                if (Math.Abs(_vrManip.MaxBox.Max()) > Math.Abs(_vrManip.MinBox.Max()))
-                    octreeSize = Math.Abs(_vrManip.MaxBox.Max()) * 2;
-                else
-                    octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
-
-                SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, Precision);
-                SelectedRobot.UpdatePrecision();
-
-                maxManip = _vrManip.MaxManipulability;
-
-                ManipulabilityVoxel voxOld = vox[0];
-                double maxValue = vox[0].Value;
-                for (int j = 1; j < vox.Length; j++)
-                {
-                    // TODO: MaxWert gewichten, je nach Drehung zwsichen Roboter und Fahrzeug
-
-                    if (vox[j].X == voxOld.X && vox[j].Y == voxOld.Y && vox[j].Z == voxOld.Z)
-                    {
-                        if (vox[j].Value > maxValue)
-                            maxValue = vox[j].Value;
-                    }
-                    else
-                    {
-                        if (!SelectedRobot.Model.Octree.Set(
-                                (int)(minB[0] + voxOld.X * Precision),
-                                (int)(minB[1] + voxOld.Y * Precision),
-                                (int)(minB[2] + voxOld.Z * Precision),
-                                maxValue))
-                        {
-                            var value = _booth.Octree.Get(
-                                (int)Math.Floor(minB[0] / Precision + voxOld.X),
-                                (int)Math.Floor(minB[1] / Precision + voxOld.Y),
-                                (int)Math.Floor(minB[2] / Precision + voxOld.Z));
-                            if (double.IsNaN(value))
-                                Console.WriteLine(
-                                    $"Nicht erfolgreich bei: {Math.Floor(minB[0] / Precision + voxOld.X)} {Math.Floor(minB[1] / Precision + voxOld.Y)} {Math.Floor(minB[2] / Precision + voxOld.Z)}");
-                        }
-
-                        voxOld = vox[j];
-                        maxValue = vox[j].Value;
-                    }
-                }
-            }
         }
 
         private void ShowAdditionalGeometries()
