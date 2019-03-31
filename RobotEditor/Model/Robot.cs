@@ -86,6 +86,7 @@ namespace RobotEditor.Model
 
         public List<Joint> Joints { get; } = new List<Joint>();
         public string Name { get; set; }
+
         public VoxelOctree Octree { get; set; }
 
         public ModelVisual3D RobotModel
@@ -97,6 +98,7 @@ namespace RobotEditor.Model
         #endregion
 
         #region Public methods
+
 
         public void SaveRobotStructur()
         {

@@ -204,6 +204,7 @@ namespace RobotEditor.ViewModel
                     RobotModels.Add(_selectedRobot.RobotModel);
                 }
 
+
                 RaisePropertyChanged();
 
                 DeleteRobot.RaisePropertyChanged();
@@ -388,10 +389,27 @@ namespace RobotEditor.ViewModel
 
         private void ManipulabilityExecute(object obj)
         {
-            if (IsCheckedManipulability)
-                SelectedRobot.Model.Show3DManipulabilityOctree();
-            else
-                SelectedRobot.Model.Hide3DManipulabilityOctree();
+            var backgroundWorker = new BackgroundWorker();
+
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                Application.Current.Dispatcher.Invoke(
+                () =>
+                {
+
+                    if (IsCheckedManipulability)
+                        SelectedRobot.Model.Show3DManipulabilityOctree();
+                    else
+                        SelectedRobot.Model.Hide3DManipulabilityOctree();
+
+                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+
+            };
+
+            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+            IsBusy = true;
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void CompareExecute(object obj)
@@ -535,7 +553,34 @@ namespace RobotEditor.ViewModel
 
         private void UpdateExecute(object obj)
         {
-            ;
+            var currentlySelectedRobot = SelectedRobot;
+
+
+            var backgroundWorker = new BackgroundWorker();
+
+            backgroundWorker.DoWork += (s, e) =>
+            {
+                Application.Current.Dispatcher.Invoke(
+                () =>
+                {
+                    foreach (var robot in Robots)
+                    {
+                        SelectedRobot = robot;
+                        CalcManipulability();
+                    }
+
+                    SelectedRobot = null;
+                    SelectedRobot = currentlySelectedRobot;
+
+                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+                
+
+            };
+
+            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+
+            IsBusy = true;
+            backgroundWorker.RunWorkerAsync();
         }
 
         private void AddRobotExecute(object obj)
@@ -1207,6 +1252,7 @@ namespace RobotEditor.ViewModel
                     octreeSize = Math.Abs(_vrManip.MinBox.Max()) * 2;
 
                 SelectedRobot.Model.Octree = VoxelOctree.Create(octreeSize, Precision);
+                SelectedRobot.UpdatePrecision();
 
                 maxManip = _vrManip.MaxManipulability;
 

@@ -40,7 +40,7 @@ namespace RobotEditor.Model
 
         public int Level { get; }
 
-        public double Precision { get; }
+        public double Precision { get; set; }
 
         public VoxelNodeInner Root => (VoxelNodeInner)Nodes[0];
 

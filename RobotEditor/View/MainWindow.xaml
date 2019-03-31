@@ -274,6 +274,11 @@
                             Header="Robot"
                             Width="Auto"
                             Binding="{Binding Name, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
+                        <DataGridTextColumn
+                            Header="Precision"
+                            Width="Auto"
+                            IsReadOnly="True"
+                            Binding="{Binding Precision, NotifyOnValidationError=True, ValidatesOnDataErrors=True}" />
                     </DataGrid.Columns>
                 </DataGrid>
 
@@ -382,7 +387,8 @@
                         x:Name="button_Update"
                         Content="Update"
                         Margin="5"
-                        Width="150" />
+                        Width="150" 
+                        Command="{Binding Update}"/>
                 </StackPanel>
                 <Button
                     x:Name="button_Compare"

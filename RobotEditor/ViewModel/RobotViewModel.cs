@@ -100,6 +100,37 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        public double Precision
+        {
+            get { return Model.Octree?.Precision ?? 0; }
+            set
+            {
+                if (value.Equals(Model.Octree.Precision))
+                    return;
+
+                if (value == 0.0)
+                {
+                    _errors[nameof(Name)] = "No precision given";
+                    return;
+                }
+
+                _errors[nameof(Name)] = string.Empty;
+
+                Model.Octree.Precision = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public void UpdatePrecision()
+        {
+            RaisePropertyChanged(nameof(Precision));
+        }
+
         #endregion
 
         #region Private methods
