@@ -60,7 +60,7 @@ namespace RobotEditor.Model
         {
             var leafNodeCount = dimension / stepSize;
 
-            var level = (int)Math.Ceiling(Math.Log((leafNodeCount * leafNodeCount * leafNodeCount), 8));
+            var level = (int)Math.Ceiling(Math.Log(leafNodeCount * leafNodeCount * leafNodeCount, 8));
             if (level < 1)
                 return null;
 

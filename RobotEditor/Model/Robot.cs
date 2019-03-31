@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -99,6 +101,7 @@ namespace RobotEditor.Model
             XmlNode robot = doc.CreateElement("Robot");
             var robotAttribute = doc.CreateAttribute("Type");
             robotAttribute.InnerText = Name;
+            Debug.Assert(robot.Attributes != null, "robot.Attributes != null");
             robot.Attributes.Append(robotAttribute);
 
             robotAttribute = doc.CreateAttribute("RootNode");
@@ -110,6 +113,7 @@ namespace RobotEditor.Model
             XmlNode rootNode = doc.CreateElement("RobotNode");
             var rootNodeAttribute = doc.CreateAttribute("name");
             rootNodeAttribute.InnerText = "root";
+            Debug.Assert(rootNode.Attributes != null, "rootNode.Attributes != null");
             rootNode.Attributes.Append(rootNodeAttribute);
 
             robot.AppendChild(rootNode);
@@ -117,6 +121,7 @@ namespace RobotEditor.Model
             XmlNode child = doc.CreateElement("Child");
             var childAttribute = doc.CreateAttribute("name");
             childAttribute.InnerText = "joint 1";
+            Debug.Assert(child.Attributes != null, "child.Attributes != null");
             child.Attributes.Append(childAttribute);
 
             rootNode.AppendChild(child);
@@ -129,23 +134,26 @@ namespace RobotEditor.Model
                 XmlNode jointNode = doc.CreateElement("RobotNode");
                 var jointNodeAttribute = doc.CreateAttribute("name");
                 jointNodeAttribute.InnerText = "joint " + i;
+                Debug.Assert(jointNode.Attributes != null, "jointNode.Attributes != null");
                 jointNode.Attributes.Append(jointNodeAttribute);
 
                 if (i > 1)
                 {
                     XmlNode transformNode = doc.CreateElement("Transform");
                     XmlNode dhNode = doc.CreateElement("DH");
+                    Debug.Assert(dhNode.Attributes != null, "dhNode.Attributes != null");
                     var dhNodeAttribute = doc.CreateAttribute("a");
-                    dhNodeAttribute.InnerText = oldJoint.A.ToString();
+                    Debug.Assert(oldJoint != null, nameof(oldJoint) + " != null");
+                    dhNodeAttribute.InnerText = oldJoint.A.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("d");
-                    dhNodeAttribute.InnerText = oldJoint.D.ToString();
+                    dhNodeAttribute.InnerText = oldJoint.D.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("alpha");
-                    dhNodeAttribute.InnerText = oldJoint.Alpha.ToString();
+                    dhNodeAttribute.InnerText = oldJoint.Alpha.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("theta");
-                    dhNodeAttribute.InnerText = oldJoint.Theta.ToString();
+                    dhNodeAttribute.InnerText = oldJoint.Theta.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("units");
                     dhNodeAttribute.InnerText = "degree";
@@ -157,11 +165,12 @@ namespace RobotEditor.Model
                 XmlNode jointTypeNode = doc.CreateElement("Joint");
                 var jointTypeNodeAttribute = doc.CreateAttribute("type");
                 XmlNode limitsNode = doc.CreateElement("Limits");
+                Debug.Assert(limitsNode.Attributes != null, "limitsNode.Attributes != null");
                 var limitsNodeAttribute = doc.CreateAttribute("lo");
-                limitsNodeAttribute.InnerText = joint.MinLim.ToString();
+                limitsNodeAttribute.InnerText = joint.MinLim.ToString(CultureInfo.InvariantCulture);
                 limitsNode.Attributes.Append(limitsNodeAttribute);
                 limitsNodeAttribute = doc.CreateAttribute("hi");
-                limitsNodeAttribute.InnerText = joint.MaxLim.ToString();
+                limitsNodeAttribute.InnerText = joint.MaxLim.ToString(CultureInfo.InvariantCulture);
                 limitsNode.Attributes.Append(limitsNodeAttribute);
                 limitsNodeAttribute = doc.CreateAttribute("units");
                 if (joint.JTypes == JointTypes.Linear)
@@ -177,6 +186,7 @@ namespace RobotEditor.Model
 
                 limitsNode.Attributes.Append(limitsNodeAttribute);
 
+                Debug.Assert(jointTypeNode.Attributes != null, "jointTypeNode.Attributes != null");
                 jointTypeNode.Attributes.Append(jointTypeNodeAttribute);
                 jointTypeNode.AppendChild(limitsNode);
                 jointNode.AppendChild(jointTypeNode);
@@ -184,6 +194,7 @@ namespace RobotEditor.Model
                 if (i < Joints.Count)
                 {
                     child = doc.CreateElement("Child");
+                    Debug.Assert(child.Attributes != null, "child.Attributes != null");
                     childAttribute = doc.CreateAttribute("name");
                     childAttribute.InnerText = "joint " + (i + 1);
                     child.Attributes.Append(childAttribute);
@@ -197,27 +208,30 @@ namespace RobotEditor.Model
                     child = doc.CreateElement("Child");
                     childAttribute = doc.CreateAttribute("name");
                     childAttribute.InnerText = "tcp";
+                    Debug.Assert(child.Attributes != null, "child.Attributes != null");
                     child.Attributes.Append(childAttribute);
                     jointNode.AppendChild(child);
 
                     XmlNode tcpNode = doc.CreateElement("RobotNode");
                     var tcpNodeAttribute = doc.CreateAttribute("name");
                     tcpNodeAttribute.InnerText = "tcp";
+                    Debug.Assert(tcpNode.Attributes != null, "tcpNode.Attributes != null");
                     tcpNode.Attributes.Append(tcpNodeAttribute);
 
                     XmlNode transformNode = doc.CreateElement("Transform");
                     XmlNode dhNode = doc.CreateElement("DH");
                     var dhNodeAttribute = doc.CreateAttribute("a");
-                    dhNodeAttribute.InnerText = joint.A.ToString();
+                    dhNodeAttribute.InnerText = joint.A.ToString(CultureInfo.InvariantCulture);
+                    Debug.Assert(dhNode.Attributes != null, "dhNode.Attributes != null");
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("d");
-                    dhNodeAttribute.InnerText = joint.D.ToString();
+                    dhNodeAttribute.InnerText = joint.D.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("alpha");
-                    dhNodeAttribute.InnerText = joint.Alpha.ToString();
+                    dhNodeAttribute.InnerText = joint.Alpha.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("theta");
-                    dhNodeAttribute.InnerText = joint.Theta.ToString();
+                    dhNodeAttribute.InnerText = joint.Theta.ToString(CultureInfo.InvariantCulture);
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("units");
                     dhNodeAttribute.InnerText = "degree";
@@ -234,6 +248,7 @@ namespace RobotEditor.Model
             XmlNode robotNodeSet = doc.CreateElement("RobotNodeSet");
             var robotNodeSetAttribute = doc.CreateAttribute("name");
             robotNodeSetAttribute.InnerText = "robotNodeSet";
+            Debug.Assert(robotNodeSet.Attributes != null, "robotNodeSet.Attributes != null");
             robotNodeSet.Attributes.Append(robotNodeSetAttribute);
             robotNodeSetAttribute = doc.CreateAttribute("kinematicRoot");
             robotNodeSetAttribute.InnerText = "root";
@@ -247,14 +262,15 @@ namespace RobotEditor.Model
                 child = doc.CreateElement("Node");
                 childAttribute = doc.CreateAttribute("name");
                 childAttribute.InnerText = "joint " + (j + 1);
+                Debug.Assert(child.Attributes != null, "child.Attributes != null");
                 child.Attributes.Append(childAttribute);
                 robotNodeSet.AppendChild(child);
             }
 
             robot.AppendChild(robotNodeSet);
 
-            var path = AppDomain.CurrentDomain.BaseDirectory + "/" + Name;
-            doc.Save(@path);
+            var path = AppDomain.CurrentDomain.BaseDirectory + Name;
+            doc.Save(path);
         }
 
         public void Show3DManipulabilityOctree()
@@ -279,11 +295,10 @@ namespace RobotEditor.Model
 
                 var startOffset = new Point3D(0, 0, 0);
 
-                var n = 0;
                 var k = i;
                 for (var w = 0; w < Octree.Level; w++)
                 {
-                    n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) % 8;
+                    var n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) % 8;
 
                     switch (n)
                     {
@@ -328,7 +343,7 @@ namespace RobotEditor.Model
                             startOffset.Z = startOffset.Z + Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
                         default:
-                            Console.WriteLine("Fehler");
+                            Console.WriteLine(@"Fehler");
                             break;
                     }
 
@@ -336,16 +351,13 @@ namespace RobotEditor.Model
                         k = Octree.StartIndexPerLevel[Octree.Level - 2 - w] + (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) / 8;
                 }
 
-                if (node != null)
-                {
-                    var mgv = new MeshGeometryVisual3D();
-                    var mb = new MeshBuilder();
-                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), (Octree.Precision / 4), (Octree.Precision / 4), (Octree.Precision / 4));
-                    mgv.MeshGeometry = mb.ToMesh();
-                    mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
-                    ManipulabilityVoxel3D.Add(mgv);
-                    RobotModel.Children.Add(ManipulabilityVoxel3D.Last());
-                }
+                var mgv = new MeshGeometryVisual3D();
+                var mb = new MeshBuilder();
+                mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), Octree.Precision / 4, Octree.Precision / 4, Octree.Precision / 4);
+                mgv.MeshGeometry = mb.ToMesh();
+                mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
+                ManipulabilityVoxel3D.Add(mgv);
+                RobotModel.Children.Add(ManipulabilityVoxel3D.Last());
             }
         }
 
@@ -396,12 +408,12 @@ namespace RobotEditor.Model
 
                 interimCs.Transform = new MatrixTransform3D(dhMatrix);
 
-                var line = new LinesVisual3D();
-                line.Thickness = 5.0;
-                var pCollection = new Point3DCollection();
-                pCollection.Add(new Point3D(0.0, 0.0, 0.0));
-                pCollection.Add(
-                    new Point3D(joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)), joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)), joint.D));
+                var line = new LinesVisual3D { Thickness = 5.0 };
+                var pCollection = new Point3DCollection
+                {
+                    new Point3D(0.0, 0.0, 0.0),
+                    new Point3D(joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)), joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)), joint.D)
+                };
                 line.Color = Colors.Gray;
                 line.Points = pCollection;
                 coordinateSystem.Children.Add(line);
