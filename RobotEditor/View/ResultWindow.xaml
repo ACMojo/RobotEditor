@@ -11,6 +11,9 @@
     Title="ResultWindow"
     Height="600"
     Width="800"
+    MinHeight="300"
+    MinWidth="400"
+    WindowStartupLocation="CenterOwner"
     SizeChanged="ResultWindow_SizeChanged">
     <AdornerDecorator>
         <Grid
