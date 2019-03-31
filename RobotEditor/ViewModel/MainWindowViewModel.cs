@@ -75,7 +75,7 @@ namespace RobotEditor.ViewModel
             CarbodyModels.Add(new DefaultLights());
 
             RobotModels.Add(new DefaultLights());
-            RobotModels.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+            RobotModels.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
 
             _obbCalculator = new RemoteObbWrapper();
 
@@ -432,10 +432,10 @@ namespace RobotEditor.ViewModel
 
                     for (var m = 0; m < 3; m++)
                     {
-                        var directionSelector = new [,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
-                        var factor = new [] { 1, 1, 1 };
-                        var factor2 = new [] { 0, 0, 0 };
-                        var factor3 = new [] { 0, 0, 0 };
+                        var directionSelector = new[,] { { 1, 2 }, { 0, 2 }, { 0, 1 } };
+                        var factor = new[] { 1, 1, 1 };
+                        var factor2 = new[] { 0, 0, 0 };
+                        var factor3 = new[] { 0, 0, 0 };
                         factor[m] = -1;
 
                         var matrixStart = new Matrix3D(
@@ -710,7 +710,7 @@ namespace RobotEditor.ViewModel
 
         private void AddCarbodyExecute(object obj)
         {
-            var fileDialog = new OpenFileDialog()
+            var fileDialog = new OpenFileDialog
             {
                 Multiselect = true
             };

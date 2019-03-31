@@ -7,8 +7,7 @@ using System.Xml;
 
 using HelixToolkit.Wpf;
 
-using RobotEditor.ViewModel;
-
+using RobotEditor.Helper;
 
 namespace RobotEditor.Model
 {
@@ -31,7 +30,6 @@ namespace RobotEditor.Model
 
         #region Fields
 
-        private ModelVisual3D _robotModel;
         public List<MeshGeometryVisual3D> ManipulabilityVoxel3D;
         public CoordinateSystemVisual3D Robot3D;
 
@@ -41,7 +39,7 @@ namespace RobotEditor.Model
 
         public Robot(int nrOfJoints, string name)
         {
-            for (int i = 0; i < nrOfJoints; i++)
+            for (var i = 0; i < nrOfJoints; i++)
                 Joints.Add(new Joint(i + 1));
 
             Name = name;
@@ -89,22 +87,17 @@ namespace RobotEditor.Model
 
         public VoxelOctree Octree { get; set; }
 
-        public ModelVisual3D RobotModel
-        {
-            get { return _robotModel; }
-            set { _robotModel = value; }
-        }
+        public ModelVisual3D RobotModel { get; set; }
 
         #endregion
 
         #region Public methods
 
-
         public void SaveRobotStructur()
         {
-            XmlDocument doc = new XmlDocument();
+            var doc = new XmlDocument();
             XmlNode robot = doc.CreateElement("Robot");
-            XmlAttribute robotAttribute = doc.CreateAttribute("Type");
+            var robotAttribute = doc.CreateAttribute("Type");
             robotAttribute.InnerText = Name;
             robot.Attributes.Append(robotAttribute);
 
@@ -115,26 +108,26 @@ namespace RobotEditor.Model
             doc.AppendChild(robot);
 
             XmlNode rootNode = doc.CreateElement("RobotNode");
-            XmlAttribute rootNodeAttribute = doc.CreateAttribute("name");
+            var rootNodeAttribute = doc.CreateAttribute("name");
             rootNodeAttribute.InnerText = "root";
             rootNode.Attributes.Append(rootNodeAttribute);
 
             robot.AppendChild(rootNode);
 
             XmlNode child = doc.CreateElement("Child");
-            XmlAttribute childAttribute = doc.CreateAttribute("name");
+            var childAttribute = doc.CreateAttribute("name");
             childAttribute.InnerText = "joint 1";
             child.Attributes.Append(childAttribute);
 
             rootNode.AppendChild(child);
 
             Joint oldJoint = null;
-            int i = 0;
+            var i = 0;
             foreach (var joint in Joints)
             {
                 i++;
                 XmlNode jointNode = doc.CreateElement("RobotNode");
-                XmlAttribute jointNodeAttribute = doc.CreateAttribute("name");
+                var jointNodeAttribute = doc.CreateAttribute("name");
                 jointNodeAttribute.InnerText = "joint " + i;
                 jointNode.Attributes.Append(jointNodeAttribute);
 
@@ -142,7 +135,7 @@ namespace RobotEditor.Model
                 {
                     XmlNode transformNode = doc.CreateElement("Transform");
                     XmlNode dhNode = doc.CreateElement("DH");
-                    XmlAttribute dhNodeAttribute = doc.CreateAttribute("a");
+                    var dhNodeAttribute = doc.CreateAttribute("a");
                     dhNodeAttribute.InnerText = oldJoint.A.ToString();
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("d");
@@ -162,9 +155,9 @@ namespace RobotEditor.Model
                 }
 
                 XmlNode jointTypeNode = doc.CreateElement("Joint");
-                XmlAttribute jointTypeNodeAttribute = doc.CreateAttribute("type");
+                var jointTypeNodeAttribute = doc.CreateAttribute("type");
                 XmlNode limitsNode = doc.CreateElement("Limits");
-                XmlAttribute limitsNodeAttribute = doc.CreateAttribute("lo");
+                var limitsNodeAttribute = doc.CreateAttribute("lo");
                 limitsNodeAttribute.InnerText = joint.MinLim.ToString();
                 limitsNode.Attributes.Append(limitsNodeAttribute);
                 limitsNodeAttribute = doc.CreateAttribute("hi");
@@ -208,13 +201,13 @@ namespace RobotEditor.Model
                     jointNode.AppendChild(child);
 
                     XmlNode tcpNode = doc.CreateElement("RobotNode");
-                    XmlAttribute tcpNodeAttribute = doc.CreateAttribute("name");
+                    var tcpNodeAttribute = doc.CreateAttribute("name");
                     tcpNodeAttribute.InnerText = "tcp";
                     tcpNode.Attributes.Append(tcpNodeAttribute);
 
                     XmlNode transformNode = doc.CreateElement("Transform");
                     XmlNode dhNode = doc.CreateElement("DH");
-                    XmlAttribute dhNodeAttribute = doc.CreateAttribute("a");
+                    var dhNodeAttribute = doc.CreateAttribute("a");
                     dhNodeAttribute.InnerText = joint.A.ToString();
                     dhNode.Attributes.Append(dhNodeAttribute);
                     dhNodeAttribute = doc.CreateAttribute("d");
@@ -239,7 +232,7 @@ namespace RobotEditor.Model
             }
 
             XmlNode robotNodeSet = doc.CreateElement("RobotNodeSet");
-            XmlAttribute robotNodeSetAttribute = doc.CreateAttribute("name");
+            var robotNodeSetAttribute = doc.CreateAttribute("name");
             robotNodeSetAttribute.InnerText = "robotNodeSet";
             robotNodeSet.Attributes.Append(robotNodeSetAttribute);
             robotNodeSetAttribute = doc.CreateAttribute("kinematicRoot");
@@ -249,7 +242,7 @@ namespace RobotEditor.Model
             robotNodeSetAttribute.InnerText = "tcp";
             robotNodeSet.Attributes.Append(robotNodeSetAttribute);
 
-            for (int j = 0; j < Joints.Count; j++)
+            for (var j = 0; j < Joints.Count; j++)
             {
                 child = doc.CreateElement("Node");
                 childAttribute = doc.CreateAttribute("name");
@@ -260,16 +253,16 @@ namespace RobotEditor.Model
 
             robot.AppendChild(robotNodeSet);
 
-            string path = AppDomain.CurrentDomain.BaseDirectory + "/" + Name;
+            var path = AppDomain.CurrentDomain.BaseDirectory + "/" + Name;
             doc.Save(@path);
         }
 
         public void Show3DManipulabilityOctree()
         {
-            int i = Octree.StartIndexLeafNodes - 1;
-            int maxValu = 0;
+            var i = Octree.StartIndexLeafNodes - 1;
+            var maxValu = 0;
 
-            for (int h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
+            for (var h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
             {
                 if (Octree.Nodes[h] == null)
                     continue;
@@ -286,16 +279,16 @@ namespace RobotEditor.Model
 
                 var startOffset = new Point3D(0, 0, 0);
 
-                int n = 0;
-                int k = i;
-                for (int w = 0; w < Octree.Level; w++)
+                var n = 0;
+                var k = i;
+                for (var w = 0; w < Octree.Level; w++)
                 {
                     n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) % 8;
 
                     switch (n)
                     {
                         case 0:
-                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision/ 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, w) * (Octree.Precision / 2);
                             startOffset.Y = startOffset.Y - Math.Pow(2, w) * (Octree.Precision / 2);
                             startOffset.Z = startOffset.Z - Math.Pow(2, w) * (Octree.Precision / 2);
                             break;
@@ -347,7 +340,7 @@ namespace RobotEditor.Model
                 {
                     var mgv = new MeshGeometryVisual3D();
                     var mb = new MeshBuilder();
-                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), (Octree.Precision/4), (Octree.Precision / 4), (Octree.Precision / 4));
+                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), (Octree.Precision / 4), (Octree.Precision / 4), (Octree.Precision / 4));
                     mgv.MeshGeometry = mb.ToMesh();
                     mgv.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValu, 1.0));
                     ManipulabilityVoxel3D.Add(mgv);
@@ -367,8 +360,8 @@ namespace RobotEditor.Model
 
             Robot3D.ArrowLengths = 100.0;
 
-            int i = 0;
-            foreach (Joint joint in Joints)
+            var i = 0;
+            foreach (var joint in Joints)
             {
                 i++;
                 var interimCs = new CoordinateSystemVisual3D();
@@ -403,9 +396,9 @@ namespace RobotEditor.Model
 
                 interimCs.Transform = new MatrixTransform3D(dhMatrix);
 
-                LinesVisual3D line = new LinesVisual3D();
+                var line = new LinesVisual3D();
                 line.Thickness = 5.0;
-                Point3DCollection pCollection = new Point3DCollection();
+                var pCollection = new Point3DCollection();
                 pCollection.Add(new Point3D(0.0, 0.0, 0.0));
                 pCollection.Add(
                     new Point3D(joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)), joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)), joint.D));

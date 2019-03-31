@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RobotEditor.ViewModel
+namespace RobotEditor.Helper
 {
     public static class DegreeToRadian
     {

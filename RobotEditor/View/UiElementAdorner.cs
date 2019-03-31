@@ -17,8 +17,6 @@ namespace RobotEditor.View
         #region Fields
 
         private TElement _child;
-        private double _offsetLeft;
-        private double _offsetTop;
 
         #endregion
 
@@ -60,32 +58,6 @@ namespace RobotEditor.View
         }
 
         /// <summary>
-        ///     Gets/sets the horizontal offset of the adorner.
-        /// </summary>
-        public double OffsetLeft
-        {
-            get { return _offsetLeft; }
-            set
-            {
-                _offsetLeft = value;
-                UpdateLocation();
-            }
-        }
-
-        /// <summary>
-        ///     Gets/sets the vertical offset of the adorner.
-        /// </summary>
-        public double OffsetTop
-        {
-            get { return _offsetTop; }
-            set
-            {
-                _offsetTop = value;
-                UpdateLocation();
-            }
-        }
-
-        /// <summary>
         ///     Override.
         /// </summary>
         protected override IEnumerator LogicalChildren
@@ -119,18 +91,7 @@ namespace RobotEditor.View
             var desiredTransform = base.GetDesiredTransform(transform);
             Debug.Assert(desiredTransform != null);
             result.Children.Add(desiredTransform);
-            result.Children.Add(new TranslateTransform(_offsetLeft, _offsetTop));
             return result;
-        }
-
-        /// <summary>
-        ///     Updates the location of the adorner in one atomic operation.
-        /// </summary>
-        public void SetOffsets(double left, double top)
-        {
-            _offsetLeft = left;
-            _offsetTop = top;
-            UpdateLocation();
         }
 
         #endregion
@@ -173,16 +134,6 @@ namespace RobotEditor.View
         protected override Visual GetVisualChild(int index)
         {
             return _child;
-        }
-
-        #endregion
-
-        #region Private methods
-
-        private void UpdateLocation()
-        {
-            var adornerLayer = Parent as AdornerLayer;
-            adornerLayer?.Update(AdornedElement);
         }
 
         #endregion

@@ -357,11 +357,10 @@ namespace RobotEditor.Model
             int centerBoundX = 0;
             int centerBoundY = 0;
             int centerBoundZ = 0;
-            int j = 0;
 
             for (var i = 0; i < Level; i++)
             {
-                j = Level - 2 - i;
+                var j = Level - 2 - i;
                 if (x >= centerBoundX)
                 {
                     centerBoundX += (int)(Math.Pow(2, j) * Precision);
@@ -505,33 +504,6 @@ namespace RobotEditor.Model
                 parent.Min = double.IsNaN(parent.Min) ? value : Math.Min(value, parent.Min);
                 parent.Max = double.IsNaN(parent.Max) ? value : Math.Max(value, parent.Max);
             }
-        }
-
-        private bool Search(int[] path, int size, int factor, int[] jumpLimits)
-        {
-            for (var i = 0; i < size; i++)
-            {
-                if (!SearchWithFactor(path, Level - 1, factor, jumpLimits))
-                    return false;
-            }
-
-            return true;
-        }
-
-        private bool SearchWithFactor(int[] path, int level, int factor, int[] jumpLimits)
-        {
-            if (level < 0)
-                return false;
-
-            if (factor >= 0 && !jumpLimits.Contains(path[level]) || factor < 0 && jumpLimits.Contains(path[level]))
-            {
-                path[level] = path[level] + factor;
-                return true;
-            }
-
-            path[level] -= factor;
-
-            return SearchWithFactor(path, level - 1, factor, jumpLimits);
         }
 
         private void CopyChildNodesBelowLevel1(VoxelOctree tree)

@@ -4,6 +4,7 @@ using System.Windows.Media.Media3D;
 
 using HelixToolkit.Wpf;
 
+using RobotEditor.Helper;
 using RobotEditor.Model;
 
 namespace RobotEditor.ViewModel
@@ -26,7 +27,7 @@ namespace RobotEditor.ViewModel
             Octree = value;
 
             _viewportResult = viewportResult;
-            viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D() { ArrowLengths = 100.0 });
+            viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
             viewportResult.Viewport.Children.Add(new DefaultLights());
 
             Booths.Add(new BoothViewModel(new Booth("Puma 560", 1560.1, 181.23)));
@@ -63,10 +64,10 @@ namespace RobotEditor.ViewModel
             Console.WriteLine(@"Level: {0} / Nodes: {1}", Octree.Level, Octree.Nodes.Length);
 
             //draw last level
-            int i = Octree.StartIndexLeafNodes - 1;
-            int maxValue = 0;
+            var i = Octree.StartIndexLeafNodes - 1;
+            var maxValue = 0;
 
-            for (int h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
+            for (var h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
             {
                 if (Octree.Nodes[h] == null)
                     continue;
@@ -85,56 +86,55 @@ namespace RobotEditor.ViewModel
                 var mb = new MeshBuilder();
                 var startOffset = new Point3D(0, 0, 0);
 
-                int n = 0;
-                int k = i;
-                for (int j = 0; j < Octree.Level; j++)
+                var k = i;
+                for (var j = 0; j < Octree.Level; j++)
                 {
-                    n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - j]) % 8;
+                    var n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - j]) % 8;
 
                     switch (n)
                     {
                         case 0:
-                            startOffset.X = startOffset.X + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 1:
-                            startOffset.X = startOffset.X + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 2:
-                            startOffset.X = startOffset.X - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 3:
-                            startOffset.X = startOffset.X - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z - Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 4:
-                            startOffset.X = startOffset.X + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 5:
-                            startOffset.X = startOffset.X + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 6:
-                            startOffset.X = startOffset.X - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         case 7:
-                            startOffset.X = startOffset.X - Math.Pow(2, j) * (100 / 2);
-                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (100 / 2);
-                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (100 / 2);
+                            startOffset.X = startOffset.X - Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Y = startOffset.Y + Math.Pow(2, j) * (Octree.Precision / 2);
+                            startOffset.Z = startOffset.Z + Math.Pow(2, j) * (Octree.Precision / 2);
                             break;
                         default:
-                            Console.WriteLine("Fehler");
+                            Console.WriteLine(@"Fehler");
                             break;
                     }
 
@@ -176,13 +176,10 @@ namespace RobotEditor.ViewModel
                 }
                 */
 
-                if (node != null)
-                {
-                    vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 1.0));
-                    mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 100.0, 100.0, 100.0);
-                    vm.MeshGeometry = mb.ToMesh();
-                    _viewportResult.Viewport.Children.Add(vm);
-                }
+                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 1.0));
+                mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 100.0, 100.0, 100.0);
+                vm.MeshGeometry = mb.ToMesh();
+                _viewportResult.Viewport.Children.Add(vm);
 
                 /*
                 if (node == null)

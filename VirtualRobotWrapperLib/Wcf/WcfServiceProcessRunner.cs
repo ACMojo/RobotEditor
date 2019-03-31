@@ -126,11 +126,8 @@ namespace VirtualRobotWrapperLib.Wcf
             if (_noRestart)
                 return;
 
-            string serverName;
             lock (_lock)
             {
-                serverName = ServerName;
-
                 if (!_running)
                 {
                     WaitForStart();
@@ -219,7 +216,6 @@ namespace VirtualRobotWrapperLib.Wcf
 
                 _serverStarted.WaitOne();
 
-                Exception startException = null;
                 try
                 {
                     Pipe = _pipeFactory.CreateChannel();
@@ -250,12 +246,10 @@ namespace VirtualRobotWrapperLib.Wcf
                             }
 
                             running = Pipe.Running();
-
-                            startException = null;
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            startException = ex;
+                            // ignored
                         }
                     }
 

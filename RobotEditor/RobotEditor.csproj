@@ -106,14 +106,12 @@
     <Compile Include="Model\Joint.cs" />
     <Compile Include="Model\Booth.cs" />
     <Compile Include="Model\Robot.cs" />
-    <Compile Include="Model\Voxel.cs" />
     <Compile Include="Model\VoxelNodeLeaf.cs" />
     <Compile Include="Model\VoxelNodeInner.cs" />
     <Compile Include="Model\VoxelNode.cs" />
     <Compile Include="Model\VoxelOctree.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="ViewModel\BaseViewModel.cs" />
-    <Compile Include="ViewModel\BoundingBox.cs" />
     <Compile Include="ViewModel\BoothViewModel.cs" />
     <Compile Include="ViewModel\CarbodyViewModel.cs" />
     <Compile Include="Helper\ColorGradient.cs" />

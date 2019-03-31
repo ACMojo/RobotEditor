@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-using RobotEditor.Annotations;
+using RobotEditor.Properties;
 
 namespace RobotEditor.ViewModel
 {

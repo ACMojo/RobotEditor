@@ -1,11 +1,9 @@
-﻿using System.Windows.Controls;
-
-namespace RobotEditor.View
+﻿namespace RobotEditor.View
 {
     /// <summary>
     ///     Interaktionslogik für BusyIndicator.xaml
     /// </summary>
-    public partial class BusyIndicator : UserControl
+    public partial class BusyIndicator
     {
         #region Instance
 

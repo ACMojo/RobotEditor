@@ -1,26 +1,14 @@
-﻿using System.Collections.Generic;
-
-using RobotEditor.Model;
+﻿using RobotEditor.Model;
 
 namespace RobotEditor.ViewModel
 {
     internal class BoothViewModel : BaseViewModel
     {
-        #region Fields
-
-        private readonly Dictionary<string, string> _errors = new Dictionary<string, string>();
-
-        #endregion
-
         #region Instance
 
         public BoothViewModel(Booth booth)
         {
             Model = booth;
-
-            _errors.Add(nameof(RobotName), string.Empty);
-            _errors.Add(nameof(BestMatch), string.Empty);
-            _errors.Add(nameof(ComputationTime), string.Empty);
         }
 
         #endregion
@@ -37,13 +25,8 @@ namespace RobotEditor.ViewModel
                 if (value.Equals(Model.RobotName))
                     return;
 
-                if (value == "")
-                {
-                    _errors[nameof(RobotName)] = "No name given";
+                if (string.IsNullOrWhiteSpace(value))
                     return;
-                }
-
-                _errors[nameof(RobotName)] = string.Empty;
 
                 Model.RobotName = value;
 
@@ -60,12 +43,7 @@ namespace RobotEditor.ViewModel
                     return;
 
                 if (double.IsNaN(value))
-                {
-                    _errors[nameof(BestMatch)] = "No name given";
                     return;
-                }
-
-                _errors[nameof(BestMatch)] = string.Empty;
 
                 Model.BestMatch = value;
 
@@ -82,12 +60,7 @@ namespace RobotEditor.ViewModel
                     return;
 
                 if (double.IsNaN(value))
-                {
-                    _errors[nameof(ComputationTime)] = "No name given";
                     return;
-                }
-
-                _errors[nameof(ComputationTime)] = string.Empty;
 
                 Model.ComputationTime = value;
 

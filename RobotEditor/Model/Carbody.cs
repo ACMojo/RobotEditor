@@ -76,8 +76,7 @@ namespace RobotEditor.Model
         {
             foreach (var hitPoint in HitPoints)
             {
-                var coordinateSystem = new CoordinateSystemVisual3D()
-                    { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
+                var coordinateSystem = new CoordinateSystemVisual3D { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
                 HitPoints3D.Add(coordinateSystem);
                 CarbodyModel.Children.Add(HitPoints3D.Last());
             }
@@ -102,8 +101,7 @@ namespace RobotEditor.Model
             var boxPosVector = new Vector3D(-BoundingBoxHalfExtents[0], -BoundingBoxHalfExtents[1], -BoundingBoxHalfExtents[2]);
             var centerTemp = Center;
 
-            RootFrame = new CoordinateSystemVisual3D() { ArrowLengths = 100.0 };
-            RootFrame.Transform = new MatrixTransform3D(Center);
+            RootFrame = new CoordinateSystemVisual3D { ArrowLengths = 100.0, Transform = new MatrixTransform3D(Center) };
             CarbodyModel.Children.Add(RootFrame);
 
             centerTemp.TranslatePrepend(boxPosVector);
@@ -115,25 +113,27 @@ namespace RobotEditor.Model
                         Math.Abs(BoundingBoxHalfExtents[0]) * 2,
                         Math.Abs(BoundingBoxHalfExtents[1]) * 2,
                         Math.Abs(BoundingBoxHalfExtents[2] * 2))),
-                Diameter = 20.0
+                Diameter = 20.0,
+                Transform = new MatrixTransform3D(centerTemp)
             };
-            BoundingBox.Transform = new MatrixTransform3D(centerTemp);
             CarbodyModel.Children.Add(BoundingBox);
         }
 
         public void Show3DSymmetryPlaneGeometry()
         {
-            var sizeOfSymmetryPlane = new double[3] { 10.0, 10.0, 10.0 };
+            var sizeOfSymmetryPlane = new[] { 10.0, 10.0, 10.0 };
 
             sizeOfSymmetryPlane[Array.IndexOf(BoundingBoxHalfExtents, BoundingBoxHalfExtents.Max())] = BoundingBoxHalfExtents.Max() * 2;
             sizeOfSymmetryPlane[DirectionOfSymmetryPlane] = BoundingBoxHalfExtents[DirectionOfSymmetryPlane] * 2;
 
-            SymmetryPlane = new BoxVisual3D()
+            SymmetryPlane = new BoxVisual3D
             {
-                Length = sizeOfSymmetryPlane[0], Width = sizeOfSymmetryPlane[1], Height = sizeOfSymmetryPlane[2],
-                Material = MaterialHelper.CreateMaterial(Colors.HotPink)
+                Length = sizeOfSymmetryPlane[0],
+                Width = sizeOfSymmetryPlane[1],
+                Height = sizeOfSymmetryPlane[2],
+                Material = MaterialHelper.CreateMaterial(Colors.HotPink),
+                Transform = new MatrixTransform3D(Center)
             };
-            SymmetryPlane.Transform = new MatrixTransform3D(Center);
             CarbodyModel.Children.Add(SymmetryPlane);
         }
 
@@ -174,11 +174,11 @@ namespace RobotEditor.Model
         {
             var carbodyAsMesh = (MeshGeometry3D)((Model3DGroup)CarbodyModel.Content).Children.Cast<GeometryModel3D>().First().Geometry;
 
-            double[][] pointCloud = new double[carbodyAsMesh.Positions.Count][];
-            int i = 0;
-            foreach (Point3D pointOnCarbody in carbodyAsMesh.Positions)
+            var pointCloud = new double[carbodyAsMesh.Positions.Count][];
+            var i = 0;
+            foreach (var pointOnCarbody in carbodyAsMesh.Positions)
             {
-                pointCloud[i] = new double[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z };
+                pointCloud[i] = new[] { pointOnCarbody.X, pointOnCarbody.Y, pointOnCarbody.Z };
                 i++;
             }
 
