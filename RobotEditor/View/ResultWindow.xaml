@@ -168,7 +168,7 @@
                     CameraRotationMode="Trackball"
                     ModelUpDirection="0,1,0"
                     ZoomExtentsWhenLoaded="True"
-                    ItemsSource="{Binding Path=BoothModels}"/>
+                    ItemsSource="{Binding Path=BoothModels}" />
                 <Button
                     Grid.Row="1"
                     x:Name="button_FitToView"
@@ -315,21 +315,18 @@
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Header="Robot"
-                        Width="351"
                         Binding="{Binding Path=RobotName, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                         IsReadOnly="true" />
                     <DataGridTextColumn
                         Binding="{Binding Path=BestMatch, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                         IsReadOnly="true"
                         ClipboardContentBinding="{x:Null}"
-                        Header="Best Match"
-                        Width="250" />
+                        Header="Best Match" />
                     <DataGridTextColumn
                         Binding="{Binding Path=ComputationTime, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                         IsReadOnly="true"
                         ClipboardContentBinding="{x:Null}"
-                        Header="Computation time"
-                        Width="250" />
+                        Header="Computation time" />
                 </DataGrid.Columns>
             </DataGrid>
 
