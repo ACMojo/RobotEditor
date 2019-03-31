@@ -417,8 +417,12 @@ namespace RobotEditor.ViewModel
             var backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += (s, e) =>
             {
-                if (Robots.Any(r => r.Precision != Precision))
-                    UpdateExecute(null);
+                Application.Current.Dispatcher.Invoke(
+                () =>
+                {
+                    if (Robots.Any(r => r.Precision != Precision))
+                        UpdateExecute(new object());
+                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
 
                 foreach (var carbody in Carbodies)
                 {
@@ -553,29 +557,43 @@ namespace RobotEditor.ViewModel
         {
             var currentlySelectedRobot = SelectedRobot;
 
-            var backgroundWorker = new BackgroundWorker();
-
-            backgroundWorker.DoWork += (s, e) =>
+            if (obj == null)
             {
-                Application.Current.Dispatcher.Invoke(
-                    () =>
-                    {
-                        foreach (var robot in Robots)
+                var backgroundWorker = new BackgroundWorker();
+
+                backgroundWorker.DoWork += (s, e) =>
+                {
+                    Application.Current.Dispatcher.Invoke(
+                        () =>
                         {
-                            SelectedRobot = robot;
-                            robot.CalcManipulability(_vrManip, _booth, Precision);
-                        }
+                            foreach (var robot in Robots)
+                            {
+                                SelectedRobot = robot;
+                                robot.CalcManipulability(_vrManip, _booth, Precision);
+                            }
 
-                        SelectedRobot = null;
-                        SelectedRobot = currentlySelectedRobot;
-                    },
-                    System.Windows.Threading.DispatcherPriority.ContextIdle);
-            };
+                            SelectedRobot = null;
+                            SelectedRobot = currentlySelectedRobot;
+                        },
+                        System.Windows.Threading.DispatcherPriority.ContextIdle);
+                };
 
-            backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
+                backgroundWorker.RunWorkerCompleted += (s, e) => { IsBusy = false; };
 
-            IsBusy = true;
-            backgroundWorker.RunWorkerAsync();
+                IsBusy = true;
+                backgroundWorker.RunWorkerAsync();
+            }
+            else
+            {
+                foreach (var robot in Robots)
+                {
+                    SelectedRobot = robot;
+                    robot.CalcManipulability(_vrManip, _booth, Precision);
+                }
+
+                SelectedRobot = null;
+                SelectedRobot = currentlySelectedRobot;
+            }
         }
 
         private void AddRobotExecute(object obj)
