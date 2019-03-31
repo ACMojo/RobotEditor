@@ -14,6 +14,7 @@ namespace RobotEditor.ViewModel
         #region Fields
 
         private readonly IHelixViewport3D _viewportResult;
+        private bool _isBusy;
         public VoxelOctree Octree;
 
         #endregion
@@ -38,6 +39,19 @@ namespace RobotEditor.ViewModel
         #endregion
 
         #region Properties
+
+        public bool IsBusy
+        {
+            get { return _isBusy; }
+            set
+            {
+                if (_isBusy == value)
+                    return;
+
+                _isBusy = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public ObservableCollection<BoothViewModel> Booths { get; } = new ObservableCollection<BoothViewModel>();
 
