@@ -30,14 +30,14 @@ namespace VirtualRobotWrapperRunner.OBB
 
         public void Calculate(double[][] points)
         {
-            //try
-            //{
-            //    _instance?.Dispose();
-            //}
-            //catch
-            //{
-            //    // ignored
-            //}
+            try
+            {
+                _instance?.Dispose();
+            }
+            catch
+            {
+                // ignored
+            }
 
             _instance = new OBBWrapper(points);
         }
@@ -54,14 +54,14 @@ namespace VirtualRobotWrapperRunner.OBB
 
         public void Dispose()
         {
-            //try
-            //{
-            //    _instance?.Dispose();
-            //}
-            //catch
-            //{
-            //    // ignored
-            //}
+            try
+            {
+                _instance?.Dispose();
+            }
+            catch
+            {
+                // ignored
+            }
 
             _instance = null;
         }

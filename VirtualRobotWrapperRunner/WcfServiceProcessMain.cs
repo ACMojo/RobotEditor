@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 
 using VirtualRobotWrapperLib.Wcf;
@@ -9,6 +10,20 @@ namespace VirtualRobotWrapperRunner
 {
     public abstract class WcfServiceProcessMain
     {
+        #region Enums
+
+        [Flags]
+        public enum ErrorModes : uint
+        {
+            // ReSharper disable InconsistentNaming
+
+            SEM_NOGPFAULTERRORBOX = 0x0002,
+
+            // ReSharper restore InconsistentNaming
+        }
+
+        #endregion
+
         #region Fields
 
         private static bool _attachDebugger;
@@ -16,6 +31,9 @@ namespace VirtualRobotWrapperRunner
         #endregion
 
         #region Public methods
+
+        [DllImport("kernel32.dll")]
+        public static extern ErrorModes SetErrorMode(ErrorModes uMode);
 
         public static void NotifyReady()
         {
@@ -25,11 +43,6 @@ namespace VirtualRobotWrapperRunner
         public static void NotifyDone()
         {
             Console.Out.WriteLine(@"done");
-        }
-
-        public static void Report(string message)
-        {
-            Console.Out.WriteLine(message);
         }
 
         public static void ReportProgress(string progress)
@@ -54,6 +67,15 @@ namespace VirtualRobotWrapperRunner
 
         protected static bool Setup(string[] args)
         {
+            try
+            {
+                SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX);
+            }
+            catch
+            {
+                // ignored
+            }
+
             try
             {
                 Process.GetCurrentProcess().ProcessorAffinity = new IntPtr((1 << Environment.ProcessorCount) - 1);
