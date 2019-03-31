@@ -417,6 +417,9 @@ namespace RobotEditor.ViewModel
             var backgroundWorker = new BackgroundWorker();
             backgroundWorker.DoWork += (s, e) =>
             {
+                if (Robots.Any(r => r.Precision != Precision))
+                    UpdateExecute(null);
+
                 foreach (var carbody in Carbodies)
                 {
                     Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
