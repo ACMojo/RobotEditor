@@ -27,7 +27,6 @@ namespace RobotEditor.ViewModel
         private IObbWrapper _obbCalculator;
         private IVirtualRobotManipulability _vrManip;
 
-        private readonly Booth _booth;
         private RobotViewModel _selectedRobot;
         private CarbodyViewModel _selectedCarbody;
 
@@ -66,7 +65,6 @@ namespace RobotEditor.ViewModel
             _viewportCarbody = viewportCarbody;
             _viewportRobot = viewportRobot;
 
-            _booth = new Booth(10000, 100d);
             _precision = 100.0;
             _vrManip = new RemoteVirtualRobotManipulability();
 
@@ -410,6 +408,8 @@ namespace RobotEditor.ViewModel
 
         private void CompareExecute(object obj)
         {
+            var booth = new Booth(10000, Precision);
+
             HideAdditionGeometries();
 
             IsBusy = true;
@@ -495,17 +495,20 @@ namespace RobotEditor.ViewModel
                         matrixStart.TranslatePrepend(matrixTranslationStart);
                         matrixEnd.TranslatePrepend(matrixTranslationEnd);
 
-                        for (var j = 0; j < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / Precision; j++)
+                        var stepSizeX = Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / Precision;
+                        var stepSizeZ = Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / Precision;
+
+                        for (var j = 0; j < stepSizeX; j++)
                         {
-                            var total = 0;
+                            var total = 0.0;
                             Vector3D vector;
-                            for (var k = 0; k < Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / Precision; k++)
+                            for (var k = 0; k < stepSizeZ; k++)
                             {
                                 Application.Current.Dispatcher.Invoke(() => SelectedCarbody.RayHi(matrixStart, matrixEnd, _octreeTemp));
 
-                                total += -100;
+                                total += -Precision;
                                 factor2[directionSelector[m, 1]] = 1;
-                                vector = new Vector3D(factor2[0] * -100, factor2[1] * -100, factor2[2] * -100);
+                                vector = new Vector3D(factor2[0] * -Precision, factor2[1] * -Precision, factor2[2] * -Precision);
 
                                 matrixStart.TranslatePrepend(vector);
                                 matrixEnd.TranslatePrepend(vector);
@@ -517,14 +520,14 @@ namespace RobotEditor.ViewModel
                             matrixEnd.TranslatePrepend(vector);
 
                             factor3[directionSelector[m, 0]] = 1;
-                            vector = new Vector3D(factor3[0] * -100, factor3[1] * -100, factor3[2] * -100);
+                            vector = new Vector3D(factor3[0] * -Precision, factor3[1] * -Precision, factor3[2] * -Precision);
 
                             matrixStart.TranslatePrepend(vector);
                             matrixEnd.TranslatePrepend(vector);
                         }
                     }
 
-                    _booth.Octree.Add(_octreeTemp);
+                    booth.Octree.Add(_octreeTemp);
                 }
             };
 
@@ -540,7 +543,7 @@ namespace RobotEditor.ViewModel
                 //octree.Set(790, -790, -790, 1);
                 //octree.Set(1, -1, -1, 2);
 
-                var comparison = new ResultWindow(_booth.Octree);
+                var comparison = new ResultWindow(booth.Octree);
                 var result = comparison.ShowDialog();
 
                 if (result == true)
@@ -569,7 +572,7 @@ namespace RobotEditor.ViewModel
                             foreach (var robot in Robots)
                             {
                                 SelectedRobot = robot;
-                                robot.CalcManipulability(_vrManip, _booth, Precision);
+                                robot.CalcManipulability(_vrManip, Precision);
                             }
 
                             SelectedRobot = null;
@@ -588,7 +591,7 @@ namespace RobotEditor.ViewModel
                 foreach (var robot in Robots)
                 {
                     SelectedRobot = robot;
-                    robot.CalcManipulability(_vrManip, _booth, Precision);
+                    robot.CalcManipulability(_vrManip, Precision);
                 }
 
                 SelectedRobot = null;
@@ -629,7 +632,7 @@ namespace RobotEditor.ViewModel
                             SelectedRobot = robotViewModel;
                         });
 
-                    robotViewModel?.CalcManipulability(_vrManip, _booth, Precision);
+                    robotViewModel?.CalcManipulability(_vrManip, Precision);
 
                     Application.Current.Dispatcher.Invoke(
                         () =>
@@ -664,7 +667,7 @@ namespace RobotEditor.ViewModel
             var result = newRobot.ShowDialog();
 
             if (result == true)
-                robotViewModel.CalcManipulability(_vrManip, _booth, Precision);
+                robotViewModel.CalcManipulability(_vrManip, Precision);
 
             SelectedRobot.Model.Show3DRobot();
             if (IsCheckedManipulability)

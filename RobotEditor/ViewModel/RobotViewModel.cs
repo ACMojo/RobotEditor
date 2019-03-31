@@ -117,7 +117,7 @@ namespace RobotEditor.ViewModel
             RaisePropertyChanged(nameof(Precision));
         }
 
-        public void CalcManipulability(IVirtualRobotManipulability vrManip, Booth booth, double precision)
+        public void CalcManipulability(IVirtualRobotManipulability vrManip, double precision)
         {
             Model.SaveRobotStructur();
 
@@ -152,20 +152,11 @@ namespace RobotEditor.ViewModel
                 }
                 else
                 {
-                    if (!Model.Octree.Set(
+                    Model.Octree.Set(
                             (int)(minB[0] + voxOld.X * precision),
                             (int)(minB[1] + voxOld.Y * precision),
                             (int)(minB[2] + voxOld.Z * precision),
-                            maxValue))
-                    {
-                        var value = booth.Octree.Get(
-                            (int)Math.Floor(minB[0] / precision + voxOld.X),
-                            (int)Math.Floor(minB[1] / precision + voxOld.Y),
-                            (int)Math.Floor(minB[2] / precision + voxOld.Z));
-                        if (double.IsNaN(value))
-                            Console.WriteLine(
-                                $@"Nicht erfolgreich bei: {Math.Floor(minB[0] / precision + voxOld.X)} {Math.Floor(minB[1] / precision + voxOld.Y)} {Math.Floor(minB[2] / precision + voxOld.Z)}");
-                    }
+                            maxValue);
 
                     voxOld = vox[j];
                     maxValue = vox[j].Value;
