@@ -28,12 +28,10 @@ namespace RobotEditor.ViewModel
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
 
             _viewportResult = viewportResult;
-            viewportResult.Viewport.Children.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
-            viewportResult.Viewport.Children.Add(new DefaultLights());
+            BoothModels.Add(new DefaultLights());
 
-            Booths.Add(new BoothViewModel(new Booth("Puma 560", 1560.1, 181.23, mixedCars, robots)));
-            Booths.Add(new BoothViewModel(new Booth("Fanuc P250", 6531.45, 267.09, mixedCars, robots)));
-            Booths.Add(new BoothViewModel(new Booth("EcoRP L033", 6441.34, 254.99, mixedCars, robots)));
+            foreach(var robot in robots)
+                Booths.Add(new BoothViewModel(new Booth("Puma 560", 0.0, 0.0, mixedCars, robot)));
         }
 
         #endregion

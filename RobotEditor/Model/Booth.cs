@@ -11,15 +11,18 @@ namespace RobotEditor.Model
     {
         #region Instance
 
-        public Booth(string robotName, double bestMatch, double computationTime, VoxelOctree mixedCarsOctree, List<VoxelOctree>robotsOctree)
+        public Booth(string robotName, double bestMatch, double computationTime, VoxelOctree mixedCarsOctree, VoxelOctree robotsOctree)
         {
             MixedCarsOctree = mixedCarsOctree;
-            RobotsOctree = robotsOctree;
+            RobotOctree = robotsOctree;
             RobotName = robotName;
             BestMatch = bestMatch;
             ComputationTime = computationTime;
+            
+            ResultOctree = VoxelOctree.Create(10000d, mixedCarsOctree.Precision);
+            ResultOctree.Add(mixedCarsOctree);
+            ResultOctree.Add(robotsOctree);
 
-            ResultOctree = mixedCarsOctree;
             BoothModel = new ModelVisual3D();
 
         }
@@ -34,7 +37,7 @@ namespace RobotEditor.Model
 
 
         public VoxelOctree MixedCarsOctree { get; }
-        public List<VoxelOctree> RobotsOctree { get; }
+        public VoxelOctree RobotOctree { get; }
         public VoxelOctree ResultOctree { get; }
         public ModelVisual3D BoothModel { get; set; }
 
@@ -122,7 +125,7 @@ namespace RobotEditor.Model
                 }
 
                 vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
-                mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 100.0, 100.0, 100.0);
+                mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), ResultOctree.Precision/2, ResultOctree.Precision / 2, ResultOctree.Precision / 2);
                 vm.MeshGeometry = mb.ToMesh();
                 BoothModel.Children.Add(vm);
             }

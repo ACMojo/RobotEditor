@@ -408,7 +408,14 @@ namespace RobotEditor.ViewModel
         {
             HideAdditionGeometries();
 
-            VoxelOctree octreeTemp = null;
+            double maxHalfExtent = 0.0; 
+            foreach(var carbody in Carbodies)
+            {
+                if (carbody.Model.BoundingBoxHalfExtents.Max() > maxHalfExtent)
+                    maxHalfExtent = carbody.Model.BoundingBoxHalfExtents.Max();
+            }
+
+            VoxelOctree octreeResult = VoxelOctree.Create(maxHalfExtent*4, Precision);
 
             IsBusy = true;
 
@@ -426,7 +433,7 @@ namespace RobotEditor.ViewModel
                 foreach (var carbody in Carbodies)
                 {
                     Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
-                    octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
+                    var octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
                     Application.Current.Dispatcher.Invoke(() => _viewportCarbody.ZoomExtents(0));
 
                     // Perform hit test
@@ -524,7 +531,7 @@ namespace RobotEditor.ViewModel
                         }
                     }
 
-                    //booth.ResultOctree.Add(_octreeTemp);
+                    octreeResult.Add(octreeTemp);
                 }
             };
 
@@ -534,15 +541,9 @@ namespace RobotEditor.ViewModel
 
                 ShowAdditionalGeometries();
 
-                //octree = VoxelOctree.Create(400, 100d);
-                //octree.Set(-790, -790, -790, 1);
-                //octree.Set(-1, -1, -1, 2);
-                //octree.Set(790, -790, -790, 1);
-                //octree.Set(1, -1, -1, 2);
-
                 var robots = Robots.Select(r => r.Model.Octree).ToList();
 
-                var comparison = new ResultWindow(octreeTemp, robots);
+                var comparison = new ResultWindow(octreeResult, robots);
                 var result = comparison.ShowDialog();
 
                 if (result == true)
