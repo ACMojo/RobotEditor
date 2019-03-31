@@ -190,7 +190,7 @@ namespace RobotEditor.ViewModel
                 }
                 */
 
-                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 1.0));
+                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0));
                 mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), 100.0, 100.0, 100.0);
                 vm.MeshGeometry = mb.ToMesh();
                 _viewportResult.Viewport.Children.Add(vm);

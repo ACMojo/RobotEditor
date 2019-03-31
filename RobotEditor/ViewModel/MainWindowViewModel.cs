@@ -36,8 +36,6 @@ namespace RobotEditor.ViewModel
         private bool _isCheckedSymmetryPlane;
         private bool _isCheckedManipulability;
         private double _precision;
-
-        private VoxelOctree _octreeTemp;
         private bool _isBusy;
 
         #endregion
@@ -418,17 +416,18 @@ namespace RobotEditor.ViewModel
             backgroundWorker.DoWork += (s, e) =>
             {
                 Application.Current.Dispatcher.Invoke(
-                () =>
-                {
-                    if (Robots.Any(r => r.Precision != Precision))
-                        UpdateExecute(new object());
-                }, System.Windows.Threading.DispatcherPriority.ContextIdle);
+                    () =>
+                    {
+                        if (Robots.Any(r => Math.Abs(r.Precision - Precision) > double.Epsilon))
+                            UpdateExecute(new object());
+                    },
+                    System.Windows.Threading.DispatcherPriority.ContextIdle);
 
                 foreach (var carbody in Carbodies)
                 {
                     Application.Current.Dispatcher.Invoke(() => SelectedCarbody = carbody);
 
-                    _octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
+                    var octreeTemp = VoxelOctree.Create(Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents.Max()) * 4, Precision);
 
                     Application.Current.Dispatcher.Invoke(() => _viewportCarbody.ZoomExtents(0));
 
@@ -504,7 +503,7 @@ namespace RobotEditor.ViewModel
                             Vector3D vector;
                             for (var k = 0; k < stepSizeZ; k++)
                             {
-                                Application.Current.Dispatcher.Invoke(() => SelectedCarbody.RayHi(matrixStart, matrixEnd, _octreeTemp));
+                                Application.Current.Dispatcher.Invoke(() => SelectedCarbody.RayHi(matrixStart, matrixEnd, octreeTemp));
 
                                 total += -Precision;
                                 factor2[directionSelector[m, 1]] = 1;
@@ -527,7 +526,7 @@ namespace RobotEditor.ViewModel
                         }
                     }
 
-                    booth.Octree.Add(_octreeTemp);
+                    booth.Octree.Add(octreeTemp);
                 }
             };
 

@@ -248,6 +248,9 @@ namespace RobotEditor.Model
 
             foreach (var leafNodeThis in leafNodesThis)
             {
+                if (index >= leafNodesOther.Length)
+                    break;
+
                 var leafNodeOther = leafNodesOther[index];
 
                 index++;
