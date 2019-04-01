@@ -22,7 +22,7 @@ namespace RobotEditor.View
 
         #region Instance
 
-        public ResultWindow(VoxelOctree mixedCars, List<VoxelOctree> robots)
+        public ResultWindow(VoxelOctree mixedCars, List<Robot> robots)
         {
             InitializeComponent();
 

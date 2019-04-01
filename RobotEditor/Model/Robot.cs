@@ -13,7 +13,7 @@ using RobotEditor.Helper;
 
 namespace RobotEditor.Model
 {
-    internal class Robot
+    public class Robot
     {
         #region Enums
 
@@ -388,20 +388,20 @@ namespace RobotEditor.Model
                 interimCs.ArrowLengths = 100.0;
 
                 var dhMatrix = new Matrix3D(
-                    Math.Cos(DegreeToRadian.GetValue(joint.Theta)),
-                    Math.Sin(DegreeToRadian.GetValue(joint.Theta)),
+                    Math.Cos(MatrixHelper.GetValue(joint.Theta)),
+                    Math.Sin(MatrixHelper.GetValue(joint.Theta)),
                     0.0,
                     0.0,
-                    -Math.Sin(DegreeToRadian.GetValue(joint.Theta)) * Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
-                    Math.Cos(DegreeToRadian.GetValue(joint.Theta)) * Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
-                    Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
+                    -Math.Sin(MatrixHelper.GetValue(joint.Theta)) * Math.Cos(MatrixHelper.GetValue(joint.Alpha)),
+                    Math.Cos(MatrixHelper.GetValue(joint.Theta)) * Math.Cos(MatrixHelper.GetValue(joint.Alpha)),
+                    Math.Sin(MatrixHelper.GetValue(joint.Alpha)),
                     0.0,
-                    Math.Sin(DegreeToRadian.GetValue(joint.Theta)) * Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
-                    -Math.Cos(DegreeToRadian.GetValue(joint.Theta)) * Math.Sin(DegreeToRadian.GetValue(joint.Alpha)),
-                    Math.Cos(DegreeToRadian.GetValue(joint.Alpha)),
+                    Math.Sin(MatrixHelper.GetValue(joint.Theta)) * Math.Sin(MatrixHelper.GetValue(joint.Alpha)),
+                    -Math.Cos(MatrixHelper.GetValue(joint.Theta)) * Math.Sin(MatrixHelper.GetValue(joint.Alpha)),
+                    Math.Cos(MatrixHelper.GetValue(joint.Alpha)),
                     0.0,
-                    joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)),
-                    joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)),
+                    joint.A * Math.Cos(MatrixHelper.GetValue(joint.Theta)),
+                    joint.A * Math.Sin(MatrixHelper.GetValue(joint.Theta)),
                     joint.D,
                     1.0
                 );
@@ -412,7 +412,7 @@ namespace RobotEditor.Model
                 var pCollection = new Point3DCollection
                 {
                     new Point3D(0.0, 0.0, 0.0),
-                    new Point3D(joint.A * Math.Cos(DegreeToRadian.GetValue(joint.Theta)), joint.A * Math.Sin(DegreeToRadian.GetValue(joint.Theta)), joint.D)
+                    new Point3D(joint.A * Math.Cos(MatrixHelper.GetValue(joint.Theta)), joint.A * Math.Sin(MatrixHelper.GetValue(joint.Theta)), joint.D)
                 };
                 line.Color = Colors.Gray;
                 line.Points = pCollection;

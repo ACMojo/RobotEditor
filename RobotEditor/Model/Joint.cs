@@ -6,7 +6,7 @@
         Rotational
     };
 
-    class Joint
+    public class Joint
     {
         #region Instance
 

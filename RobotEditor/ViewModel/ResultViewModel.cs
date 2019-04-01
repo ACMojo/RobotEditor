@@ -22,7 +22,7 @@ namespace RobotEditor.ViewModel
 
         #region Instance
 
-        public ResultViewModel(HelixViewport3D viewportResult, VoxelOctree mixedCars, List<VoxelOctree> robots)
+        public ResultViewModel(HelixViewport3D viewportResult, VoxelOctree mixedCars, List<Robot> robots)
         {
             Start = new DelegateCommand<object>(StartExecute, StartCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
@@ -32,7 +32,7 @@ namespace RobotEditor.ViewModel
             BoothModels.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
 
             foreach (var robot in robots)
-                Booths.Add(new BoothViewModel(new Booth("Puma 560", 0.0, 0.0, mixedCars, robot)));
+                Booths.Add(new BoothViewModel(new Booth(robot.Name, 0.0, 0.0, mixedCars, robot)));
         }
 
         #endregion

@@ -11,17 +11,17 @@ namespace RobotEditor.Model
     {
         #region Instance
 
-        public Booth(string robotName, double bestMatch, double computationTime, VoxelOctree mixedCarsOctree, VoxelOctree robotsOctree)
+        public Booth(string robotName, double bestMatch, double computationTime, VoxelOctree mixedCarsOctree, Robot robot)
         {
             MixedCarsOctree = mixedCarsOctree;
-            RobotOctree = robotsOctree;
+            RobotOctree = robot.Octree;
             RobotName = robotName;
             BestMatch = bestMatch;
             ComputationTime = computationTime;
             
             ResultOctree = VoxelOctree.Create(10000d, mixedCarsOctree.Precision);
+            ResultOctree.Add(robot.Octree);
             ResultOctree.Add(mixedCarsOctree);
-            ResultOctree.Add(robotsOctree);
 
             BoothModel = new ModelVisual3D();
 
@@ -46,14 +46,14 @@ namespace RobotEditor.Model
 
         public void Show3DBooth()
         {
-            var maxValue = 0;
+            var maxValue = 0.0;
             for (var h = ResultOctree.StartIndexPerLevel[ResultOctree.Level - 2]; h < ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1]; h++)
             {
                 if (ResultOctree.Nodes[h] == null)
                     continue;
 
                 if (((VoxelNodeInner)ResultOctree.Nodes[h]).Max > maxValue)
-                    maxValue = (int)((VoxelNodeInner)ResultOctree.Nodes[h]).Max;
+                    maxValue = ((VoxelNodeInner)ResultOctree.Nodes[h]).Max;
             }
 
             var i = ResultOctree.StartIndexLeafNodes - 1;

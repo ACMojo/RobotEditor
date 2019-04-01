@@ -101,7 +101,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Helper\DegreeToRadian.cs" />
+    <Compile Include="Helper\MatrixHelper.cs" />
     <Compile Include="Model\Carbody.cs" />
     <Compile Include="Model\Joint.cs" />
     <Compile Include="Model\Booth.cs" />

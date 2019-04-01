@@ -541,7 +541,7 @@ namespace RobotEditor.ViewModel
 
                 ShowAdditionalGeometries();
 
-                var robots = Robots.Select(r => r.Model.Octree).ToList();
+                var robots = Robots.Select(r => r.Model).ToList();
 
                 var comparison = new ResultWindow(octreeResult, robots);
                 var result = comparison.ShowDialog();
