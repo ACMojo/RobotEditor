@@ -533,8 +533,9 @@ namespace RobotEditor.ViewModel
 
                     octreeResult.Add(octreeTemp);
                 }
+                octreeResult.RecalcMinMaxSum();
             };
-
+            
             backgroundWorker.RunWorkerCompleted += (s, e) =>
             {
                 IsBusy = false;

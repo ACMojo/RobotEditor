@@ -20,8 +20,6 @@ namespace RobotEditor.Model
             ComputationTime = computationTime;
             
             ResultOctree = VoxelOctree.Create(10000d, mixedCarsOctree.Precision);
-            ResultOctree.Add(robot.Octree);
-            ResultOctree.Add(mixedCarsOctree);
 
             BoothModel = new ModelVisual3D();
 
@@ -46,15 +44,7 @@ namespace RobotEditor.Model
 
         public void Show3DBooth()
         {
-            var maxValue = 0.0;
-            for (var h = ResultOctree.StartIndexPerLevel[ResultOctree.Level - 2]; h < ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1]; h++)
-            {
-                if (ResultOctree.Nodes[h] == null)
-                    continue;
-
-                if (((VoxelNodeInner)ResultOctree.Nodes[h]).Max > maxValue)
-                    maxValue = ((VoxelNodeInner)ResultOctree.Nodes[h]).Max;
-            }
+            var maxValue = ((VoxelNodeInner)ResultOctree.Nodes[0]).Max;
 
             var i = ResultOctree.StartIndexLeafNodes - 1;
             foreach (var node in ResultOctree.GetLeafNodes())
@@ -70,7 +60,7 @@ namespace RobotEditor.Model
                 var k = i;
                 for (var j = 0; j < ResultOctree.Level; j++)
                 {
-                    var n = (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1 - j]) % 8;
+                    var n = (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - j]) % 8;
 
                     switch (n)
                     {
@@ -119,12 +109,47 @@ namespace RobotEditor.Model
                             break;
                     }
 
-                    if (j < ResultOctree.Level - 1)
-                        k = ResultOctree.StartIndexPerLevel[ResultOctree.Level - 2 - j] + (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1 - j]) / 8;
+                    // DELETE START
+                    switch (node.Value)
+                    {
+                        case 1:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Red);
+                            break;
+                        case 2:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Purple);
+                            break;
+                        case 3:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Gray);
+                            break;
+                        case 4:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Green);
+                            break;
+                        case 5:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Orange);
+                            break;
+                        case 6:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.DarkBlue);
+                            break;
+                        case 7:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Cyan);
+                            break;
+                        case 8:
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Yellow);
+                            break;
+                        default:
+                            Console.WriteLine(@"Fehler");
+                            break;
+                    }
+                    // DELETE END
+
+                    if (j < ResultOctree.Level)
+                        k = ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1 - j] + (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - j]) / 8;
                     //k = (int)Math.Floor((double)k / 8);
                 }
 
-                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
+
+                //INSERT
+               // vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
                 mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), ResultOctree.Precision/2, ResultOctree.Precision / 2, ResultOctree.Precision / 2);
                 vm.MeshGeometry = mb.ToMesh();
                 BoothModel.Children.Add(vm);

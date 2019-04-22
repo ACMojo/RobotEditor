@@ -275,18 +275,9 @@ namespace RobotEditor.Model
 
         public void Show3DManipulabilityOctree()
         {
+            var maxValue = ((VoxelNodeInner)Octree.Nodes[0]).Max;
+
             var i = Octree.StartIndexLeafNodes - 1;
-            var maxValue = 0.0;
-
-            for (var h = Octree.StartIndexPerLevel[Octree.Level - 2]; h < Octree.StartIndexPerLevel[Octree.Level - 1]; h++)
-            {
-                if (Octree.Nodes[h] == null)
-                    continue;
-
-                if (((VoxelNodeInner)Octree.Nodes[h]).Max > maxValue)
-                    maxValue = ((VoxelNodeInner)Octree.Nodes[h]).Max;
-            }
-
             foreach (var node in Octree.GetLeafNodes())
             {
                 i++;
@@ -298,7 +289,7 @@ namespace RobotEditor.Model
                 var k = i;
                 for (var w = 0; w < Octree.Level; w++)
                 {
-                    var n = (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) % 8;
+                    var n = (k - Octree.StartIndexPerLevel[Octree.Level - w]) % 8;
 
                     switch (n)
                     {
@@ -347,8 +338,8 @@ namespace RobotEditor.Model
                             break;
                     }
 
-                    if (w < Octree.Level - 1)
-                        k = Octree.StartIndexPerLevel[Octree.Level - 2 - w] + (k - Octree.StartIndexPerLevel[Octree.Level - 1 - w]) / 8;
+                    if (w < Octree.Level)
+                        k = Octree.StartIndexPerLevel[Octree.Level - 1 - w] + (k - Octree.StartIndexPerLevel[Octree.Level - w]) / 8;
                 }
 
                 var mgv = new MeshGeometryVisual3D();

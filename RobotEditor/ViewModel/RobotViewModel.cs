@@ -162,6 +162,7 @@ namespace RobotEditor.ViewModel
                     maxValue = vox[j].Value;
                 }
             }
+            Model.Octree.RecalcMinMaxSum();
         }
 
         #endregion

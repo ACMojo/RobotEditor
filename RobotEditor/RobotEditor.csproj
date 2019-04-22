@@ -101,6 +101,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helper\MatchAlgorithms.cs" />
     <Compile Include="Helper\MatrixHelper.cs" />
     <Compile Include="Model\Carbody.cs" />
     <Compile Include="Model\Joint.cs" />
