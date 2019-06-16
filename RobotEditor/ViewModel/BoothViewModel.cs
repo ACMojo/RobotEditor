@@ -66,6 +66,23 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        public int Cycles
+        {
+            get { return Model.Cycles; }
+            set
+            {
+                if (value.Equals(Model.Cycles))
+                    return;
+
+                if (value < 0)
+                    return;
+
+                Model.Cycles = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
         public double ComputationTime
         {
             get { return Model.ComputationTime; }
@@ -78,6 +95,65 @@ namespace RobotEditor.ViewModel
                     return;
 
                 Model.ComputationTime = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public double LowerBound
+        {
+            get { return Model.LowerBound; }
+            set
+            {
+                if (value.Equals(Model.LowerBound))
+                    return;
+
+                if (double.IsNaN(value))
+                    return;
+
+                Model.LowerBound = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public int XPos
+        {
+            get { return Model.XPos; }
+            set
+            {
+                if (value.Equals(Model.XPos))
+                    return;
+
+                Model.XPos = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public int YPos
+        {
+            get { return Model.YPos; }
+            set
+            {
+                if (value.Equals(Model.YPos))
+                    return;
+
+                Model.YPos = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public int ZPos
+        {
+            get { return Model.ZPos; }
+            set
+            {
+                if (value.Equals(Model.ZPos))
+                    return;
+
+                Model.ZPos = value;
 
                 RaisePropertyChanged();
             }

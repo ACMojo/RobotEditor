@@ -22,11 +22,11 @@ namespace RobotEditor.View
 
         #region Instance
 
-        public ResultWindow(VoxelOctree mixedCars, List<Robot> robots)
+        public ResultWindow(VoxelOctree mixedCars, List<Robot> robots, double[] boundingBoxHalfExtents)
         {
             InitializeComponent();
 
-            _resultViewModel = new ResultViewModel(view_Result, mixedCars, robots);
+            _resultViewModel = new ResultViewModel(view_Result, mixedCars, robots, boundingBoxHalfExtents);
 
             DataContext = _resultViewModel;
 

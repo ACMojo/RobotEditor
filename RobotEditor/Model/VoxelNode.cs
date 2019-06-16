@@ -5,7 +5,6 @@
         #region Fields
 
         public double Value = double.NaN;
-        public double NeighborValue = double.NaN;
 
         #endregion
 

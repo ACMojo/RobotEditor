@@ -7,6 +7,7 @@ using HelixToolkit.Wpf;
 using RobotEditor.Helper;
 using RobotEditor.Model;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace RobotEditor.ViewModel
 {
@@ -17,22 +18,45 @@ namespace RobotEditor.ViewModel
         private readonly IHelixViewport3D _viewportResult;
         private BoothViewModel _selectedBooth;
         private bool _isBusy;
+        private bool _isCheckedMaxVoxel;
+        private bool _isCheckedMaxLeaf;
+        private bool _isCheckedMaxValue;
+        private bool _isCheckedMaxLeafs;
+        private bool _isCheckedMaxMax;
+        private bool _isCheckedRotation;
+        private bool _isCheckedNoGo;
+        private bool _isCheckedSymmetry;
+        private int _selectedShiftMethod = 1;
+        private int _selectedSearchMethod = 0;
+        private int _searchCycles = 0;
+        private int _noOfRobots = 1;
+        private double[] boundingBoxHalfExtents;
 
         #endregion
 
         #region Instance
 
-        public ResultViewModel(HelixViewport3D viewportResult, VoxelOctree mixedCars, List<Robot> robots)
+        public ResultViewModel(HelixViewport3D viewportResult, VoxelOctree mixedCars, List<Robot> robots, double[] boundingBoxHalfExtents)
         {
             Start = new DelegateCommand<object>(StartExecute, StartCanExecute);
             FitToView = new DelegateCommand<object>(FitToViewExecute, FitToViewCanExecute);
+            MaxVoxel = new DelegateCommand<object>(MaxVoxelExecute, MaxVoxelCanExecute);
+            MaxLeaf = new DelegateCommand<object>(MaxLeafExecute, MaxLeafCanExecute);
+            MaxValue = new DelegateCommand<object>(MaxValueExecute, MaxValueCanExecute);
+            MaxLeafs= new DelegateCommand<object>(MaxLeafsExecute, MaxLeafsCanExecute);
+            MaxMax = new DelegateCommand<object>(MaxMaxExecute, MaxMaxCanExecute);
+            Rotation = new DelegateCommand<object>(MaxValueExecute, MaxValueCanExecute);
+            NoGo = new DelegateCommand<object>(MaxLeafsExecute, MaxLeafsCanExecute);
+            Symmetry = new DelegateCommand<object>(MaxMaxExecute, MaxMaxCanExecute);
+
+            this.boundingBoxHalfExtents = boundingBoxHalfExtents;
 
             _viewportResult = viewportResult;
             BoothModels.Add(new DefaultLights());
             BoothModels.Add(new CoordinateSystemVisual3D { ArrowLengths = 100.0 });
 
             foreach (var robot in robots)
-                Booths.Add(new BoothViewModel(new Booth(robot.Name, 0.0, 0.0, mixedCars, robot)));
+                Booths.Add(new BoothViewModel(new Booth(robot.Name, mixedCars, robot)));
         }
 
         #endregion
@@ -52,11 +76,147 @@ namespace RobotEditor.ViewModel
             }
         }
 
+        public bool IsCheckedMaxVoxel
+        {
+            get { return _isCheckedMaxVoxel; }
+            set
+            {
+                _isCheckedMaxVoxel = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedMaxLeaf
+        {
+            get { return _isCheckedMaxLeaf; }
+            set
+            {
+                _isCheckedMaxLeaf = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedMaxValue
+        {
+            get { return _isCheckedMaxValue; }
+            set
+            {
+                _isCheckedMaxValue = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedMaxLeafs
+        {
+            get { return _isCheckedMaxLeafs; }
+            set
+            {
+                _isCheckedMaxLeafs = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedMaxMax
+        {
+            get { return _isCheckedMaxMax; }
+            set
+            {
+                _isCheckedMaxMax = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedRotation
+        {
+            get { return _isCheckedRotation; }
+            set
+            {
+                _isCheckedRotation = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedNoGo
+        {
+            get { return _isCheckedNoGo; }
+            set
+            {
+                _isCheckedNoGo = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsCheckedSymmetry
+        {
+            get { return _isCheckedSymmetry; }
+            set
+            {
+                _isCheckedSymmetry = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int SelectedItemShiftMethod
+        {
+            get { return _selectedShiftMethod; }
+            set
+            {
+                _selectedShiftMethod = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public int SelectedItemSearchMethod
+        {
+            get { return _selectedSearchMethod; }
+            set
+            {
+                _selectedSearchMethod = value;
+
+                RaisePropertyChanged();
+                MaxVoxel.RaisePropertyChanged();
+                MaxLeaf.RaisePropertyChanged();
+                MaxValue.RaisePropertyChanged();
+                MaxLeafs.RaisePropertyChanged();
+                MaxMax.RaisePropertyChanged();
+            }
+        }
+
+        public int SearchCycles
+        {
+            get { return _searchCycles; }
+            set
+            {
+                _searchCycles = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
+        public int NoOfRobots
+        {
+            get { return _noOfRobots; }
+            set
+            {
+                _noOfRobots = value;
+
+                RaisePropertyChanged();
+            }
+        }
+
         public ObservableCollection<BoothViewModel> Booths { get; } = new ObservableCollection<BoothViewModel>();
         public ObservableCollection<Visual3D> BoothModels { get; } = new ObservableCollection<Visual3D>();
 
         public DelegateCommand<object> Start { get; }
         public DelegateCommand<object> FitToView { get; }
+        public DelegateCommand<object> MaxVoxel { get; }
+        public DelegateCommand<object> MaxLeaf { get; }
+        public DelegateCommand<object> MaxValue { get; }
+        public DelegateCommand<object> MaxLeafs { get; }
+        public DelegateCommand<object> MaxMax { get; }
+        public DelegateCommand<object> Rotation { get; }
+        public DelegateCommand<object> NoGo { get; }
+        public DelegateCommand<object> Symmetry { get; }
 
         public BoothViewModel SelectedBooth
         {
@@ -98,83 +258,99 @@ namespace RobotEditor.ViewModel
 
         private void StartExecute(object obj)
         {
-            var posRot = MatchAlgorithms.MatchMaxValue(SelectedBooth.Model.MixedCarsOctree, SelectedBooth.Model.RobotOctree);     
 
+            #region TestData
+            VoxelOctree testCarTree = new VoxelOctree(3, 100.0);
+
+            for (int i = 0; i < 512; i++)
+            {
+                /*
+                if ( (i >= 56 && i <= 63) || (i >= 112 && i <= 119) || (i >= 168 && i <= 175) || (i >= 224 && i <= 231) || (i >= 280 && i <= 287) || (i >= 336 && i <= 343) || (i >= 392 && i <= 393) || (i >= 448 && i <= 455))
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, 20);
+                }
+                else
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, Math.Ceiling((i + 1) / 64.0));
+                }*/
+
+                
+                if ((i >= 448 && i <= 511))
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, 20);
+                }
+                else
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, Math.Ceiling((i + 1) / 64.0));
+                }
+                
+
+
+                /*
+                if ( (i >= 0 && i <= 511))
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, 20);
+                }
+                else
+                {
+                    testCarTree.Set(testCarTree.StartIndexLeafNodes + i, Math.Ceiling((i + 1) / 512.0));
+                }*/
+            }
+
+            testCarTree.RecalcMinMaxSum();
+
+            VoxelOctree testRobotTree = new VoxelOctree(2, 100.0);
+
+            for (int i = 0; i < 64; i++)
+                testRobotTree.Set(testRobotTree.StartIndexLeafNodes + i, Math.Ceiling((i+1) / 8.0));
+
+            testRobotTree.RecalcMinMaxSum();
+
+            #endregion
+            SelectedBooth.Model.Hide3DBooth();
             SelectedBooth.Model.ResultOctree.Clear();
-            
-            SelectedBooth.Model.RobotOctree.RotateX(posRot[3]);
-            SelectedBooth.Model.RobotOctree.RotateY(posRot[4]);
-            SelectedBooth.Model.RobotOctree.RotateZ(posRot[5]);
+            SelectedBooth.Model.RenewMixedCarsCopy();
 
-            SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(SelectedBooth.Model.RobotOctree, posRot[0], posRot[1], posRot[2]);
-            SelectedBooth.Model.ResultOctree.Add(SelectedBooth.Model.MixedCarsOctree);
+            for (int i = 0; i < NoOfRobots; i++)
+            {
+                var watch = new Stopwatch();
+                watch.Start();
+                var pos = MatchAlgorithms.BranchAndBound(SelectedBooth.Model.MixedCarsOctreeCopy, SelectedBooth.Model.RobotOctree, IsCheckedMaxVoxel, IsCheckedMaxLeaf, IsCheckedMaxValue, IsCheckedMaxLeafs, IsCheckedMaxMax, SelectedItemSearchMethod, SelectedItemShiftMethod, SearchCycles, IsCheckedRotation, IsCheckedNoGo, IsCheckedSymmetry, boundingBoxHalfExtents);
+                watch.Stop();
+
+                SelectedBooth.XPos = pos[0];
+                SelectedBooth.YPos = pos[1];
+                SelectedBooth.ZPos = pos[2];
+
+                SelectedBooth.BestMatch += MatchAlgorithms.lowerBound;
+                SelectedBooth.Cycles += MatchAlgorithms.cycles;
+                SelectedBooth.ComputationTime += watch.Elapsed.TotalMilliseconds;
+
+                SelectedBooth.Model.MixedCarsOctreeCopy.ClearInXYZFromRoot(MatchAlgorithms.rotatedRobotTrees[MatchAlgorithms.rotateOperator], pos[0], pos[1], pos[2]);
+                SelectedBooth.Model.MixedCarsOctreeCopy.RecalcMinMaxSum();
+
+                SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(MatchAlgorithms.rotatedRobotTrees[MatchAlgorithms.rotateOperator], pos[0], pos[1], pos[2]);
+            }
+            
+            SelectedBooth.LowerBound = MatchAlgorithms.initLowerBound;
+
+            SelectedBooth.Model.ResultOctree.Add(SelectedBooth.Model.MixedCarsOctreeCopy);
             SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();
+
+
+
+            /*
+            var rotatedTestRobots = MatrixHelper.allRotationsOfCube(testRobotTree);
+
+            for (int i = 0; i < rotatedTestRobots.Length; i++)
+            {
+                SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(rotatedTestRobots[i], 0, 800 * (i % 4), -800 * (int)Math.Floor(i / 4.0));
+            }
+
+            SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();*/
 
             SelectedBooth.Model.Show3DBooth();
 
-            /*var Octree1 = new VoxelOctree(1, 100);
-
-            int[,] rotateConversion = new int[24, 8]{
-                { 0,1,2,3,4,5,6,7 },
-                { 2,0,3,1,6,4,7,5 },
-                { 3,2,1,0,7,6,5,4 },
-                { 1,3,0,2,5,7,4,6 },
-                { 0,2,4,6,1,3,5,7 },
-                { 4,6,5,7,0,2,1,3 },
-                { 5,7,1,3,4,6,0,2 },
-                { 2,3,6,7,0,1,4,5 },
-                { 3,7,2,6,1,5,0,4 },
-                { 7,6,3,2,5,4,1,0 },
-                { 6,2,7,3,4,0,5,1 },
-                { 7,3,5,1,6,2,4,0 },
-                { 5,1,4,0,7,3,6,2 },
-                { 4,0,6,2,5,1,7,3 },
-                { 6,4,2,0,7,5,3,1 },
-                { 4,5,0,1,6,7,2,3 },
-                { 5,4,7,6,1,0,3,2 },
-                { 3,1,7,5,2,0,6,4 },
-                { 1,0,5,4,3,2,7,6 },
-                { 0,4,1,5,2,6,3,7 },
-                { 1,5,3,7,0,4,2,6 },
-                { 2,6,0,4,3,7,1,5 },
-                { 7,5,6,4,3,1,2,0 },
-                { 6,7,4,5,2,3,0,1 },};
-
-            Octree1.Set(50, -50, -50, 1);
-            Octree1.Set(50, 50, -50, 2);
-            Octree1.Set(-50, -50, -50, 3);
-            Octree1.Set(-50, 50, -50, 4);
-            Octree1.Set(50, -50, 50, 5);
-            Octree1.Set(50, 50, 50, 6);
-            Octree1.Set(-50, -50, 50, 7);
-            Octree1.Set(-50, 50, 50, 8);
-
-            VoxelOctree[] Oct = new VoxelOctree[24];
-            for (int i = 0; i<24; i++)
-            {
-                Oct[i] = new VoxelOctree(1, 100);
-
-                Oct[i].Set(50, -50, -50, 1);
-                Oct[i].Set(50, 50, -50, 2);
-                Oct[i].Set(-50, -50, -50, 3);
-                Oct[i].Set(-50, 50, -50, 4);
-                Oct[i].Set(50, -50, 50, 5);
-                Oct[i].Set(50, 50, 50, 6);
-                Oct[i].Set(-50, -50, 50, 7);
-                Oct[i].Set(-50, 50, 50, 8);
-
-                Oct[i].Nodes[1] = Octree1.Nodes[rotateConversion[i, 0] + 1];
-                Oct[i].Nodes[2] = Octree1.Nodes[rotateConversion[i, 1] + 1];
-                Oct[i].Nodes[3] = Octree1.Nodes[rotateConversion[i, 2] + 1];
-                Oct[i].Nodes[4] = Octree1.Nodes[rotateConversion[i, 3] + 1];
-                Oct[i].Nodes[5] = Octree1.Nodes[rotateConversion[i, 4] + 1];
-                Oct[i].Nodes[6] = Octree1.Nodes[rotateConversion[i, 5] + 1];
-                Oct[i].Nodes[7] = Octree1.Nodes[rotateConversion[i, 6] + 1];
-                Oct[i].Nodes[8] = Octree1.Nodes[rotateConversion[i, 7] + 1];
-
-                SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(Oct[i], 0, 250 * i, 0);
-
-            }*/
         }
 
         private bool FitToViewCanExecute(object arg)
@@ -185,6 +361,86 @@ namespace RobotEditor.ViewModel
         private void FitToViewExecute(object obj)
         {
             _viewportResult.ZoomExtents(0);
+        }
+
+        private bool MaxVoxelCanExecute(object arg)
+        {
+            return SelectedItemSearchMethod != 2;
+        }
+
+        private void MaxVoxelExecute(object obj)
+        {
+            ;
+        }
+
+        private bool MaxLeafCanExecute(object arg)
+        {
+            return SelectedItemSearchMethod != 2;
+        }
+
+        private void MaxLeafExecute(object obj)
+        {
+            ;
+        }
+
+        private bool MaxValueCanExecute(object arg)
+        {
+            return SelectedItemSearchMethod != 2;
+        }
+
+        private void MaxValueExecute(object obj)
+        {
+            ;
+        }
+
+        private bool MaxLeafsCanExecute(object arg)
+        {
+            return SelectedItemSearchMethod != 2;
+        }
+
+        private void MaxLeafsExecute(object obj)
+        {
+            ;
+        }
+
+        private bool MaxMaxCanExecute(object arg)
+        {
+            return SelectedItemSearchMethod != 2;
+        }
+
+        private void MaxMaxExecute(object obj)
+        {
+            ;
+        }
+
+        private bool RotationCanExecute(object arg)
+        {
+            return true;
+        }
+
+        private void RotationExecute(object obj)
+        {
+            ;
+        }
+
+        private bool NoGoCanExecute(object arg)
+        {
+            return true;
+        }
+
+        private void NoGoExecute(object obj)
+        {
+            ;
+        }
+
+        private bool SymmetryCanExecute(object arg)
+        {
+            return true;
+        }
+
+        private void SymmetryExecute(object obj)
+        {
+            ;
         }
 
         #endregion

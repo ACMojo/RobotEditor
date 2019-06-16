@@ -66,7 +66,7 @@ namespace RobotEditor.Model
                     break;
                 default:
                     Name = $"Robot_{count}";
-                    Joints.Add(new Joint(1, 0.0, -90.0, 0.0, 90.0, 160.0, -160.0, JointTypes.Rotational, 0.0, 0.0));
+                    Joints.Add(new Joint(1, 0.0, -90.0, 0.0, 90.0, 30.0, -30.0, JointTypes.Rotational, 0.0, 0.0));
                     Joints.Add(new Joint(2, 431.0, 0.0, 149.0, 0.0, 45.0, -225, JointTypes.Rotational, 0.0, 0.0));
                     Joints.Add(new Joint(3, -20.0, 90.0, 0.0, 90.0, 225, -45, JointTypes.Rotational, 0.0, 0.0));
                     Joints.Add(new Joint(4, 0.0, -90.0, 433.0, 0.0, 170, -110, JointTypes.Rotational, 0.0, 0.0));

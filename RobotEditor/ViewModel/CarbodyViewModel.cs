@@ -264,22 +264,29 @@ namespace RobotEditor.ViewModel
 
             centerOfTop.TranslatePrepend(matrixTranslationTop);
 
+            // Save index to recover bounding box sizes in result window
+            Model.YIndex = directionOfFront;
+            Model.ZIndex = directionOfTop;
+            if (directionOfFront == 0 || directionOfTop == 0)
+                if (directionOfFront == 1 || directionOfTop == 1)
+                    Model.XIndex = 2;
+                else
+                    Model.XIndex = 1;
+            else
+                Model.XIndex = 0;
+
             //move carbody front to world     
             if (dispatcher != null && !dispatcher.CheckAccess())
             {
                 dispatcher.Invoke(
                     () =>
                     {
-                        Console.WriteLine(@"Position vorher: " + CarbodyModel.GetTransform());
                         Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-                        Console.WriteLine(@"Position nachher: " + CarbodyModel.GetTransform());
                     });
             }
             else
             {
-                Console.WriteLine(@"Position vorher: " + CarbodyModel.GetTransform());
                 Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-                Console.WriteLine(@"Position nachher: " + CarbodyModel.GetTransform());
             }
         }
 

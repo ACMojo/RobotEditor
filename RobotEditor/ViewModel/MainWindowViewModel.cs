@@ -408,12 +408,10 @@ namespace RobotEditor.ViewModel
         {
             HideAdditionGeometries();
 
-            double maxHalfExtent = 0.0; 
-            foreach(var carbody in Carbodies)
-            {
-                if (carbody.Model.BoundingBoxHalfExtents.Max() > maxHalfExtent)
-                    maxHalfExtent = carbody.Model.BoundingBoxHalfExtents.Max();
-            }
+            var maxBBoxDimensions = new double[3]; // 0:X - 1:Y - 2:Z
+            double maxHalfExtent = 0.0;
+            foreach (var carbody in Carbodies)
+                maxHalfExtent = (carbody.Model.BoundingBoxHalfExtents.Max() > maxHalfExtent) ? carbody.Model.BoundingBoxHalfExtents.Max() : maxHalfExtent;
 
             VoxelOctree octreeResult = VoxelOctree.Create(maxHalfExtent*4, Precision);
 
@@ -502,6 +500,11 @@ namespace RobotEditor.ViewModel
                         var stepSizeX = Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 0]]) * 2 / Precision;
                         var stepSizeZ = Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[directionSelector[m, 1]]) * 2 / Precision;
 
+
+                        maxBBoxDimensions[0] = (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.XIndex]) > maxBBoxDimensions[0]) ? Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.XIndex]) : maxBBoxDimensions[0];
+                        maxBBoxDimensions[1] = (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.YIndex]) > maxBBoxDimensions[1]) ? Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.YIndex]) : maxBBoxDimensions[1];
+                        maxBBoxDimensions[2] = (Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.ZIndex]) > maxBBoxDimensions[2]) ? Math.Abs(SelectedCarbody.Model.BoundingBoxHalfExtents[SelectedCarbody.Model.ZIndex]) : maxBBoxDimensions[2];
+
                         for (var j = 0; j < stepSizeX; j++)
                         {
                             var total = 0.0;
@@ -530,8 +533,9 @@ namespace RobotEditor.ViewModel
                             matrixEnd.TranslatePrepend(vector);
                         }
                     }
-
-                    octreeResult.Add(octreeTemp);
+                    octreeResult.AddInXYZ(octreeTemp, 0, (int)maxBBoxDimensions[1], 0);     // Shifts carbody into the center of the booth
+                    
+                    //octreeResult.Add(octreeTemp);
                 }
                 octreeResult.RecalcMinMaxSum();
             };
@@ -543,8 +547,8 @@ namespace RobotEditor.ViewModel
                 ShowAdditionalGeometries();
 
                 var robots = Robots.Select(r => r.Model).ToList();
-
-                var comparison = new ResultWindow(octreeResult, robots);
+                
+                var comparison = new ResultWindow(octreeResult, robots, maxBBoxDimensions);
                 var result = comparison.ShowDialog();
 
                 if (result == true)

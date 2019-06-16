@@ -195,7 +195,7 @@
                     Grid.IsSharedSizeScope="True"
                     HorizontalAlignment="Stretch"
                     Orientation="Vertical">
-
+                
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition
@@ -213,13 +213,38 @@
                             Grid.Column="1"
                             HorizontalAlignment="Stretch"
                             x:Name="comboBox_SearchMethod"
-                            SelectedIndex="1">
+                            SelectedIndex="{Binding SelectedItemSearchMethod}">
                             <ListBoxItem
-                                Content="CPLEX" />
+                                Content="Depth-First" />
                             <ListBoxItem
-                                Content="DFS" />
+                                Content="Best-Voxel-First" />
                             <ListBoxItem
                                 Content="Brute Force" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="Auto"
+                                SharedSizeGroup="Label" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            x:Name="label_Shift"
+                            Content="Shift Method:" />
+                        <ComboBox
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            x:Name="comboBox_ShiftMethod"
+                            SelectedIndex="{Binding SelectedItemShiftMethod}">
+                            <ListBoxItem
+                                Content="Corner Voxel" />
+                            <ListBoxItem
+                                Content="Center Voxel" />
                         </ComboBox>
                     </Grid>
 
@@ -239,7 +264,7 @@
                         <TextBox
                             Grid.Column="1"
                             x:Name="textBox_NrOfSearchCycles"
-                            Text="150" />
+                            Text="{Binding SearchCycles, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
 
                     <Grid>
@@ -277,11 +302,146 @@
                             Maximum="8"
                             IsSnapToTickEnabled="True"
                             TickPlacement="BottomRight"
-                            Minimum="2"
-                            Value="2"
-                            SmallChange="2"
-                            TickFrequency="2"
-                            LargeChange="2" />
+                            Minimum="1"
+                            Value="{Binding NoOfRobots}"
+                            SmallChange="1"
+                            TickFrequency="1"
+                            LargeChange="1" />
+
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="Auto"
+                                SharedSizeGroup="Label" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            x:Name="label_initialLowerBound"
+                            Content="Initial Lower Bound:" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            x:Name="checkBox_MaxVoxel"
+                            Content="Max. Voxel"
+                            Command="{Binding MaxVoxel}"
+                            IsChecked="{Binding IsCheckedMaxVoxel}" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            x:Name="checkBox_Leaf"
+                            Content="Max. Leaf"
+                            Command="{Binding MaxLeaf}"
+                            IsChecked="{Binding IsCheckedMaxLeaf}" />
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="Auto"
+                                SharedSizeGroup="Label" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            x:Name="label_lowerBound"
+                            Content="Lower bound check:" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            x:Name="checkBox_MaxValue"
+                            Content="Max. Value"
+                            Command="{Binding MaxValue}"
+                            IsChecked="{Binding IsCheckedMaxValue}" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            x:Name="checkBox_MaxLeaf"
+                            Content="Max. Leafs"
+                            Command="{Binding MaxLeafs}"
+                            IsChecked="{Binding IsCheckedMaxLeafs}" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="2"
+                            x:Name="checkBox_MaxMax"
+                            Content="Max. Max."
+                            Command="{Binding MaxMax}"
+                            IsChecked="{Binding IsCheckedMaxMax}" />
+                    </Grid>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="Auto"
+                                SharedSizeGroup="Label" />
+                            <ColumnDefinition
+                                Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                            <RowDefinition
+                                Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Label
+                            Grid.Column="0"
+                            Grid.Row="0"
+                            x:Name="label_layoutOptions"
+                            Content="Layout Options:" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="0"
+                            x:Name="checkBox_Rotation"
+                            Content="Rotate robot"
+                            Command="{Binding Rotation}"
+                            IsChecked="{Binding IsCheckedRotation}" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="1"
+                            x:Name="checkBox_NoGo"
+                            Content="Exclude NoGo-Zones"
+                            Command="{Binding NoGo}"
+                            IsChecked="{Binding IsCheckedNoGo}" />
+
+                        <CheckBox
+                            Grid.Column="1"
+                            Grid.Row="2"
+                            x:Name="checkBox_Symmetry"
+                            Content="Symmetric layout"
+                            Command="{Binding Symmetry}"
+                            IsChecked="{Binding IsCheckedSymmetry}" />
                     </Grid>
 
                     <Button
@@ -321,12 +481,37 @@
                         Binding="{Binding Path=BestMatch, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                         IsReadOnly="true"
                         ClipboardContentBinding="{x:Null}"
-                        Header="Best Match" />
+                        Header="Total Match" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=LowerBound, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                        IsReadOnly="true"
+                        ClipboardContentBinding="{x:Null}"
+                        Header="Init. Lower Bound" />
                     <DataGridTextColumn
                         Binding="{Binding Path=ComputationTime, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
                         IsReadOnly="true"
                         ClipboardContentBinding="{x:Null}"
                         Header="Computation time" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=Cycles, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                        IsReadOnly="true"
+                        ClipboardContentBinding="{x:Null}"
+                        Header="Branches" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=XPos, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                        IsReadOnly="true"
+                        ClipboardContentBinding="{x:Null}"
+                        Header="X-Pos" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=YPos, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                        IsReadOnly="true"
+                        ClipboardContentBinding="{x:Null}"
+                        Header="Y-Pos" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=ZPos, ValidatesOnDataErrors=True, NotifyOnValidationError=True}"
+                        IsReadOnly="true"
+                        ClipboardContentBinding="{x:Null}"
+                        Header="Z-Pos" />
                 </DataGrid.Columns>
             </DataGrid>
 

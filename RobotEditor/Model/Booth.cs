@@ -1,7 +1,6 @@
 ﻿using HelixToolkit.Wpf;
 using RobotEditor.Helper;
 using System;
-using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
@@ -11,13 +10,19 @@ namespace RobotEditor.Model
     {
         #region Instance
 
-        public Booth(string robotName, double bestMatch, double computationTime, VoxelOctree mixedCarsOctree, Robot robot)
+        public Booth(string robotName, VoxelOctree mixedCarsOctree, Robot robot)
         {
             MixedCarsOctree = mixedCarsOctree;
+            MixedCarsOctreeCopy = mixedCarsOctree;
             RobotOctree = robot.Octree;
             RobotName = robotName;
-            BestMatch = bestMatch;
-            ComputationTime = computationTime;
+            BestMatch = 0.0;
+            ComputationTime = 0.0;
+            LowerBound = 0.0;
+            Cycles = 0;
+            XPos = 0;
+            YPos = 0;
+            ZPos = 0;
             
             ResultOctree = VoxelOctree.Create(10000d, mixedCarsOctree.Precision);
 
@@ -32,15 +37,25 @@ namespace RobotEditor.Model
         public string RobotName { get; set; }
         public double BestMatch { get; set; }
         public double ComputationTime { get; set; }
+        public int Cycles { get; set; }
+        public int XPos { get; set; }
+        public int YPos { get; set; }
+        public int ZPos { get; set; }
+        public double LowerBound { get; set; }
 
 
         public VoxelOctree MixedCarsOctree { get; }
+        public VoxelOctree MixedCarsOctreeCopy { get; set; }
         public VoxelOctree RobotOctree { get; }
         public VoxelOctree ResultOctree { get; }
         public ModelVisual3D BoothModel { get; set; }
 
         #endregion
 
+        public void RenewMixedCarsCopy()
+        {
+            MixedCarsOctreeCopy = MixedCarsOctree.Clone();
+        }
 
         public void Show3DBooth()
         {
@@ -60,8 +75,9 @@ namespace RobotEditor.Model
                 var k = i;
                 for (var j = 0; j < ResultOctree.Level; j++)
                 {
+                    
                     var n = (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - j]) % 8;
-
+                    
                     switch (n)
                     {
                         case 0:
@@ -108,7 +124,8 @@ namespace RobotEditor.Model
                             Console.WriteLine(@"Fehler");
                             break;
                     }
-
+                    
+                    /*
                     // DELETE START
                     switch (node.Value)
                     {
@@ -137,11 +154,11 @@ namespace RobotEditor.Model
                             vm.Material = MaterialHelper.CreateMaterial(Colors.Yellow);
                             break;
                         default:
-                            Console.WriteLine(@"Fehler");
+                            vm.Material = MaterialHelper.CreateMaterial(Colors.Wheat);
                             break;
                     }
-                    // DELETE END
-
+                    // DELETE END 
+                    */
                     if (j < ResultOctree.Level)
                         k = ResultOctree.StartIndexPerLevel[ResultOctree.Level - 1 - j] + (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - j]) / 8;
                     //k = (int)Math.Floor((double)k / 8);
@@ -149,7 +166,7 @@ namespace RobotEditor.Model
 
 
                 //INSERT
-               // vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
+                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));     
                 mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), ResultOctree.Precision/2, ResultOctree.Precision / 2, ResultOctree.Precision / 2);
                 vm.MeshGeometry = mb.ToMesh();
                 BoothModel.Children.Add(vm);
@@ -158,7 +175,7 @@ namespace RobotEditor.Model
 
         public void Hide3DBooth()
         {
-            ;
+            BoothModel.Children.Clear(); ;
         }
     }
 }
