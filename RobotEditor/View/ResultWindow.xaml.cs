@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Documents;
 
 using RobotEditor.Model;
 using RobotEditor.ViewModel;
-using System.Collections.Generic;
 
 namespace RobotEditor.View
 {

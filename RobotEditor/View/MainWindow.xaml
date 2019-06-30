@@ -387,8 +387,8 @@
                         x:Name="button_Update"
                         Content="Update"
                         Margin="5"
-                        Width="150" 
-                        Command="{Binding Update}"/>
+                        Width="150"
+                        Command="{Binding Update}" />
                 </StackPanel>
                 <Button
                     x:Name="button_Compare"

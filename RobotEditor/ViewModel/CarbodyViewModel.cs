@@ -268,10 +268,12 @@ namespace RobotEditor.ViewModel
             Model.YIndex = directionOfFront;
             Model.ZIndex = directionOfTop;
             if (directionOfFront == 0 || directionOfTop == 0)
+            {
                 if (directionOfFront == 1 || directionOfTop == 1)
                     Model.XIndex = 2;
                 else
                     Model.XIndex = 1;
+            }
             else
                 Model.XIndex = 0;
 
@@ -279,15 +281,10 @@ namespace RobotEditor.ViewModel
             if (dispatcher != null && !dispatcher.CheckAccess())
             {
                 dispatcher.Invoke(
-                    () =>
-                    {
-                        Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-                    });
+                    () => { Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse()); });
             }
             else
-            {
                 Model.CarbodyModel.Transform = new MatrixTransform3D(centerOfTop.Inverse());
-            }
         }
 
         public void RayHi(Matrix3D matrixStart, Matrix3D matrixEnd, VoxelOctree octree)

@@ -1,13 +1,18 @@
-﻿using RobotEditor.Model;
-using System;
-using System.Windows.Media.Media3D;
-using System.Linq;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+
+using RobotEditor.Model;
 
 namespace RobotEditor.Helper
 {
     public static class MatchAlgorithms
     {
+        #region Fields
+
+        public static int cycles;
+
+        #endregion
 
         #region Properties
 
@@ -21,13 +26,22 @@ namespace RobotEditor.Helper
         public static VoxelOctree[] rotatedRobotTrees { get; set; }
         public static int[] translateOperator { get; set; }
         public static int rotateOperator { get; set; }
-        public static int cycles;
 
         #endregion
 
         #region Public methods
 
-        public static void BestVoxelFirstSearch(IOrderedEnumerable<KeyValuePair<int, VoxelNode>> nodes, int level, int maxCycles, bool maxValue, bool maxLeafs, bool maxMax, int rotations, bool noGo, bool symmetry, double[] boundingBoxHalfExtents)
+        public static void BestVoxelFirstSearch(
+            IOrderedEnumerable<KeyValuePair<int, VoxelNode>> nodes,
+            int level,
+            int maxCycles,
+            bool maxValue,
+            bool maxLeafs,
+            bool maxMax,
+            int rotations,
+            bool noGo,
+            bool symmetry,
+            double[] boundingBoxHalfExtents)
         {
             if (cycles >= maxCycles && maxCycles > 0)
                 return;
@@ -56,7 +70,7 @@ namespace RobotEditor.Helper
                     if (IsRobotInSymmetryZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && symmetry)
                         continue;
                 }
-                
+
                 if (level < carTree.Level)
                 {
                     var maxValueValue = 0.0;
@@ -79,7 +93,8 @@ namespace RobotEditor.Helper
                                 {
                                     maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
                                     maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
-                                    maxLeafsList.AddRange(carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
+                                    maxLeafsList.AddRange(
+                                        carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
                                 }
 
                                 var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
@@ -89,6 +104,7 @@ namespace RobotEditor.Helper
                                 else
                                     carXIndex += (int)carXIndexTemp;
                             }
+
                             var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
 
                             if (carYIndexTemp == null)
@@ -96,6 +112,7 @@ namespace RobotEditor.Helper
                             else
                                 carYIndex += (int)carYIndexTemp;
                         }
+
                         var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
 
                         if (carZIndexTemp == null)
@@ -103,7 +120,6 @@ namespace RobotEditor.Helper
                         else
                             carZIndex += (int)carZIndexTemp;
                     }
-
 
                     // Lower bound check maxValue and maxMax
                     var m = 0;
@@ -131,7 +147,6 @@ namespace RobotEditor.Helper
                     if (maxMaxValue <= lowerBound && maxMax)
                         continue;
 
-
                     // Lower bound check maxLeafs
                     if (maxLeafs)
                     {
@@ -152,7 +167,17 @@ namespace RobotEditor.Helper
                             continue;
                     }
 
-                    BestVoxelFirstSearch(carTree.GetChildNodesWithIndex(node.Key).OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0), level + 1, maxCycles, maxValue, maxLeafs, maxMax, rotations, noGo, symmetry, boundingBoxHalfExtents);
+                    BestVoxelFirstSearch(
+                        carTree.GetChildNodesWithIndex(node.Key).OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0),
+                        level + 1,
+                        maxCycles,
+                        maxValue,
+                        maxLeafs,
+                        maxMax,
+                        rotations,
+                        noGo,
+                        symmetry,
+                        boundingBoxHalfExtents);
                 }
                 else
                 {
@@ -172,8 +197,10 @@ namespace RobotEditor.Helper
                                 int? carXIndex = carYIndex;
                                 for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
                                 {
-                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
-                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
+                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
+                                            .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
+                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
+                                                     .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
 
                                     var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
                                     var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
@@ -213,7 +240,6 @@ namespace RobotEditor.Helper
 
                         if (value > lowerBound)
                         {
-
                             var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
                             for (int i = 0; i < 3; i++)
                                 diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
@@ -227,7 +253,17 @@ namespace RobotEditor.Helper
             }
         }
 
-        public static void DepthFirstSearch(IEnumerable<KeyValuePair<int, VoxelNode>> nodes, int level, int maxCycles, bool maxValue, bool maxLeafs, bool maxMax, int rotations, bool noGo, bool symmetry, double[] boundingBoxHalfExtents)
+        public static void DepthFirstSearch(
+            IEnumerable<KeyValuePair<int, VoxelNode>> nodes,
+            int level,
+            int maxCycles,
+            bool maxValue,
+            bool maxLeafs,
+            bool maxMax,
+            int rotations,
+            bool noGo,
+            bool symmetry,
+            double[] boundingBoxHalfExtents)
         {
             if (cycles >= maxCycles && maxCycles > 0)
                 return;
@@ -241,7 +277,7 @@ namespace RobotEditor.Helper
                 robotMaxNodes = robotTree.GetAncestorNodes(relLevel).Cast<VoxelNodeInner>().Where(n => n != null).OrderByDescending(n => n.Max);
 
             var robotRefNodePos = robotTree.CalculateNodePosition(robotTree.StartIndexPerLevel[robotTree.Level]);
-            
+
             foreach (var node in nodes)
             {
                 if (noGo || symmetry)
@@ -260,8 +296,8 @@ namespace RobotEditor.Helper
                 if (level < carTree.Level)
                 {
                     var maxValueValue = 0.0;
-                    var maxMaxValue = 0.0;                   
-                    
+                    var maxMaxValue = 0.0;
+
                     List<double> maxValueList = new List<double>();
                     List<double> maxMaxList = new List<double>();
                     List<VoxelNodeLeaf> maxLeafsList = new List<VoxelNodeLeaf>();
@@ -279,7 +315,8 @@ namespace RobotEditor.Helper
                                 {
                                     maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
                                     maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
-                                    maxLeafsList.AddRange(carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());                                 
+                                    maxLeafsList.AddRange(
+                                        carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
                                 }
 
                                 var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
@@ -289,6 +326,7 @@ namespace RobotEditor.Helper
                                 else
                                     carXIndex += (int)carXIndexTemp;
                             }
+
                             var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
 
                             if (carYIndexTemp == null)
@@ -296,6 +334,7 @@ namespace RobotEditor.Helper
                             else
                                 carYIndex += (int)carYIndexTemp;
                         }
+
                         var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
 
                         if (carZIndexTemp == null)
@@ -303,7 +342,6 @@ namespace RobotEditor.Helper
                         else
                             carZIndex += (int)carZIndexTemp;
                     }
-
 
                     // Lower bound check maxValue and maxMax
                     var m = 0;
@@ -313,7 +351,7 @@ namespace RobotEditor.Helper
                         if (m >= maxValueListTemp.Count())
                             break;
 
-                        if(maxValue)
+                        if (maxValue)
                             maxValueValue += robotMaxNode.Max * maxValueListTemp.ElementAt(m);
 
                         if (maxMax)
@@ -330,7 +368,6 @@ namespace RobotEditor.Helper
 
                     if (maxMaxValue <= lowerBound && maxMax)
                         continue;
-
 
                     // Lower bound check maxLeafs
                     if (maxLeafs)
@@ -352,7 +389,17 @@ namespace RobotEditor.Helper
                             continue;
                     }
 
-                    DepthFirstSearch(carTree.GetChildNodesWithIndex(node.Key), level + 1, maxCycles, maxValue, maxLeafs, maxMax, rotations, noGo, symmetry, boundingBoxHalfExtents);
+                    DepthFirstSearch(
+                        carTree.GetChildNodesWithIndex(node.Key),
+                        level + 1,
+                        maxCycles,
+                        maxValue,
+                        maxLeafs,
+                        maxMax,
+                        rotations,
+                        noGo,
+                        symmetry,
+                        boundingBoxHalfExtents);
                 }
                 else
                 {
@@ -372,8 +419,10 @@ namespace RobotEditor.Helper
                                 int? carXIndex = carYIndex;
                                 for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
                                 {
-                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
-                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
+                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
+                                            .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
+                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
+                                                     .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
 
                                     var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
                                     var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
@@ -413,7 +462,6 @@ namespace RobotEditor.Helper
 
                         if (value > lowerBound)
                         {
-
                             var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
                             for (int i = 0; i < 3; i++)
                                 diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
@@ -427,7 +475,14 @@ namespace RobotEditor.Helper
             }
         }
 
-        public static void BruteForce(IEnumerable<KeyValuePair<int, VoxelNode>> nodes, int level, int maxCycles, int rotations, bool noGo, bool symmetry, double[] boundingBoxHalfExtents)
+        public static void BruteForce(
+            IEnumerable<KeyValuePair<int, VoxelNode>> nodes,
+            int level,
+            int maxCycles,
+            int rotations,
+            bool noGo,
+            bool symmetry,
+            double[] boundingBoxHalfExtents)
         {
             if (cycles >= maxCycles && maxCycles > 0)
                 return;
@@ -453,11 +508,8 @@ namespace RobotEditor.Helper
                         continue;
                 }
 
-
                 if (level < carTree.Level)
-                {
                     BruteForce(carTree.GetChildNodesWithIndex(node.Key), level + 1, maxCycles, rotations, noGo, symmetry, boundingBoxHalfExtents);
-                }
                 else
                 {
                     for (int m = 0; m < rotations; m++)
@@ -476,8 +528,10 @@ namespace RobotEditor.Helper
                                 int? carXIndex = carYIndex;
                                 for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
                                 {
-                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
-                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m].Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
+                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
+                                            .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
+                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
+                                                     .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
 
                                     var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
                                     var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
@@ -531,7 +585,12 @@ namespace RobotEditor.Helper
             }
         }
 
-        public static double MaxVoxelInit(IOrderedEnumerable<KeyValuePair<int, VoxelNode>> sortedNodes, int rotations, bool noGo, bool symmetry, double[] boundingBoxHalfExtents)
+        public static double MaxVoxelInit(
+            IOrderedEnumerable<KeyValuePair<int, VoxelNode>> sortedNodes,
+            int rotations,
+            bool noGo,
+            bool symmetry,
+            double[] boundingBoxHalfExtents)
         {
             var lbInit = 0.0;
             var robotRefNodePos = robotTree.CalculateNodePosition(robotTree.Root);
@@ -554,7 +613,7 @@ namespace RobotEditor.Helper
                 break;
             }
 
-            var directChilds = carTree.GetChildNodes((VoxelNodeInner)largestNode).ToArray();        
+            var directChilds = carTree.GetChildNodes((VoxelNodeInner)largestNode).ToArray();
 
             // Find the best rotation
             // COMMENT FOR PAPER: Finding the rotation first is weak, in case of high values in neighbours but low values in the center, as rotation is than based on missing data
@@ -568,22 +627,25 @@ namespace RobotEditor.Helper
                     if (rotatedRobotTrees[i].Nodes[j + 1] == null || directChilds[j] == null)
                         continue;
 
-                    maxPossibleMatchTemp += (((VoxelNodeInner)rotatedRobotTrees[i].Nodes[j + 1]).Max * ((VoxelNodeInner)directChilds[j]).Max);
+                    maxPossibleMatchTemp += ((VoxelNodeInner)rotatedRobotTrees[i].Nodes[j + 1]).Max * ((VoxelNodeInner)directChilds[j]).Max;
                 }
+
                 if (maxPossibleMatchTemp > maxPossibleMatch)
                 {
                     maxPossibleMatch = maxPossibleMatchTemp;
                     maxMatchPossibleRotation = i;
                 }
             }
+
             upperBound = maxPossibleMatch;
-            
+
             for (var j = 0; j < 8; j++)
             {
                 if (rotatedRobotTrees[maxMatchPossibleRotation].Nodes[j + 1] == null || directChilds[j] == null)
                     continue;
 
-                var robotLeafs = rotatedRobotTrees[maxMatchPossibleRotation].GetLeafNodes((VoxelNodeInner)rotatedRobotTrees[maxMatchPossibleRotation].Nodes[j + 1]);
+                var robotLeafs = rotatedRobotTrees[maxMatchPossibleRotation]
+                    .GetLeafNodes((VoxelNodeInner)rotatedRobotTrees[maxMatchPossibleRotation].Nodes[j + 1]);
                 var carLeafs = carTree.GetLeafNodes((VoxelNodeInner)directChilds[j]);
 
                 if (robotLeafs.Count() != carLeafs.Count())
@@ -593,6 +655,7 @@ namespace RobotEditor.Helper
                 {
                     if (robotLeafs.ElementAt(i) == null || carLeafs.ElementAt(i) == null)
                         continue;
+
                     lbInit += robotLeafs.ElementAt(i).Value * carLeafs.ElementAt(i).Value;
                 }
             }
@@ -614,22 +677,24 @@ namespace RobotEditor.Helper
             {
                 var robotLeafs = rotatedRobotTrees[j].GetLeafNodesWithIndex();
                 var orderedRobotLeafs = robotLeafs.OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0);
-               
+
                 var k = 0;
                 var diffBetweenRefs = new int[3];
-                foreach(var robotLeaf in orderedRobotLeafs)
+                foreach (var robotLeaf in orderedRobotLeafs)
                 {
                     diffBetweenRefs = carTree.CalculateNodePosition(largestCarLeaf.Key);
                     var robotRefNodePos = rotatedRobotTrees[j].CalculateNodePosition(robotLeaf.Key);
                     for (var i = 0; i < 3; i++)
                         diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
 
-
                     if (symmetry)
                     {
                         if (noGo)
                         {
-                            if (!IsRobotInNoGoZone(diffBetweenRefs, robotTree.Level, boundingBoxHalfExtents) && !IsRobotInSymmetryZone(diffBetweenRefs, robotTree.Level, boundingBoxHalfExtents))
+                            if (!IsRobotInNoGoZone(diffBetweenRefs, robotTree.Level, boundingBoxHalfExtents) && !IsRobotInSymmetryZone(
+                                    diffBetweenRefs,
+                                    robotTree.Level,
+                                    boundingBoxHalfExtents))
                                 break;
                         }
                         else
@@ -648,13 +713,12 @@ namespace RobotEditor.Helper
                         else
                             break;
                     }
-                    
+
                     k++;
                 }
 
                 if (k >= orderedRobotLeafs.Count())
                     continue;
-
 
                 var largestRobotLeaf = orderedRobotLeafs.ElementAt(k);
 
@@ -674,13 +738,14 @@ namespace RobotEditor.Helper
 
                     lbInitTemp += carTreeLeafValue * robotLeaf.Value.Value;
                 }
+
                 if (lbInitTemp > lbInit)
                 {
                     lbInit = lbInitTemp;
                     rotateOperator = j;
                     translateOperator = diffBetweenRefs;
                 }
-            }         
+            }
 
             return lbInit;
         }
@@ -703,22 +768,29 @@ namespace RobotEditor.Helper
             sevenPosOfRobotCenter[2] = zeroPosOfRobotCenter[2] + stepSize;
 
             // Below Grid?
-            if (zeroPosOfRobotCenter[2] < 0 && sevenPosOfRobotCenter[2] < 0)   // Z-Value of robot root in Worst-Case below 0?
+            if (zeroPosOfRobotCenter[2] < 0 && sevenPosOfRobotCenter[2] < 0) // Z-Value of robot root in Worst-Case below 0?
                 return true;
 
             // Above or in Bounding Box of Carbody?
-            if (zeroPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && zeroPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0])
-                if (zeroPosOfRobotCenter[1] >= -boundingBoxHalfExtents[1] && sevenPosOfRobotCenter[1] >= -boundingBoxHalfExtents[1] && zeroPosOfRobotCenter[1] <= boundingBoxHalfExtents[1] && sevenPosOfRobotCenter[1] <= boundingBoxHalfExtents[1])
+            if (zeroPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] &&
+                zeroPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0])
+            {
+                if (zeroPosOfRobotCenter[1] >= -boundingBoxHalfExtents[1] && sevenPosOfRobotCenter[1] >= -boundingBoxHalfExtents[1] &&
+                    zeroPosOfRobotCenter[1] <= boundingBoxHalfExtents[1] && sevenPosOfRobotCenter[1] <= boundingBoxHalfExtents[1])
                     return true;
+            }
 
             // In Front, in or behind Bounding Box of Carbody?
-            if (zeroPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && zeroPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0])
-                if (zeroPosOfRobotCenter[2] <= (boundingBoxHalfExtents[2] * 2) && sevenPosOfRobotCenter[2] <= (boundingBoxHalfExtents[2] * 2) && zeroPosOfRobotCenter[2] >= 0 && sevenPosOfRobotCenter[2] >= 0)
+            if (zeroPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] <= boundingBoxHalfExtents[0] &&
+                zeroPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] >= -boundingBoxHalfExtents[0])
+            {
+                if (zeroPosOfRobotCenter[2] <= boundingBoxHalfExtents[2] * 2 && sevenPosOfRobotCenter[2] <= boundingBoxHalfExtents[2] * 2 &&
+                    zeroPosOfRobotCenter[2] >= 0 && sevenPosOfRobotCenter[2] >= 0)
                     return true;
+            }
 
             return false;
         }
-
 
         public static bool IsRobotInSymmetryZone(int[] distance, int relLevel, double[] boundingBoxHalfExtents)
         {
@@ -738,13 +810,27 @@ namespace RobotEditor.Helper
             sevenPosOfRobotCenter[2] = zeroPosOfRobotCenter[2] + stepSize;
 
             // X-Value smaller than right side of bounding box?
-            if (zeroPosOfRobotCenter[0] < -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] < -boundingBoxHalfExtents[0])   
+            if (zeroPosOfRobotCenter[0] < -boundingBoxHalfExtents[0] && sevenPosOfRobotCenter[0] < -boundingBoxHalfExtents[0])
                 return true;
 
             return false;
         }
 
-        public static int[] BranchAndBound(VoxelOctree cTree, VoxelOctree rTree, bool maxVoxel, bool maxLeaf, bool maxValue, bool maxLeafs, bool maxMax, int searchMethod, int shiftMethod, int maxCycles, bool rotation, bool noGo, bool symmetry, double[] boundingBoxHalfExtents)
+        public static int[] BranchAndBound(
+            VoxelOctree cTree,
+            VoxelOctree rTree,
+            bool maxVoxel,
+            bool maxLeaf,
+            bool maxValue,
+            bool maxLeafs,
+            bool maxMax,
+            int searchMethod,
+            int shiftMethod,
+            int maxCycles,
+            bool rotation,
+            bool noGo,
+            bool symmetry,
+            double[] boundingBoxHalfExtents)
         {
             cycles = 0;
             translateOperator = new int[3];
@@ -757,7 +843,6 @@ namespace RobotEditor.Helper
             var nodesOnStartLevel = carTree.GetAncestorNodesWithIndex(startLevel);
             var orderedNodesOnStartLevel = nodesOnStartLevel.OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0);
 
-
             // Number of robot rotations zu check
             var rotationsToCheck = rotation ? rotatedRobotTrees.Count() : 1;
 
@@ -765,9 +850,11 @@ namespace RobotEditor.Helper
             lowerBound = 0.0;
             var lbTemp = 0.0;
 
-            if(maxVoxel)
-                lowerBound = (lbTemp = MaxVoxelInit(orderedNodesOnStartLevel, rotationsToCheck, noGo, symmetry, boundingBoxHalfExtents)) > lowerBound ? lbTemp : lowerBound;
-            if(maxLeaf)
+            if (maxVoxel)
+                lowerBound = (lbTemp = MaxVoxelInit(orderedNodesOnStartLevel, rotationsToCheck, noGo, symmetry, boundingBoxHalfExtents)) > lowerBound
+                                 ? lbTemp
+                                 : lowerBound;
+            if (maxLeaf)
                 lowerBound = (lbTemp = MaxLeafInit(rotationsToCheck, boundingBoxHalfExtents, noGo, symmetry)) > lowerBound ? lbTemp : lowerBound;
 
             initLowerBound = lowerBound;
@@ -776,19 +863,39 @@ namespace RobotEditor.Helper
             switch (searchMethod)
             {
                 case 0:
-                    DepthFirstSearch(nodesOnStartLevel, startLevel, maxCycles, maxValue, maxLeafs, maxMax, rotationsToCheck, noGo, symmetry, boundingBoxHalfExtents);
+                    DepthFirstSearch(
+                        nodesOnStartLevel,
+                        startLevel,
+                        maxCycles,
+                        maxValue,
+                        maxLeafs,
+                        maxMax,
+                        rotationsToCheck,
+                        noGo,
+                        symmetry,
+                        boundingBoxHalfExtents);
                     break;
                 case 1:
-                    BestVoxelFirstSearch(orderedNodesOnStartLevel, startLevel, maxCycles, maxValue, maxLeafs, maxMax, rotationsToCheck, noGo, symmetry, boundingBoxHalfExtents);                    
+                    BestVoxelFirstSearch(
+                        orderedNodesOnStartLevel,
+                        startLevel,
+                        maxCycles,
+                        maxValue,
+                        maxLeafs,
+                        maxMax,
+                        rotationsToCheck,
+                        noGo,
+                        symmetry,
+                        boundingBoxHalfExtents);
                     break;
                 case 2:
                     BruteForce(nodesOnStartLevel, startLevel, maxCycles, rotationsToCheck, noGo, symmetry, boundingBoxHalfExtents);
                     break;
             }
-            
+
             return translateOperator;
         }
 
-         #endregion
+        #endregion
     }
 }

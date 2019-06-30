@@ -1,8 +1,9 @@
-﻿using HelixToolkit.Wpf;
-using RobotEditor.Helper;
-using System;
-using System.Windows.Media;
+﻿using System;
 using System.Windows.Media.Media3D;
+
+using HelixToolkit.Wpf;
+
+using RobotEditor.Helper;
 
 namespace RobotEditor.Model
 {
@@ -23,11 +24,10 @@ namespace RobotEditor.Model
             XPos = 0;
             YPos = 0;
             ZPos = 0;
-            
+
             ResultOctree = VoxelOctree.Create(10000d, mixedCarsOctree.Precision);
 
             BoothModel = new ModelVisual3D();
-
         }
 
         #endregion
@@ -43,7 +43,6 @@ namespace RobotEditor.Model
         public int ZPos { get; set; }
         public double LowerBound { get; set; }
 
-
         public VoxelOctree MixedCarsOctree { get; }
         public VoxelOctree MixedCarsOctreeCopy { get; set; }
         public VoxelOctree RobotOctree { get; }
@@ -51,6 +50,8 @@ namespace RobotEditor.Model
         public ModelVisual3D BoothModel { get; set; }
 
         #endregion
+
+        #region Public methods
 
         public void RenewMixedCarsCopy()
         {
@@ -75,9 +76,8 @@ namespace RobotEditor.Model
                 var k = i;
                 for (var j = 0; j < ResultOctree.Level; j++)
                 {
-                    
                     var n = (k - ResultOctree.StartIndexPerLevel[ResultOctree.Level - j]) % 8;
-                    
+
                     switch (n)
                     {
                         case 0:
@@ -124,7 +124,7 @@ namespace RobotEditor.Model
                             Console.WriteLine(@"Fehler");
                             break;
                     }
-                    
+
                     /*
                     // DELETE START
                     switch (node.Value)
@@ -164,10 +164,13 @@ namespace RobotEditor.Model
                     //k = (int)Math.Floor((double)k / 8);
                 }
 
-
                 //INSERT
-                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));     
-                mb.AddBox(new Point3D(startOffset.X, startOffset.Y, startOffset.Z), ResultOctree.Precision/2, ResultOctree.Precision / 2, ResultOctree.Precision / 2);
+                vm.Material = MaterialHelper.CreateMaterial(ColorGradient.GetColorForValue(node.Value, maxValue, 0.0));
+                mb.AddBox(
+                    new Point3D(startOffset.X, startOffset.Y, startOffset.Z),
+                    ResultOctree.Precision / 2,
+                    ResultOctree.Precision / 2,
+                    ResultOctree.Precision / 2);
                 vm.MeshGeometry = mb.ToMesh();
                 BoothModel.Children.Add(vm);
             }
@@ -175,7 +178,10 @@ namespace RobotEditor.Model
 
         public void Hide3DBooth()
         {
-            BoothModel.Children.Clear(); ;
+            BoothModel.Children.Clear();
+            ;
         }
+
+        #endregion
     }
 }

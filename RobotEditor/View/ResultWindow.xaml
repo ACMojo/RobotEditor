@@ -195,7 +195,7 @@
                     Grid.IsSharedSizeScope="True"
                     HorizontalAlignment="Stretch"
                     Orientation="Vertical">
-                
+
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition

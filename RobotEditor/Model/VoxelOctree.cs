@@ -1,10 +1,10 @@
-﻿using RobotEditor.Helper;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Windows;
 using System.Windows.Media.Media3D;
+
+using RobotEditor.Helper;
 
 namespace RobotEditor.Model
 {
@@ -23,9 +23,9 @@ namespace RobotEditor.Model
             Nodes[0] = new VoxelNodeInner();
 
             // Length of Array segment per level (1)
-            NodePathFactorPerLevel = new int[Level+1];
+            NodePathFactorPerLevel = new int[Level + 1];
             // Start points in Array for each level (2)
-            StartIndexPerLevel = new int[Level+1];
+            StartIndexPerLevel = new int[Level + 1];
 
             var index = 0;
             for (var i = 0; i <= Level; i++)
@@ -34,7 +34,7 @@ namespace RobotEditor.Model
                 NodePathFactorPerLevel[i] = factor;
 
                 StartIndexPerLevel[i] = index;
-                index += factor;            
+                index += factor;
             }
         }
 
@@ -150,7 +150,7 @@ namespace RobotEditor.Model
             for (var i = startIndex; i < endIndex; i++)
                 yield return Nodes[i];
         }
-        
+
         public IEnumerable<KeyValuePair<int, VoxelNode>> GetAncestorNodesWithIndex(int level)
         {
             var startIndex = StartIndexPerLevel[level];
@@ -167,19 +167,20 @@ namespace RobotEditor.Model
 
             for (var i = startIndex; i < endIndex; i++)
             {
-                var neighborOffsets = MatrixHelper.getAllSurroundingVoxel(level, i-startIndex);
+                var neighborOffsets = MatrixHelper.getAllSurroundingVoxel(level, i - startIndex);
 
-                var neighborValue = Nodes[startIndex+(int)neighborOffsets[0]] == null ? 0.0 : Nodes[startIndex + (int)neighborOffsets[0]].Value;
+                var neighborValue = Nodes[startIndex + (int)neighborOffsets[0]] == null ? 0.0 : Nodes[startIndex + (int)neighborOffsets[0]].Value;
                 for (var k = 1; k < 27; k++)
                 {
-                    if (neighborOffsets[k] == null)        // Border of Octree reached
+                    if (neighborOffsets[k] == null) // Border of Octree reached
                         continue;
 
                     if (Nodes[startIndex + (int)neighborOffsets[k]] == null)
                         continue;
 
                     neighborValue += Nodes[startIndex + (int)neighborOffsets[k]].Value;
-                }             
+                }
+
                 yield return new KeyValuePair<int, double>(i, neighborValue);
             }
         }
@@ -247,7 +248,6 @@ namespace RobotEditor.Model
                 yield return new KeyValuePair<int, VoxelNode>(i, Nodes[i]);
         }
 
-
         public IEnumerable<KeyValuePair<int, VoxelNode>> GetChildNodesWithIndex(VoxelNodeInner node)
         {
             var level = CalculateNodeLevel(node) + 1;
@@ -288,7 +288,6 @@ namespace RobotEditor.Model
             return clone;
         }
 
-
         public void RotateX(int Rx)
         {
             if (Rx == 0)
@@ -311,9 +310,9 @@ namespace RobotEditor.Model
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
                 vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundX(Rx));
 
-
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
+
             Nodes = octreeTemp.Nodes;
         }
 
@@ -339,9 +338,9 @@ namespace RobotEditor.Model
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
                 vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundY(Ry));
 
-
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
+
             Nodes = octreeTemp.Nodes;
         }
 
@@ -367,9 +366,9 @@ namespace RobotEditor.Model
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
                 vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundZ(Rz));
 
-
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
+
             Nodes = octreeTemp.Nodes;
         }
 
@@ -462,11 +461,11 @@ namespace RobotEditor.Model
 
                     var parentNodeTemp = GetParent(Nodes[j]);
 
-                    if (parentNodeTemp != parentNode)   // Reset values for new parent node
+                    if (parentNodeTemp != parentNode) // Reset values for new parent node
                     {
                         parentNode = parentNodeTemp;
                         parentNode.Min = double.NaN;
-                        parentNode.Max = double.NaN;                   
+                        parentNode.Max = double.NaN;
                         parentNode.Value = 0.0;
                     }
 
@@ -477,21 +476,23 @@ namespace RobotEditor.Model
                     }
                     else
                     {
-                        parentNode.Min = double.IsNaN(parentNode.Min) ? ((VoxelNodeInner)Nodes[j]).Min : Math.Min(((VoxelNodeInner)Nodes[j]).Min, parentNode.Min);
-                        parentNode.Max = double.IsNaN(parentNode.Max) ? ((VoxelNodeInner)Nodes[j]).Max : Math.Max(((VoxelNodeInner)Nodes[j]).Max, parentNode.Max);
+                        parentNode.Min = double.IsNaN(parentNode.Min)
+                                             ? ((VoxelNodeInner)Nodes[j]).Min
+                                             : Math.Min(((VoxelNodeInner)Nodes[j]).Min, parentNode.Min);
+                        parentNode.Max = double.IsNaN(parentNode.Max)
+                                             ? ((VoxelNodeInner)Nodes[j]).Max
+                                             : Math.Max(((VoxelNodeInner)Nodes[j]).Max, parentNode.Max);
                     }
+
                     parentNode.Value += double.IsNaN(Nodes[j].Value) ? 0.0 : Nodes[j].Value;
 
                     if (double.IsNaN(parentNode.Min))
                         Console.WriteLine("Fehler");
                 }
             }
+
             ;
         }
-
-        #endregion
-
-        #region Private methods
 
         public void ClearInXYZFromRoot(VoxelOctree tree, int x, int y, int z)
         {
@@ -512,25 +513,6 @@ namespace RobotEditor.Model
             }
         }
 
-        private void AddFromRoot(VoxelOctree tree)
-        {
-            var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
-
-            var maxLeafOther = leafNodesOther.Max(n => n.Key);
-            for (var i = tree.StartIndexLeafNodes; i<=maxLeafOther; i++)
-            {
-                var leafNodeOther = (VoxelNodeLeaf)tree.Nodes[i];
-                var valueOther = leafNodeOther == null || double.IsNaN(leafNodeOther.Value) ? 0 : leafNodeOther.Value;
-
-                if (Math.Abs(valueOther) < 0.0000001)
-                    continue;
-
-                var position = tree.CalculateNodePosition(leafNodeOther);
-                Set(position[0], position[1], position[2], valueOther);
-            }
-        }
-
-
         public void AddInXYZFromRoot(VoxelOctree tree, int x, int y, int z)
         {
             var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
@@ -545,7 +527,7 @@ namespace RobotEditor.Model
                     continue;
 
                 var position = tree.CalculateNodePosition(leafNodeOther);
-                Set(position[0]+x, position[1]+y, position[2]+z, valueOther);
+                Set(position[0] + x, position[1] + y, position[2] + z, valueOther);
             }
         }
 
@@ -562,13 +544,183 @@ namespace RobotEditor.Model
                 if (Math.Abs(valueOther) < 0.0000001)
                     continue;
 
-                var position = tree.CalculateNodePosition(leafNodeOther);             
+                var position = tree.CalculateNodePosition(leafNodeOther);
                 var valueThis = Get(position[0] + x, position[1] + y, position[2] + z);
                 if (double.IsNaN(valueThis))
                     valueThis = 0.0;
-                
+
                 Update(position[0] + x, position[1] + y, position[2] + z, valueOther + valueThis);
-                
+            }
+        }
+
+        public int[] CalculateNodePosition(int nodeIndex)
+        {
+            double[] positionTemp = new double[3];
+            var tempNodeIndex = nodeIndex;
+            var startLevel = CalculateNodeLevel(nodeIndex);
+
+            for (var i = startLevel; i > 0; i--)
+            {
+                var differenceToAdd = Precision * Math.Pow(2, Level - i) / 2;
+                var path = tempNodeIndex;
+                tempNodeIndex = (int)GetParentIndex(tempNodeIndex);
+
+                switch ((path - StartIndexPerLevel[i]) % 8)
+                {
+                    case 0:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 1:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 2:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 3:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 4:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 5:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 6:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 7:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                }
+            }
+
+            int[] position = new int[3];
+            position[0] = (int)positionTemp[0];
+            position[1] = (int)positionTemp[1];
+            position[2] = (int)positionTemp[2];
+
+            return position;
+        }
+
+        public int[] CalculateNodePosition(VoxelNode node)
+        {
+            double[] positionTemp = new double[3];
+            var tempNode = node;
+            var startLevel = CalculateNodeLevel(node);
+
+            for (var i = startLevel; i > 0; i--)
+            {
+                var differenceToAdd = Precision * Math.Pow(2, Level - i) / 2;
+                var path = Array.IndexOf(Nodes, tempNode);
+                tempNode = GetParent(tempNode);
+
+                switch ((path - StartIndexPerLevel[i]) % 8)
+                {
+                    case 0:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 1:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 2:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 3:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] -= differenceToAdd;
+                        break;
+                    case 4:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 5:
+                        positionTemp[0] += differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 6:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] -= differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                    case 7:
+                        positionTemp[0] -= differenceToAdd;
+                        positionTemp[1] += differenceToAdd;
+                        positionTemp[2] += differenceToAdd;
+                        break;
+                }
+            }
+
+            int[] position = new int[3];
+            position[0] = (int)positionTemp[0];
+            position[1] = (int)positionTemp[1];
+            position[2] = (int)positionTemp[2];
+
+            return position;
+        }
+
+        public bool Set(int nodeIndex, double value)
+        {
+            var node = (VoxelNodeLeaf)Nodes[nodeIndex];
+            if (node != null)
+                return false;
+
+            node = new VoxelNodeLeaf { Value = value };
+            Nodes[nodeIndex] = node;
+
+            VoxelNodeInner parent = null;
+            while ((parent = GetParent((VoxelNode)parent ?? node)) != null)
+            {
+                parent.Min = double.IsNaN(parent.Min) ? value : Math.Min(value, parent.Min);
+                parent.Max = double.IsNaN(parent.Max) ? value : Math.Max(value, parent.Max);
+            }
+
+            return true;
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void AddFromRoot(VoxelOctree tree)
+        {
+            var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
+
+            var maxLeafOther = leafNodesOther.Max(n => n.Key);
+            for (var i = tree.StartIndexLeafNodes; i <= maxLeafOther; i++)
+            {
+                var leafNodeOther = (VoxelNodeLeaf)tree.Nodes[i];
+                var valueOther = leafNodeOther == null || double.IsNaN(leafNodeOther.Value) ? 0 : leafNodeOther.Value;
+
+                if (Math.Abs(valueOther) < 0.0000001)
+                    continue;
+
+                var position = tree.CalculateNodePosition(leafNodeOther);
+                Set(position[0], position[1], position[2], valueOther);
             }
         }
 
@@ -730,137 +882,6 @@ namespace RobotEditor.Model
             return index;
         }
 
-        public int[] CalculateNodePosition(int nodeIndex)
-        {
-            double[] positionTemp = new double[3];
-            var tempNodeIndex = nodeIndex;
-            var startLevel = CalculateNodeLevel(nodeIndex);
-
-            for (var i = startLevel; i > 0; i--)
-            {
-                var differenceToAdd = (Precision * Math.Pow(2, Level - i)) / 2;
-                var path = tempNodeIndex;
-                tempNodeIndex = (int)GetParentIndex(tempNodeIndex);
-
-                switch ((path - StartIndexPerLevel[i]) % 8)
-                {
-                    case 0:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 1:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 2:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 3:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 4:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 5:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 6:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 7:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                }
-            }
-
-            int[] position = new int[3];
-            position[0] = (int)positionTemp[0];
-            position[1] = (int)positionTemp[1];
-            position[2] = (int)positionTemp[2];
-
-            return position;
-        }
-
-
-        public int[] CalculateNodePosition(VoxelNode node)
-        {
-            double[] positionTemp = new double[3];
-            var tempNode = node;
-            var startLevel = CalculateNodeLevel(node);
-
-            for (var i = startLevel; i > 0; i--)
-            {
-                var differenceToAdd = (Precision * Math.Pow(2, Level-i)) / 2;
-                var path = Array.IndexOf(Nodes, tempNode);
-                tempNode = GetParent(tempNode);
-
-                switch ((path-StartIndexPerLevel[i])%8)
-                {
-                    case 0:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 1:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 2:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 3:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] -= differenceToAdd;
-                        break;
-                    case 4:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 5:
-                        positionTemp[0] += differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 6:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] -= differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                    case 7:
-                        positionTemp[0] -= differenceToAdd;
-                        positionTemp[1] += differenceToAdd;
-                        positionTemp[2] += differenceToAdd;
-                        break;
-                }
-            }
-
-            int[] position = new int[3];
-            position[0] = (int)positionTemp[0];
-            position[1] = (int)positionTemp[1];
-            position[2] = (int)positionTemp[2];
-
-            return position;
-        }
-
         private double Get(int nodeIndex)
         {
             var node = (VoxelNodeLeaf)Nodes[nodeIndex];
@@ -868,26 +889,6 @@ namespace RobotEditor.Model
                 return double.NaN;
 
             return node.Value;
-        }
-
-        public bool Set(int nodeIndex, double value)
-        {
-            var node = (VoxelNodeLeaf)Nodes[nodeIndex];
-            if (node != null)
-                return false;
-
-            node = new VoxelNodeLeaf { Value = value };
-            Nodes[nodeIndex] = node;
-
-            
-            VoxelNodeInner parent = null;
-            while ((parent = GetParent((VoxelNode)parent ?? node)) != null)
-            {
-                parent.Min = double.IsNaN(parent.Min) ? value : Math.Min(value, parent.Min);
-                parent.Max = double.IsNaN(parent.Max) ? value : Math.Max(value, parent.Max);
-            }
-
-            return true;
         }
 
         private void Update(int nodeIndex, double value)

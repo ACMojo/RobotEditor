@@ -1,5 +1,6 @@
-﻿using RobotEditor.Model;
-using System.Windows.Media.Media3D;
+﻿using System.Windows.Media.Media3D;
+
+using RobotEditor.Model;
 
 namespace RobotEditor.ViewModel
 {

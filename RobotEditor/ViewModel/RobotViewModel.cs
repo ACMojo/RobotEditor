@@ -153,15 +153,16 @@ namespace RobotEditor.ViewModel
                 else
                 {
                     Model.Octree.Set(
-                            (int)(minB[0] + voxOld.X * precision),
-                            (int)(minB[1] + voxOld.Y * precision),
-                            (int)(minB[2] + voxOld.Z * precision),
-                            maxValue);
+                        (int)(minB[0] + voxOld.X * precision),
+                        (int)(minB[1] + voxOld.Y * precision),
+                        (int)(minB[2] + voxOld.Z * precision),
+                        maxValue);
 
                     voxOld = vox[j];
                     maxValue = vox[j].Value;
                 }
             }
+
             Model.Octree.RecalcMinMaxSum();
         }
 

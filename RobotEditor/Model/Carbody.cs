@@ -79,7 +79,8 @@ namespace RobotEditor.Model
         {
             foreach (var hitPoint in HitPoints)
             {
-                var coordinateSystem = new CoordinateSystemVisual3D { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
+                var coordinateSystem = new CoordinateSystemVisual3D
+                    { ArrowLengths = 100.0, Transform = new TranslateTransform3D(hitPoint.X, hitPoint.Y, hitPoint.Z) };
                 HitPoints3D.Add(coordinateSystem);
                 CarbodyModel.Children.Add(HitPoints3D.Last());
             }

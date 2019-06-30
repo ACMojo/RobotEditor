@@ -7,6 +7,5 @@
         public double Value = double.NaN;
 
         #endregion
-
     }
 }
