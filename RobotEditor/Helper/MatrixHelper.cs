@@ -302,14 +302,16 @@ namespace RobotEditor.Helper
             List<double> iList2 = new List<double>();
 
             var sum = 0.0;
-            for (int i = 1; i <= Math.Pow(2, level); i++)
+            for (int i = 1; i <= (1L << level); i++)
             {
-                var term = 0.0;
+                double term;
                 for (int j = 1; j <= level; j++)
                 {
-                    var sign = 0.0;
+                    double sign;
 
-                    if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                    var x = 1 << j - 1;
+
+                    if ((i & x) > 0)
                         sign = 1;
                     else
                         sign = -1;
@@ -320,8 +322,8 @@ namespace RobotEditor.Helper
                     /*
                     for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                     {
-                        intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                        //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                        intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                        //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                     }
                     if (intermediateTerm > 0.001)
                         intermediateTerm = 1;
@@ -331,7 +333,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 2 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                    term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum += term;
                 }
@@ -348,14 +350,16 @@ namespace RobotEditor.Helper
             List<double> iList2 = new List<double>();
 
             var sum = 0.0;
-            for (int i = 1; i <= Math.Pow(2, level); i++)
+            for (int i = 1; i <= (1L << level); i++)
             {
-                var term = 0.0;
+                double term;
                 for (int j = 1; j <= level; j++)
                 {
-                    var sign = 0.0;
+                    double sign;
 
-                    if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                    var x = 1 << j - 1;
+
+                    if ((i & x) > 0)
                         sign = 1;
                     else
                         sign = -1;
@@ -366,8 +370,8 @@ namespace RobotEditor.Helper
                     /*
                     for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                     {
-                        intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                        //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                        intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                        //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                     }
                     if (intermediateTerm > 0.001)
                         intermediateTerm = 1;
@@ -377,7 +381,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 4 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                    term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum -= term;
                 }
@@ -394,14 +398,16 @@ namespace RobotEditor.Helper
             List<double> iList2 = new List<double>();
 
             var sum = 0.0;
-            for (int i = 1; i <= Math.Pow(2, level); i++)
+            for (int i = 1; i <= (1L << level); i++)
             {
-                var term = 0.0;
+                double term;
                 for (int j = 1; j <= level; j++)
                 {
-                    var sign = 0.0;
+                    double sign;
 
-                    if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                    var x = 1 << j - 1;
+
+                    if ((i & x) > 0)
                         sign = 1;
                     else
                         sign = -1;
@@ -412,8 +418,8 @@ namespace RobotEditor.Helper
                     /*
                     for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                     {
-                        intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                        //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                        intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                        //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                     }
                     if (intermediateTerm > 0.001)
                         intermediateTerm = 1;
@@ -423,7 +429,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 8 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                    term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum += term;
                 }
@@ -440,7 +446,7 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 4)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (int)(1L << h - 1);
             }
 
             if (i == 0) // limit of octree reached
@@ -448,12 +454,14 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -464,8 +472,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -475,7 +483,7 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 4 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
@@ -488,20 +496,22 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 8)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (int)(1L << h - 1);
             }
 
-            if (i == Math.Pow(2, level)) // limit of octree reached          
+            if (i == (1L << level)) // limit of octree reached          
                 return null;
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -512,8 +522,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -523,7 +533,7 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 8 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
@@ -536,20 +546,22 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 2)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (1 << h - 1);
             }
 
-            if (i == Math.Pow(2, level)) // limit of octree reached
+            if (i == (1L << level)) // limit of octree reached
                 return null;
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -560,8 +572,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -571,7 +583,7 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 2 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
@@ -584,20 +596,22 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 4)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (1 << h - 1);
             }
 
-            if (i == Math.Pow(2, level)) // limit of octree reached
+            if (i == (1L << level)) // limit of octree reached
                 return null;
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = (1L << j - 1);
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -608,8 +622,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -619,7 +633,11 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 4 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                var modulo = i % x;
+                if (modulo != 0)
+                    continue;
+
+                term = Math.Pow(8, j) / 4 * sign;
                 sum += (int)term;
             }
 
@@ -632,7 +650,7 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 8)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (1 << h - 1);
             }
 
             if (i == 0) // limit of octree reached
@@ -640,12 +658,14 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -656,8 +676,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -667,7 +687,7 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 8 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
@@ -680,7 +700,7 @@ namespace RobotEditor.Helper
             for (int h = level; h > 0; h--) // find out where the current voxel is located
             {
                 if ((nodeIndexOnLevel & (int)(Math.Pow(8, h) / 2)) > 0)
-                    i += (int)Math.Pow(2, h - 1);
+                    i += (int)(1L << h - 1);
             }
 
             if (i == 0) // limit of octree reached
@@ -688,12 +708,14 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            var term = 0.0;
+            double term;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0.0;
+                double sign;
 
-                if ((i & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((i & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
@@ -704,8 +726,8 @@ namespace RobotEditor.Helper
                 /*
                 for (int k = 0; k <= Math.Floor(Math.Log(i, 2)); k++)
                 {
-                    intermediateTerm += Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2);
-                    //if ((Math.Pow(2, k) * (Math.Floor(i / Math.Pow(2, k)) % 2) * (Math.Floor(Math.Pow(2, j - 1) / Math.Pow(2, k)) % 2)) > 0)
+                    intermediateTerm += (1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2);
+                    //if (((1L << k) * (Math.Floor(i / (1L << k)) % 2) * (Math.Floor((1L << j - 1) / (1L << k)) % 2)) > 0)
                 }
                 if (intermediateTerm > 0.001)
                     intermediateTerm = 1;
@@ -715,7 +737,7 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 2 * Math.Pow(0, i % Math.Pow(2, j - 1)) * sign;
+                term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
@@ -731,21 +753,23 @@ namespace RobotEditor.Helper
             var rest = nodeIndexOnLevel;
             for (int h = level; h > 0; h--)
             {
-                start += (int)(Math.Pow(2, h - 1) * (rest / (Math.Pow(8, h) / (int)direction)));
+                start += (int)((1L << h - 1) * (rest / (Math.Pow(8, h) / (int)direction)));
                 rest = rest % (int)(Math.Pow(8, h) / (int)direction);
             }
 
             var term = 0;
             for (int j = 1; j <= level; j++)
             {
-                var sign = 0;
+                int sign;
 
-                if ((start & (int)Math.Pow(2, j - 1)) > 0)
+                var x = 1 << j - 1;
+
+                if ((start & x) > 0)
                     sign = 1;
                 else
                     sign = -1;
 
-                term += (int)(Math.Pow(8, j) / (int)direction) * (int)Math.Pow(0, start % Math.Pow(2, j - 1)) * sign;
+                term += (int)(Math.Pow(8, j) / (int)direction) * (start % x == 0 ? 1 : 0) * sign;
             }
             /*
             if (term < 0)
