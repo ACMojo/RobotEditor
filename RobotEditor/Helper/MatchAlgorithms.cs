@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using RobotEditor.Model;
 
@@ -56,201 +57,204 @@ namespace RobotEditor.Helper
 
             var robotRefNodePos = robotTree.CalculateNodePosition(robotTree.StartIndexPerLevel[robotTree.Level]);
 
-            foreach (var node in nodes)
-            {
-                if (noGo || symmetry)
+            
+            Parallel.ForEach(
+                nodes,
+                node =>
                 {
-                    var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
-                    for (int i = 0; i < 3; i++)
-                        diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
-
-                    if (IsRobotInNoGoZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && noGo)
-                        continue;
-
-                    if (IsRobotInSymmetryZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && symmetry)
-                        continue;
-                }
-
-                if (level < carTree.Level)
-                {
-                    var maxValueValue = 0.0;
-                    var maxMaxValue = 0.0;
-
-                    List<double> maxValueList = new List<double>();
-                    List<double> maxMaxList = new List<double>();
-                    List<VoxelNodeLeaf> maxLeafsList = new List<VoxelNodeLeaf>();
-
-                    int? carZIndex = node.Key - carTree.StartIndexPerLevel[level];
-                    for (int i = 0; i <= Math.Pow(2, relLevel); i++) // +Z
+                    if (noGo || symmetry)
                     {
-                        int? carYIndex = carZIndex;
-                        for (int j = 0; j <= Math.Pow(2, relLevel); j++) // +Y
+                        var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
+                        for (int i = 0; i < 3; i++)
+                            diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
+
+                        if (IsRobotInNoGoZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && noGo)
+                            return;
+
+                        if (IsRobotInSymmetryZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && symmetry)
+                            return;
+                    }
+
+                    if (level < carTree.Level)
+                    {
+                        var maxValueValue = 0.0;
+                        var maxMaxValue = 0.0;
+
+                        List<double> maxValueList = new List<double>();
+                        List<double> maxMaxList = new List<double>();
+                        List<VoxelNodeLeaf> maxLeafsList = new List<VoxelNodeLeaf>();
+
+                        int? carZIndex = node.Key - carTree.StartIndexPerLevel[level];
+                        for (int i = 0; i <= Math.Pow(2, relLevel); i++) // +Z
                         {
-                            int? carXIndex = carYIndex;
-                            for (int k = 0; k <= Math.Pow(2, relLevel); k++) // -X
+                            int? carYIndex = carZIndex;
+                            for (int j = 0; j <= Math.Pow(2, relLevel); j++) // +Y
                             {
-                                if (carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex] != null)
+                                int? carXIndex = carYIndex;
+                                for (int k = 0; k <= Math.Pow(2, relLevel); k++) // -X
                                 {
-                                    maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
-                                    maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
-                                    maxLeafsList.AddRange(
-                                        carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
+                                    if (carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex] != null)
+                                    {
+                                        maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
+                                        maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
+                                        maxLeafsList.AddRange(
+                                            carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
+                                    }
+
+                                    var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
+
+                                    if (carXIndexTemp == null)
+                                        break;
+                                    else
+                                        carXIndex += (int)carXIndexTemp;
                                 }
 
-                                var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
+                                var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
 
-                                if (carXIndexTemp == null)
+                                if (carYIndexTemp == null)
                                     break;
                                 else
-                                    carXIndex += (int)carXIndexTemp;
+                                    carYIndex += (int)carYIndexTemp;
                             }
 
-                            var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
+                            var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
 
-                            if (carYIndexTemp == null)
+                            if (carZIndexTemp == null)
                                 break;
                             else
-                                carYIndex += (int)carYIndexTemp;
+                                carZIndex += (int)carZIndexTemp;
                         }
 
-                        var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
-
-                        if (carZIndexTemp == null)
-                            break;
-                        else
-                            carZIndex += (int)carZIndexTemp;
-                    }
-
-                    // Lower bound check maxValue and maxMax
-                    var m = 0;
-                    var maxValueListTemp = maxValueList.OrderByDescending(n => n);
-                    foreach (var robotMaxNode in robotMaxNodes)
-                    {
-                        if (m >= maxValueListTemp.Count())
-                            break;
-
-                        if (maxValue)
-                            maxValueValue += robotMaxNode.Max * maxValueListTemp.ElementAt(m);
-
-                        if (maxMax)
+                        // Lower bound check maxValue and maxMax
+                        var m = 0;
+                        var maxValueListTemp = maxValueList.OrderByDescending(n => n);
+                        foreach (var robotMaxNode in robotMaxNodes)
                         {
-                            var robCount = robotTree.GetLeafNodes(robotMaxNode).Where(n => n != null).Count();
-                            maxMaxValue += robCount * robotMaxNode.Max * maxMaxList.ElementAt(m);
-                        }
-
-                        m++;
-                    }
-
-                    if (maxValueValue <= lowerBound && maxValue)
-                        continue;
-
-                    if (maxMaxValue <= lowerBound && maxMax)
-                        continue;
-
-                    // Lower bound check maxLeafs
-                    if (maxLeafs)
-                    {
-                        var robLeafs = robotTree.GetLeafNodes(robotTree.Root).Where(n => n != null).OrderByDescending(n => n.Value);
-                        var maxLeafsListTemp = maxLeafsList.Where(n => n != null).OrderByDescending(n => n.Value);
-                        var t = 0;
-                        var maxLeafsValue = 0.0;
-                        foreach (var robLeaf in robLeafs)
-                        {
-                            if (t >= maxLeafsListTemp.Count())
+                            if (m >= maxValueListTemp.Count())
                                 break;
 
-                            maxLeafsValue += robLeaf.Value * maxLeafsListTemp.ElementAt(t).Value;
-                            t++;
+                            if (maxValue)
+                                maxValueValue += robotMaxNode.Max * maxValueListTemp.ElementAt(m);
+
+                            if (maxMax)
+                            {
+                                var robCount = robotTree.GetLeafNodes(robotMaxNode).Where(n => n != null).Count();
+                                maxMaxValue += robCount * robotMaxNode.Max * maxMaxList.ElementAt(m);
+                            }
+
+                            m++;
                         }
 
-                        if (maxLeafsValue <= lowerBound)
-                            continue;
-                    }
+                        if (maxValueValue <= lowerBound && maxValue)
+                            return;
 
-                    BestVoxelFirstSearch(
-                        carTree.GetChildNodesWithIndex(node.Key).OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0),
-                        level + 1,
-                        maxCycles,
-                        maxValue,
-                        maxLeafs,
-                        maxMax,
-                        rotations,
-                        noGo,
-                        symmetry,
-                        boundingBoxHalfExtents);
-                }
-                else
-                {
-                    for (int m = 0; m < rotations; m++)
-                    {
-                        var value = 0.0;
+                        if (maxMaxValue <= lowerBound && maxMax)
+                            return;
 
-                        int? robZIndex = 0;
-                        int? carZIndex = node.Key - carTree.StartIndexLeafNodes;
-                        for (int i = 0; i < Math.Pow(2, rotatedRobotTrees[m].Level); i++) // +Z
+                        // Lower bound check maxLeafs
+                        if (maxLeafs)
                         {
-                            int? robYIndex = robZIndex;
-                            int? carYIndex = carZIndex;
-                            for (int j = 0; j < Math.Pow(2, rotatedRobotTrees[m].Level); j++) // +Y
+                            var robLeafs = robotTree.GetLeafNodes(robotTree.Root).Where(n => n != null).OrderByDescending(n => n.Value);
+                            var maxLeafsListTemp = maxLeafsList.Where(n => n != null).OrderByDescending(n => n.Value);
+                            var t = 0;
+                            var maxLeafsValue = 0.0;
+                            foreach (var robLeaf in robLeafs)
                             {
-                                int? robXIndex = robYIndex;
-                                int? carXIndex = carYIndex;
-                                for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
+                                if (t >= maxLeafsListTemp.Count())
+                                    break;
+
+                                maxLeafsValue += robLeaf.Value * maxLeafsListTemp.ElementAt(t).Value;
+                                t++;
+                            }
+
+                            if (maxLeafsValue <= lowerBound)
+                                return;
+                        }
+
+                        BestVoxelFirstSearch(
+                            carTree.GetChildNodesWithIndex(node.Key).OrderByDescending(n => n.Value != null ? n.Value.Value : 0.0),
+                            level + 1,
+                            maxCycles,
+                            maxValue,
+                            maxLeafs,
+                            maxMax,
+                            rotations,
+                            noGo,
+                            symmetry,
+                            boundingBoxHalfExtents);
+                    }
+                    else
+                    {
+                        for (int m = 0; m < rotations; m++)
+                        {
+                            var value = 0.0;
+
+                            int? robZIndex = 0;
+                            int? carZIndex = node.Key - carTree.StartIndexLeafNodes;
+                            for (int i = 0; i < Math.Pow(2, rotatedRobotTrees[m].Level); i++) // +Z
+                            {
+                                int? robYIndex = robZIndex;
+                                int? carYIndex = carZIndex;
+                                for (int j = 0; j < Math.Pow(2, rotatedRobotTrees[m].Level); j++) // +Y
                                 {
-                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
-                                            .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
-                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
-                                                     .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
+                                    int? robXIndex = robYIndex;
+                                    int? carXIndex = carYIndex;
+                                    for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
+                                    {
+                                        if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
+                                                .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
+                                            value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
+                                                         .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
 
-                                    var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
-                                    var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
+                                        var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
+                                        var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
 
-                                    if (robXIndexTemp == null || carXIndexTemp == null)
+                                        if (robXIndexTemp == null || carXIndexTemp == null)
+                                            break;
+                                        else
+                                        {
+                                            robXIndex += (int)robXIndexTemp;
+                                            carXIndex += (int)carXIndexTemp;
+                                        }
+                                    }
+
+                                    var robYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robYIndex);
+                                    var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(carTree.Level, (int)carYIndex);
+
+                                    if (robYIndexTemp == null || carYIndexTemp == null)
                                         break;
                                     else
                                     {
-                                        robXIndex += (int)robXIndexTemp;
-                                        carXIndex += (int)carXIndexTemp;
+                                        robYIndex += (int)robYIndexTemp;
+                                        carYIndex += (int)carYIndexTemp;
                                     }
                                 }
 
-                                var robYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robYIndex);
-                                var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(carTree.Level, (int)carYIndex);
+                                var robZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robZIndex);
+                                var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(carTree.Level, (int)carZIndex);
 
-                                if (robYIndexTemp == null || carYIndexTemp == null)
+                                if (robZIndexTemp == null || carZIndexTemp == null)
                                     break;
                                 else
                                 {
-                                    robYIndex += (int)robYIndexTemp;
-                                    carYIndex += (int)carYIndexTemp;
+                                    robZIndex += (int)robZIndexTemp;
+                                    carZIndex += (int)carZIndexTemp;
                                 }
                             }
 
-                            var robZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robZIndex);
-                            var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(carTree.Level, (int)carZIndex);
-
-                            if (robZIndexTemp == null || carZIndexTemp == null)
-                                break;
-                            else
+                            if (value > lowerBound)
                             {
-                                robZIndex += (int)robZIndexTemp;
-                                carZIndex += (int)carZIndexTemp;
+                                var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
+                                for (int i = 0; i < 3; i++)
+                                    diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
+
+                                lowerBound = value;
+                                translateOperator = diffBetweenRefs;
+                                rotateOperator = m;
                             }
                         }
-
-                        if (value > lowerBound)
-                        {
-                            var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
-                            for (int i = 0; i < 3; i++)
-                                diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
-
-                            lowerBound = value;
-                            translateOperator = diffBetweenRefs;
-                            rotateOperator = m;
-                        }
                     }
-                }
-            }
+                });
         }
 
         public static void DepthFirstSearch(
@@ -278,201 +282,203 @@ namespace RobotEditor.Helper
 
             var robotRefNodePos = robotTree.CalculateNodePosition(robotTree.StartIndexPerLevel[robotTree.Level]);
 
-            foreach (var node in nodes)
-            {
-                if (noGo || symmetry)
+            Parallel.ForEach(
+                nodes,
+                node =>
                 {
-                    var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
-                    for (int i = 0; i < 3; i++)
-                        diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
-
-                    if (IsRobotInNoGoZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && noGo)
-                        continue;
-
-                    if (IsRobotInSymmetryZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && symmetry)
-                        continue;
-                }
-
-                if (level < carTree.Level)
-                {
-                    var maxValueValue = 0.0;
-                    var maxMaxValue = 0.0;
-
-                    List<double> maxValueList = new List<double>();
-                    List<double> maxMaxList = new List<double>();
-                    List<VoxelNodeLeaf> maxLeafsList = new List<VoxelNodeLeaf>();
-
-                    int? carZIndex = node.Key - carTree.StartIndexPerLevel[level];
-                    for (int i = 0; i <= Math.Pow(2, relLevel); i++) // +Z
+                    if (noGo || symmetry)
                     {
-                        int? carYIndex = carZIndex;
-                        for (int j = 0; j <= Math.Pow(2, relLevel); j++) // +Y
+                        var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
+                        for (int i = 0; i < 3; i++)
+                            diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
+
+                        if (IsRobotInNoGoZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && noGo)
+                            return;
+
+                        if (IsRobotInSymmetryZone(diffBetweenRefs, relLevel, boundingBoxHalfExtents) && symmetry)
+                            return;
+                    }
+
+                    if (level < carTree.Level)
+                    {
+                        var maxValueValue = 0.0;
+                        var maxMaxValue = 0.0;
+
+                        List<double> maxValueList = new List<double>();
+                        List<double> maxMaxList = new List<double>();
+                        List<VoxelNodeLeaf> maxLeafsList = new List<VoxelNodeLeaf>();
+
+                        int? carZIndex = node.Key - carTree.StartIndexPerLevel[level];
+                        for (int i = 0; i <= Math.Pow(2, relLevel); i++) // +Z
                         {
-                            int? carXIndex = carYIndex;
-                            for (int k = 0; k <= Math.Pow(2, relLevel); k++) // -X
+                            int? carYIndex = carZIndex;
+                            for (int j = 0; j <= Math.Pow(2, relLevel); j++) // +Y
                             {
-                                if (carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex] != null)
+                                int? carXIndex = carYIndex;
+                                for (int k = 0; k <= Math.Pow(2, relLevel); k++) // -X
                                 {
-                                    maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
-                                    maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
-                                    maxLeafsList.AddRange(
-                                        carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
+                                    if (carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex] != null)
+                                    {
+                                        maxValueList.Add(carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex].Value);
+                                        maxMaxList.Add(((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).Max);
+                                        maxLeafsList.AddRange(
+                                            carTree.GetLeafNodes((VoxelNodeInner)carTree.Nodes[carTree.StartIndexPerLevel[level] + (int)carXIndex]).ToList());
+                                    }
+
+                                    var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
+
+                                    if (carXIndexTemp == null)
+                                        break;
+                                    else
+                                        carXIndex += (int)carXIndexTemp;
                                 }
 
-                                var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(level, (int)carXIndex);
+                                var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
 
-                                if (carXIndexTemp == null)
+                                if (carYIndexTemp == null)
                                     break;
                                 else
-                                    carXIndex += (int)carXIndexTemp;
+                                    carYIndex += (int)carYIndexTemp;
                             }
 
-                            var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(level, (int)carYIndex);
+                            var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
 
-                            if (carYIndexTemp == null)
+                            if (carZIndexTemp == null)
                                 break;
                             else
-                                carYIndex += (int)carYIndexTemp;
+                                carZIndex += (int)carZIndexTemp;
                         }
 
-                        var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(level, (int)carZIndex);
-
-                        if (carZIndexTemp == null)
-                            break;
-                        else
-                            carZIndex += (int)carZIndexTemp;
-                    }
-
-                    // Lower bound check maxValue and maxMax
-                    var m = 0;
-                    var maxValueListTemp = maxValueList.OrderByDescending(n => n);
-                    foreach (var robotMaxNode in robotMaxNodes)
-                    {
-                        if (m >= maxValueListTemp.Count())
-                            break;
-
-                        if (maxValue)
-                            maxValueValue += robotMaxNode.Max * maxValueListTemp.ElementAt(m);
-
-                        if (maxMax)
+                        // Lower bound check maxValue and maxMax
+                        var m = 0;
+                        var maxValueListTemp = maxValueList.OrderByDescending(n => n);
+                        foreach (var robotMaxNode in robotMaxNodes)
                         {
-                            var robCount = robotTree.GetLeafNodes(robotMaxNode).Where(n => n != null).Count();
-                            maxMaxValue += robCount * robotMaxNode.Max * maxMaxList.ElementAt(m);
-                        }
-
-                        m++;
-                    }
-
-                    if (maxValueValue <= lowerBound && maxValue)
-                        continue;
-
-                    if (maxMaxValue <= lowerBound && maxMax)
-                        continue;
-
-                    // Lower bound check maxLeafs
-                    if (maxLeafs)
-                    {
-                        var robLeafs = robotTree.GetLeafNodes(robotTree.Root).Where(n => n != null).OrderByDescending(n => n.Value);
-                        var maxLeafsListTemp = maxLeafsList.Where(n => n != null).OrderByDescending(n => n.Value);
-                        var t = 0;
-                        var maxLeafsValue = 0.0;
-                        foreach (var robLeaf in robLeafs)
-                        {
-                            if (t >= maxLeafsListTemp.Count())
+                            if (m >= maxValueListTemp.Count())
                                 break;
 
-                            maxLeafsValue += robLeaf.Value * maxLeafsListTemp.ElementAt(t).Value;
-                            t++;
+                            if (maxValue)
+                                maxValueValue += robotMaxNode.Max * maxValueListTemp.ElementAt(m);
+
+                            if (maxMax)
+                            {
+                                var robCount = robotTree.GetLeafNodes(robotMaxNode).Where(n => n != null).Count();
+                                maxMaxValue += robCount * robotMaxNode.Max * maxMaxList.ElementAt(m);
+                            }
+
+                            m++;
                         }
 
-                        if (maxLeafsValue <= lowerBound)
-                            continue;
-                    }
+                        if (maxValueValue <= lowerBound && maxValue)
+                            return;
 
-                    DepthFirstSearch(
-                        carTree.GetChildNodesWithIndex(node.Key),
-                        level + 1,
-                        maxCycles,
-                        maxValue,
-                        maxLeafs,
-                        maxMax,
-                        rotations,
-                        noGo,
-                        symmetry,
-                        boundingBoxHalfExtents);
-                }
-                else
-                {
-                    for (int m = 0; m < rotations; m++)
-                    {
-                        var value = 0.0;
+                        if (maxMaxValue <= lowerBound && maxMax)
+                            return;
 
-                        int? robZIndex = 0;
-                        int? carZIndex = node.Key - carTree.StartIndexLeafNodes;
-                        for (int i = 0; i < Math.Pow(2, rotatedRobotTrees[m].Level); i++) // +Z
+                        // Lower bound check maxLeafs
+                        if (maxLeafs)
                         {
-                            int? robYIndex = robZIndex;
-                            int? carYIndex = carZIndex;
-                            for (int j = 0; j < Math.Pow(2, rotatedRobotTrees[m].Level); j++) // +Y
+                            var robLeafs = robotTree.GetLeafNodes(robotTree.Root).Where(n => n != null).OrderByDescending(n => n.Value);
+                            var maxLeafsListTemp = maxLeafsList.Where(n => n != null).OrderByDescending(n => n.Value);
+                            var t = 0;
+                            var maxLeafsValue = 0.0;
+                            foreach (var robLeaf in robLeafs)
                             {
-                                int? robXIndex = robYIndex;
-                                int? carXIndex = carYIndex;
-                                for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
+                                if (t >= maxLeafsListTemp.Count())
+                                    break;
+
+                                maxLeafsValue += robLeaf.Value * maxLeafsListTemp.ElementAt(t).Value;
+                                t++;
+                            }
+
+                            if (maxLeafsValue <= lowerBound)
+                                return;
+                        }
+
+                        DepthFirstSearch(
+                            carTree.GetChildNodesWithIndex(node.Key),
+                            level + 1,
+                            maxCycles,
+                            maxValue,
+                            maxLeafs,
+                            maxMax,
+                            rotations,
+                            noGo,
+                            symmetry,
+                            boundingBoxHalfExtents);
+                    }
+                    else
+                    {
+                        for (int m = 0; m < rotations; m++)
+                        {
+                            var value = 0.0;
+
+                            int? robZIndex = 0;
+                            int? carZIndex = node.Key - carTree.StartIndexLeafNodes;
+                            for (int i = 0; i < Math.Pow(2, rotatedRobotTrees[m].Level); i++) // +Z
+                            {
+                                int? robYIndex = robZIndex;
+                                int? carYIndex = carZIndex;
+                                for (int j = 0; j < Math.Pow(2, rotatedRobotTrees[m].Level); j++) // +Y
                                 {
-                                    if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
-                                            .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
-                                        value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
-                                                     .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
+                                    int? robXIndex = robYIndex;
+                                    int? carXIndex = carYIndex;
+                                    for (int k = 0; k < Math.Pow(2, rotatedRobotTrees[m].Level); k++) // -X
+                                    {
+                                        if (carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex] != null && rotatedRobotTrees[m]
+                                                .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex] != null)
+                                            value += carTree.Nodes[carTree.StartIndexPerLevel[carTree.Level] + (int)carXIndex].Value * rotatedRobotTrees[m]
+                                                         .Nodes[rotatedRobotTrees[m].StartIndexPerLevel[rotatedRobotTrees[m].Level] + (int)robXIndex].Value;
 
-                                    var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
-                                    var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
+                                        var robXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robXIndex);
+                                        var carXIndexTemp = MatrixHelper.moveOneInMXFromRefOnLevel(carTree.Level, (int)carXIndex);
 
-                                    if (robXIndexTemp == null || carXIndexTemp == null)
+                                        if (robXIndexTemp == null || carXIndexTemp == null)
+                                            break;
+                                        else
+                                        {
+                                            robXIndex += (int)robXIndexTemp;
+                                            carXIndex += (int)carXIndexTemp;
+                                        }
+                                    }
+
+                                    var robYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robYIndex);
+                                    var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(carTree.Level, (int)carYIndex);
+
+                                    if (robYIndexTemp == null || carYIndexTemp == null)
                                         break;
                                     else
                                     {
-                                        robXIndex += (int)robXIndexTemp;
-                                        carXIndex += (int)carXIndexTemp;
+                                        robYIndex += (int)robYIndexTemp;
+                                        carYIndex += (int)carYIndexTemp;
                                     }
                                 }
 
-                                var robYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robYIndex);
-                                var carYIndexTemp = MatrixHelper.moveOneInPYFromRefOnLevel(carTree.Level, (int)carYIndex);
+                                var robZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robZIndex);
+                                var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(carTree.Level, (int)carZIndex);
 
-                                if (robYIndexTemp == null || carYIndexTemp == null)
+                                if (robZIndexTemp == null || carZIndexTemp == null)
                                     break;
                                 else
                                 {
-                                    robYIndex += (int)robYIndexTemp;
-                                    carYIndex += (int)carYIndexTemp;
+                                    robZIndex += (int)robZIndexTemp;
+                                    carZIndex += (int)carZIndexTemp;
                                 }
                             }
 
-                            var robZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(rotatedRobotTrees[m].Level, (int)robZIndex);
-                            var carZIndexTemp = MatrixHelper.moveOneInPZFromRefOnLevel(carTree.Level, (int)carZIndex);
-
-                            if (robZIndexTemp == null || carZIndexTemp == null)
-                                break;
-                            else
+                            if (value > lowerBound)
                             {
-                                robZIndex += (int)robZIndexTemp;
-                                carZIndex += (int)carZIndexTemp;
+                                var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
+                                for (int i = 0; i < 3; i++)
+                                    diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
+
+                                lowerBound = value;
+                                translateOperator = diffBetweenRefs;
+                                rotateOperator = m;
                             }
                         }
-
-                        if (value > lowerBound)
-                        {
-                            var diffBetweenRefs = carTree.CalculateNodePosition(node.Key);
-                            for (int i = 0; i < 3; i++)
-                                diffBetweenRefs[i] = diffBetweenRefs[i] - robotRefNodePos[i];
-
-                            lowerBound = value;
-                            translateOperator = diffBetweenRefs;
-                            rotateOperator = m;
-                        }
                     }
-                }
-            }
+                });
         }
 
         public static void BruteForce(
