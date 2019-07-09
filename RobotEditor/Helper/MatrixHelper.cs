@@ -65,7 +65,7 @@ namespace RobotEditor.Helper
             return matrix;
         }
 
-        public static VoxelOctree[] allRotationsOfCube(VoxelOctree cubeToRotate)
+        public static VoxelOctree[] AllRotationsOfCube(VoxelOctree cubeToRotate)
         {
             VoxelOctree[] rotatedRobots = new VoxelOctree[24];
 
@@ -166,7 +166,7 @@ namespace RobotEditor.Helper
             return rotatedRobots;
         }
 
-        public static int[] getRotationOffset(int value)
+        public static int[] GetRotationOffset(int value)
         {
             int[] offset = new int[3]; // Rotation in X - Y - Z
             switch (value)
@@ -296,7 +296,7 @@ namespace RobotEditor.Helper
             return offset;
         }
 
-        public static int[] allMovementsOnLevelinZ(int level)
+        public static int[] AllMovementsOnLevelinZ(int level)
         {
             List<double> iList = new List<double>();
             List<double> iList2 = new List<double>();
@@ -304,7 +304,6 @@ namespace RobotEditor.Helper
             var sum = 0.0;
             for (int i = 1; i <= (1L << level); i++)
             {
-                double term;
                 for (int j = 1; j <= level; j++)
                 {
                     double sign;
@@ -333,7 +332,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
+                    var term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum += term;
                 }
@@ -344,7 +343,7 @@ namespace RobotEditor.Helper
             return null;
         }
 
-        public static int[] allMovementsOnLevelinX(int level)
+        public static int[] AllMovementsOnLevelinX(int level)
         {
             List<double> iList = new List<double>();
             List<double> iList2 = new List<double>();
@@ -352,7 +351,6 @@ namespace RobotEditor.Helper
             var sum = 0.0;
             for (int i = 1; i <= (1L << level); i++)
             {
-                double term;
                 for (int j = 1; j <= level; j++)
                 {
                     double sign;
@@ -381,7 +379,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
+                    var term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum -= term;
                 }
@@ -392,7 +390,7 @@ namespace RobotEditor.Helper
             return null;
         }
 
-        public static int[] allMovementsOnLevelinY(int level)
+        public static int[] AllMovementsOnLevelinY(int level)
         {
             List<double> iList = new List<double>();
             List<double> iList2 = new List<double>();
@@ -400,7 +398,6 @@ namespace RobotEditor.Helper
             var sum = 0.0;
             for (int i = 1; i <= (1L << level); i++)
             {
-                double term;
                 for (int j = 1; j <= level; j++)
                 {
                     double sign;
@@ -429,7 +426,7 @@ namespace RobotEditor.Helper
 
                     #endregion
 
-                    term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
+                    var term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                     iList2.Add(term);
                     sum += term;
                 }
@@ -440,7 +437,7 @@ namespace RobotEditor.Helper
             return null;
         }
 
-        public static int? moveOneInPXFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInPxFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 0;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -454,7 +451,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -483,14 +479,14 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
+                var term = Math.Pow(8, j) / 4 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
             return -sum;
         }
 
-        public static int? moveOneInPYFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInPyFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 1;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -504,7 +500,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -533,14 +528,14 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
+                var term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
             return sum;
         }
 
-        public static int? moveOneInPZFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInPzFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 1;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -554,7 +549,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -583,14 +577,14 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
+                var term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
             return sum;
         }
 
-        public static int? moveOneInMXFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInMxFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 1;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -604,7 +598,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -637,14 +630,14 @@ namespace RobotEditor.Helper
                 if (modulo != 0)
                     continue;
 
-                term = Math.Pow(8, j) / 4 * sign;
+                var term = Math.Pow(8, j) / 4 * sign;
                 sum += (int)term;
             }
 
             return sum;
         }
 
-        public static int? moveOneInMYFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInMyFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 0;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -658,7 +651,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -687,14 +679,14 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
+                var term = Math.Pow(8, j) / 8 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
             return -sum;
         }
 
-        public static int? moveOneInMZFromRefOnLevel(int level, int nodeIndexOnLevel)
+        public static int? MoveOneInMzFromRefOnLevel(int level, int nodeIndexOnLevel)
         {
             var i = 0;
             for (int h = level; h > 0; h--) // find out where the current voxel is located
@@ -708,7 +700,6 @@ namespace RobotEditor.Helper
 
             var sum = 0;
 
-            double term;
             for (int j = 1; j <= level; j++)
             {
                 double sign;
@@ -737,14 +728,14 @@ namespace RobotEditor.Helper
 
                 #endregion
 
-                term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
+                var term = Math.Pow(8, j) / 2 * (i % x == 0 ? 1 : 0) * sign;
                 sum += (int)term;
             }
 
             return -sum;
         }
 
-        public static int moveOneFromRefOnLevel(int level, int nodeIndexOnLevel, Directions direction, PosNeg posNeg) // FEHLER!
+        public static int MoveOneFromRefOnLevel(int level, int nodeIndexOnLevel, Directions direction, PosNeg posNeg) // FEHLER!
         {
             var start = 1;
             if (posNeg == PosNeg.Neg)
@@ -782,47 +773,47 @@ namespace RobotEditor.Helper
             return (int)posNeg * term;
         }
 
-        public static int?[] getDedicatedNeighborMovements(int level, int nodeCount, IEnumerable<KeyValuePair<int, VoxelNode>> nodeGroup, int neighborDirection)
+        public static int?[] GetDedicatedNeighborMovements(int level, int nodeCount, IEnumerable<KeyValuePair<int, VoxelNode>> nodeGroup, int neighborDirection)
         {
             int?[] moveConversion = new int?[nodeCount];
 
             var i = 0;
             foreach (var node in nodeGroup)
             {
-                moveConversion[i] = getAllSurroundingVoxel(level, node.Key)[neighborDirection];
+                moveConversion[i] = GetAllSurroundingVoxel(level, node.Key)[neighborDirection];
                 i++;
             }
 
             return moveConversion;
         }
 
-        public static int?[][] getAllNeighborMovements(int level, int nodeCount, IEnumerable<KeyValuePair<int, VoxelNode>> nodeGroup)
+        public static int?[][] GetAllNeighborMovements(int level, int nodeCount, IEnumerable<KeyValuePair<int, VoxelNode>> nodeGroup)
         {
             int?[][] moveConversion = new int?[nodeCount][];
 
             var i = 0;
             foreach (var node in nodeGroup)
             {
-                moveConversion[i] = getAllSurroundingVoxel(level, node.Key);
+                moveConversion[i] = GetAllSurroundingVoxel(level, node.Key);
                 i++;
             }
 
             return moveConversion;
         }
 
-        public static int?[] getAllSurroundingVoxel(int level, int nodeIndexOnLevel)
+        public static int?[] GetAllSurroundingVoxel(int level, int nodeIndexOnLevel)
         {
             int?[] surroundingVoxel = new int?[27];
 
-            int? offsetTemp = nodeIndexOnLevel;
+            int? offsetTemp;
 
             surroundingVoxel[0] = nodeIndexOnLevel;
-            surroundingVoxel[1] = (offsetTemp = moveOneInPXFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //+X
-            surroundingVoxel[2] = (offsetTemp = moveOneInPYFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //+Y
-            surroundingVoxel[3] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //+Z
-            surroundingVoxel[4] = (offsetTemp = moveOneInMXFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //-X
-            surroundingVoxel[5] = (offsetTemp = moveOneInMYFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //-Y
-            surroundingVoxel[6] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : offsetTemp; //-Z
+            surroundingVoxel[1] = (offsetTemp = MoveOneInPxFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //+X
+            surroundingVoxel[2] = (offsetTemp = MoveOneInPyFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //+Y
+            surroundingVoxel[3] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //+Z
+            surroundingVoxel[4] = (offsetTemp = MoveOneInMxFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //-X
+            surroundingVoxel[5] = (offsetTemp = MoveOneInMyFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //-Y
+            surroundingVoxel[6] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null ? nodeIndexOnLevel + offsetTemp : null; //-Z
 
             if (surroundingVoxel[1] == null)
             {
@@ -833,18 +824,18 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[7] = (offsetTemp = moveOneInPYFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[7] = (offsetTemp = MoveOneInPyFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                           ? surroundingVoxel[1] + offsetTemp
-                                          : offsetTemp; //+X +Y
-                surroundingVoxel[8] = (offsetTemp = moveOneInMYFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                          : null; //+X +Y
+                surroundingVoxel[8] = (offsetTemp = MoveOneInMyFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                           ? surroundingVoxel[1] + offsetTemp
-                                          : offsetTemp; //+X -Y
-                surroundingVoxel[9] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                          : null; //+X -Y
+                surroundingVoxel[9] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                           ? surroundingVoxel[1] + offsetTemp
-                                          : offsetTemp; //+X +Z
-                surroundingVoxel[10] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                          : null; //+X +Z
+                surroundingVoxel[10] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[1] + offsetTemp
-                                           : offsetTemp; //+X -Z
+                                           : null; //+X -Z
             }
 
             if (surroundingVoxel[4] == null)
@@ -856,18 +847,18 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[11] = (offsetTemp = moveOneInPYFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[11] = (offsetTemp = MoveOneInPyFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[4] + offsetTemp
-                                           : offsetTemp; //-X +Y
-                surroundingVoxel[12] = (offsetTemp = moveOneInMYFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                           : null; //-X +Y
+                surroundingVoxel[12] = (offsetTemp = MoveOneInMyFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[4] + offsetTemp
-                                           : offsetTemp; //-X -Y
-                surroundingVoxel[13] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                           : null; //-X -Y
+                surroundingVoxel[13] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[4] + offsetTemp
-                                           : offsetTemp; //-X +Z
-                surroundingVoxel[14] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                                           : null; //-X +Z
+                surroundingVoxel[14] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[4] + offsetTemp
-                                           : offsetTemp; //-X -Z
+                                           : null; //-X -Z
             }
 
             if (surroundingVoxel[2] == null)
@@ -877,10 +868,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[15] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[15] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[2] + offsetTemp
                                            : offsetTemp; //+Y +Z
-                surroundingVoxel[16] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[16] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[2] + offsetTemp
                                            : offsetTemp; //+Y -Z
             }
@@ -892,10 +883,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[17] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[17] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[5] + offsetTemp
                                            : offsetTemp; //-Y +Z
-                surroundingVoxel[18] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[18] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[5] + offsetTemp
                                            : offsetTemp; //-Y -Z
             }
@@ -907,10 +898,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[19] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[19] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[7] + offsetTemp
                                            : offsetTemp; //+X +Y +Z
-                surroundingVoxel[20] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[20] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[7] + offsetTemp
                                            : offsetTemp; //+X +Y -Z
             }
@@ -922,10 +913,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[21] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[21] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[8] + offsetTemp
                                            : offsetTemp; //+X -Y +Z
-                surroundingVoxel[22] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[22] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[8] + offsetTemp
                                            : offsetTemp; //+X -Y -Z
             }
@@ -937,10 +928,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[23] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[23] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[11] + offsetTemp
                                            : offsetTemp; //-X +Y +Z
-                surroundingVoxel[24] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[24] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[11] + offsetTemp
                                            : offsetTemp; //-X +Y -Z
             }
@@ -952,10 +943,10 @@ namespace RobotEditor.Helper
             }
             else
             {
-                surroundingVoxel[25] = (offsetTemp = moveOneInPZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[25] = (offsetTemp = MoveOneInPzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[12] + offsetTemp
                                            : offsetTemp; //-X -Y +Z
-                surroundingVoxel[26] = (offsetTemp = moveOneInMZFromRefOnLevel(level, nodeIndexOnLevel)) != null
+                surroundingVoxel[26] = (offsetTemp = MoveOneInMzFromRefOnLevel(level, nodeIndexOnLevel)) != null
                                            ? surroundingVoxel[12] + offsetTemp
                                            : offsetTemp; //-X -Y -Z
             }

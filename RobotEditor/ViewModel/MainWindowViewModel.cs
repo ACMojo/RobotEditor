@@ -540,7 +540,7 @@ namespace RobotEditor.ViewModel
                         }
                     }
 
-                    octreeResult.AddInXYZ(octreeTemp, 0, (int)maxBBoxDimensions[1], 0); // Shifts carbody into the center of the booth
+                    octreeResult.AddInXyz(octreeTemp, 0, (int)maxBBoxDimensions[1], 0); // Shifts carbody into the center of the booth
 
                     //octreeResult.Add(octreeTemp);
                 }

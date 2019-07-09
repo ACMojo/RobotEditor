@@ -30,7 +30,7 @@ namespace RobotEditor.ViewModel
         private int _selectedSearchMethod = 0;
         private int _searchCycles = 0;
         private int _noOfRobots = 1;
-        private readonly double[] boundingBoxHalfExtents;
+        private readonly double[] _boundingBoxHalfExtents;
 
         #endregion
 
@@ -49,7 +49,7 @@ namespace RobotEditor.ViewModel
             NoGo = new DelegateCommand<object>(MaxLeafsExecute, MaxLeafsCanExecute);
             Symmetry = new DelegateCommand<object>(MaxMaxExecute, MaxMaxCanExecute);
 
-            this.boundingBoxHalfExtents = boundingBoxHalfExtents;
+            this._boundingBoxHalfExtents = boundingBoxHalfExtents;
 
             _viewportResult = viewportResult;
             BoothModels.Add(new DefaultLights());
@@ -323,28 +323,28 @@ namespace RobotEditor.ViewModel
                     IsCheckedRotation,
                     IsCheckedNoGo,
                     IsCheckedSymmetry,
-                    boundingBoxHalfExtents);
+                    _boundingBoxHalfExtents);
                 watch.Stop();
 
                 SelectedBooth.XPos = pos[0];
                 SelectedBooth.YPos = pos[1];
                 SelectedBooth.ZPos = pos[2];
 
-                SelectedBooth.BestMatch += MatchAlgorithms.lowerBound;
-                SelectedBooth.Cycles += MatchAlgorithms.cycles;
+                SelectedBooth.BestMatch += MatchAlgorithms.LowerBound;
+                SelectedBooth.Cycles += MatchAlgorithms.Cycles;
                 SelectedBooth.ComputationTime += watch.Elapsed.TotalMilliseconds;
 
-                SelectedBooth.Model.MixedCarsOctreeCopy.ClearInXYZFromRoot(
-                    MatchAlgorithms.rotatedRobotTrees[MatchAlgorithms.rotateOperator],
+                SelectedBooth.Model.MixedCarsOctreeCopy.ClearInXyzFromRoot(
+                    MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator],
                     pos[0],
                     pos[1],
                     pos[2]);
                 SelectedBooth.Model.MixedCarsOctreeCopy.RecalcMinMaxSum();
 
-                SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(MatchAlgorithms.rotatedRobotTrees[MatchAlgorithms.rotateOperator], pos[0], pos[1], pos[2]);
+                SelectedBooth.Model.ResultOctree.AddInXyzFromRoot(MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator], pos[0], pos[1], pos[2]);
             }
 
-            SelectedBooth.LowerBound = MatchAlgorithms.initLowerBound;
+            SelectedBooth.LowerBound = MatchAlgorithms.InitLowerBound;
 
             SelectedBooth.Model.ResultOctree.Add(SelectedBooth.Model.MixedCarsOctreeCopy);
             SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();

@@ -167,7 +167,7 @@ namespace RobotEditor.Model
 
             for (var i = startIndex; i < endIndex; i++)
             {
-                var neighborOffsets = MatrixHelper.getAllSurroundingVoxel(level, i - startIndex);
+                var neighborOffsets = MatrixHelper.GetAllSurroundingVoxel(level, i - startIndex);
 
                 var neighborValue = Nodes[startIndex + (int)neighborOffsets[0]] == null ? 0.0 : Nodes[startIndex + (int)neighborOffsets[0]].Value;
                 for (var k = 1; k < 27; k++)
@@ -288,9 +288,9 @@ namespace RobotEditor.Model
             return clone;
         }
 
-        public void RotateX(int Rx)
+        public void RotateX(int rx)
         {
-            if (Rx == 0)
+            if (rx == 0)
                 return;
 
             var leafNodesThis = GetLeafNodesWithIndex().ToArray();
@@ -308,7 +308,7 @@ namespace RobotEditor.Model
                 var position = CalculateNodePosition(leafNodeThis);
 
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
-                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundX(Rx));
+                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundX(rx));
 
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
@@ -316,9 +316,9 @@ namespace RobotEditor.Model
             Nodes = octreeTemp.Nodes;
         }
 
-        public void RotateY(int Ry)
+        public void RotateY(int ry)
         {
-            if (Ry == 0)
+            if (ry == 0)
                 return;
 
             var leafNodesThis = GetLeafNodesWithIndex().ToArray();
@@ -336,7 +336,7 @@ namespace RobotEditor.Model
                 var position = CalculateNodePosition(leafNodeThis);
 
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
-                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundY(Ry));
+                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundY(ry));
 
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
@@ -344,9 +344,9 @@ namespace RobotEditor.Model
             Nodes = octreeTemp.Nodes;
         }
 
-        public void RotateZ(int Rz)
+        public void RotateZ(int rz)
         {
-            if (Rz == 0)
+            if (rz == 0)
                 return;
 
             var leafNodesThis = GetLeafNodesWithIndex().ToArray();
@@ -364,7 +364,7 @@ namespace RobotEditor.Model
                 var position = CalculateNodePosition(leafNodeThis);
 
                 var vectorTemp = new Vector3D(position[0], position[1], position[2]);
-                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundZ(Rz));
+                vectorTemp = Vector3D.Multiply(vectorTemp, MatrixHelper.NewMatrixRotateAroundZ(rz));
 
                 octreeTemp.Set((int)vectorTemp.X, (int)vectorTemp.Y, (int)vectorTemp.Z, valueThis);
             }
@@ -453,8 +453,8 @@ namespace RobotEditor.Model
             for (var i = Level; i > 0; i--) // Start from leaf nodes
             {
                 VoxelNodeInner parentNode = null;
-                var EndIndexOfThisLevel = StartIndexPerLevel[i] + NodePathFactorPerLevel[i];
-                for (var j = StartIndexPerLevel[i]; j < EndIndexOfThisLevel; j++)
+                var endIndexOfThisLevel = StartIndexPerLevel[i] + NodePathFactorPerLevel[i];
+                for (var j = StartIndexPerLevel[i]; j < endIndexOfThisLevel; j++)
                 {
                     if (Nodes[j] == null)
                         continue;
@@ -494,7 +494,7 @@ namespace RobotEditor.Model
             ;
         }
 
-        public void ClearInXYZFromRoot(VoxelOctree tree, int x, int y, int z)
+        public void ClearInXyzFromRoot(VoxelOctree tree, int x, int y, int z)
         {
             var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
 
@@ -513,7 +513,7 @@ namespace RobotEditor.Model
             }
         }
 
-        public void AddInXYZFromRoot(VoxelOctree tree, int x, int y, int z)
+        public void AddInXyzFromRoot(VoxelOctree tree, int x, int y, int z)
         {
             var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
 
@@ -531,7 +531,7 @@ namespace RobotEditor.Model
             }
         }
 
-        public void AddInXYZ(VoxelOctree tree, int x, int y, int z)
+        public void AddInXyz(VoxelOctree tree, int x, int y, int z)
         {
             var leafNodesOther = tree.GetLeafNodesWithIndex().ToArray();
 
