@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Media.Media3D;
 
@@ -305,61 +306,79 @@ namespace RobotEditor.ViewModel
             SelectedBooth.Model.ResultOctree.Clear();
             SelectedBooth.Model.RenewMixedCarsCopy();
 
-            for (int i = 0; i < NoOfRobots; i++)
+            IsBusy = true;
+
+            var bw = new BackgroundWorker();
+
+            bw.DoWork += (s, e) =>
             {
-                var watch = new Stopwatch();
-                watch.Start();
-                var pos = MatchAlgorithms.BranchAndBound(
-                    SelectedBooth.Model.MixedCarsOctreeCopy,
-                    SelectedBooth.Model.RobotOctree,
-                    IsCheckedMaxVoxel,
-                    IsCheckedMaxLeaf,
-                    IsCheckedMaxValue,
-                    IsCheckedMaxLeafs,
-                    IsCheckedMaxMax,
-                    SelectedItemSearchMethod,
-                    SelectedItemShiftMethod,
-                    SearchCycles,
-                    IsCheckedRotation,
-                    IsCheckedNoGo,
-                    IsCheckedSymmetry,
-                    _boundingBoxHalfExtents);
-                watch.Stop();
+                for (int i = 0; i < NoOfRobots; i++)
+                {
+                    var watch = new Stopwatch();
+                    watch.Start();
+                    var pos = MatchAlgorithms.BranchAndBound(
+                        SelectedBooth.Model.MixedCarsOctreeCopy,
+                        SelectedBooth.Model.RobotOctree,
+                        IsCheckedMaxVoxel,
+                        IsCheckedMaxLeaf,
+                        IsCheckedMaxValue,
+                        IsCheckedMaxLeafs,
+                        IsCheckedMaxMax,
+                        SelectedItemSearchMethod,
+                        SelectedItemShiftMethod,
+                        SearchCycles,
+                        IsCheckedRotation,
+                        IsCheckedNoGo,
+                        IsCheckedSymmetry,
+                        _boundingBoxHalfExtents);
+                    watch.Stop();
 
-                SelectedBooth.XPos = pos[0];
-                SelectedBooth.YPos = pos[1];
-                SelectedBooth.ZPos = pos[2];
+                    SelectedBooth.XPos = pos[0];
+                    SelectedBooth.YPos = pos[1];
+                    SelectedBooth.ZPos = pos[2];
 
-                SelectedBooth.BestMatch += MatchAlgorithms.LowerBound;
-                SelectedBooth.Cycles += MatchAlgorithms.Cycles;
-                SelectedBooth.ComputationTime += watch.Elapsed.TotalMilliseconds;
+                    SelectedBooth.BestMatch += MatchAlgorithms.LowerBound;
+                    SelectedBooth.Cycles += MatchAlgorithms.Cycles;
+                    SelectedBooth.ComputationTime += watch.Elapsed.TotalMilliseconds;
 
-                SelectedBooth.Model.MixedCarsOctreeCopy.ClearInXyzFromRoot(
-                    MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator],
-                    pos[0],
-                    pos[1],
-                    pos[2]);
-                SelectedBooth.Model.MixedCarsOctreeCopy.RecalcMinMaxSum();
+                    SelectedBooth.Model.MixedCarsOctreeCopy.ClearInXyzFromRoot(
+                        MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator],
+                        pos[0],
+                        pos[1],
+                        pos[2]);
+                    SelectedBooth.Model.MixedCarsOctreeCopy.RecalcMinMaxSum();
 
-                SelectedBooth.Model.ResultOctree.AddInXyzFromRoot(MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator], pos[0], pos[1], pos[2]);
-            }
+                    SelectedBooth.Model.ResultOctree.AddInXyzFromRoot(
+                        MatchAlgorithms.RotatedRobotTrees[MatchAlgorithms.RotateOperator],
+                        pos[0],
+                        pos[1],
+                        pos[2]);
+                }
 
-            SelectedBooth.LowerBound = MatchAlgorithms.InitLowerBound;
+                SelectedBooth.LowerBound = MatchAlgorithms.InitLowerBound;
 
-            SelectedBooth.Model.ResultOctree.Add(SelectedBooth.Model.MixedCarsOctreeCopy);
-            SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();
+                SelectedBooth.Model.ResultOctree.Add(SelectedBooth.Model.MixedCarsOctreeCopy);
+                SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();
 
-            /*
-            var rotatedTestRobots = MatrixHelper.allRotationsOfCube(testRobotTree);
+                /*
+                var rotatedTestRobots = MatrixHelper.allRotationsOfCube(testRobotTree);
+    
+                for (int i = 0; i < rotatedTestRobots.Length; i++)
+                {
+                    SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(rotatedTestRobots[i], 0, 800 * (i % 4), -800 * (int)Math.Floor(i / 4.0));
+                }
+    
+                SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();*/
+            };
 
-            for (int i = 0; i < rotatedTestRobots.Length; i++)
+            bw.RunWorkerCompleted += (s, e) =>
             {
-                SelectedBooth.Model.ResultOctree.AddInXYZFromRoot(rotatedTestRobots[i], 0, 800 * (i % 4), -800 * (int)Math.Floor(i / 4.0));
-            }
+                SelectedBooth.Model.Show3DBooth();
 
-            SelectedBooth.Model.ResultOctree.RecalcMinMaxSum();*/
+                IsBusy = false;
+            };
 
-            SelectedBooth.Model.Show3DBooth();
+            bw.RunWorkerAsync();
         }
 
         private bool FitToViewCanExecute(object arg)
